@@ -8,6 +8,14 @@ Learn You a Haskell for Great Good! — 非公式日本語訳
 > オーム社刊『すごいHaskellたのしく学ぼう！』（田中英行・村主崇行 訳, 2012）とは別物で、両者の間に関係はありません。
 > 公式の日本語訳が欲しい方はオーム社版を購入してください。
 
+EPUB をダウンロード
+-------------------
+最新ビルドは [Releases ページ](https://github.com/yusukeshib/learn-you-a-haskell-kindle/releases/latest) から取得できます。
+
+直リンク: [learn-you-a-haskell-ja.epub](https://github.com/yusukeshib/learn-you-a-haskell-kindle/releases/download/v1.0.0-ja/learn-you-a-haskell-ja.epub)
+
+Send to Kindle / iBooks / その他 EPUB リーダーでそのまま読めます。`.mobi` / `.azw3` が必要なら calibre や Kindle Previewer で変換してください。
+
 EPUB をビルドする
 -----------------
 リポジトリには `book.opf` / `toc.ncx` / `pages/` / `css/` / `images/` が揃っているので、

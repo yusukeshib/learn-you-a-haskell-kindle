@@ -1,8 +1,12 @@
-すごいHaskellたのしく学ぼう！ (Kindle 用日本語版)
-==================================================
+Learn You a Haskell for Great Good! — 非公式日本語訳
+=====================================================
 
-[Miran Lipovača の "Learn You a Haskell for Great Good!"][1] を Kindle 向けに日本語化した版です。
+[Miran Lipovača の "Learn You a Haskell for Great Good!"][1] を Kindle 向けに日本語化したコミュニティ訳です。
 原著の Kindle 用ソース（[igstan/learn-you-a-haskell-kindle][orig]）を fork し、本文を全章日本語化しました。
+
+> ⚠️ 本訳は CC BY-NC-SA 3.0 に基づく **非公式** のコミュニティ翻訳です。
+> オーム社刊『すごいHaskellたのしく学ぼう！』（田中英行・村主崇行 訳, 2012）とは別物で、両者の間に関係はありません。
+> 公式の日本語訳が欲しい方はオーム社版を購入してください。
 
 EPUB をビルドする
 -----------------
@@ -30,7 +34,8 @@ calibre / Kindle Previewer で `.mobi` / `.azw3` への変換もできます。
 
 ライセンス
 ----------
-原著と同じく Creative Commons 表示-非営利-継承 3.0 非移植ライセンスで公開されています。
+原著と同じく Creative Commons 表示-非営利-継承 3.0 非移植ライセンス
+（[CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/)）の下で公開されています。
 
 [1]: http://learnyouahaskell.com/
 [2]: https://www.amazon.com/gp/feature.html?tag=mr060-20&docId=1000765211

@@ -2,7 +2,7 @@
 
 <package xmlns="http://www.idpf.org/2007/opf" version="2.0" unique-identifier="BookId">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-    <dc:title>すごいHaskellたのしく学ぼう！</dc:title>
+    <dc:title>Learn You a Haskell for Great Good! — 非公式日本語訳</dc:title>
     <dc:language>ja</dc:language>
     <dc:creator>Miran Lipovača</dc:creator>
     <dc:identifier id="BookId" opf:scheme="UUID">urn:uuid:learn-you-a-haskell-ja-2026</dc:identifier>

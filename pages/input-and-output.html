@@ -3,172 +3,86 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Learn You a Haskell for Great Good!</title>
+<title>すごいHaskellたのしく学ぼう！</title>
 <link rel="stylesheet" href="../css/main.css" type="text/css" charset="utf-8">
 <body>
 
-<h1>Input and Output</h1>
+<h1>入出力</h1>
 
-<p>We've mentioned that Haskell is a purely functional language. Whereas
- in imperative languages you usually get things done by giving the 
-computer a series of steps to execute, functional programming is more of
- defining what stuff is. In Haskell, a function can't change some state,
- like changing the contents of a variable (when a function changes 
-state, we say that the function has <i>side-effects</i>). The only thing
- a function can do in Haskell is give us back some result based on the 
-parameters we gave it. If a function is called two times with the same 
-parameters, it has to return the same result. While this may seem a bit 
-limiting when you're coming from an imperative world, we've seen that 
-it's actually really cool. In an imperative language, you have no 
-guarantee that a simple function that should just crunch some numbers 
-won't burn down your house, kidnap your dog and scratch your car with a 
-potato while crunching those numbers. For instance, when we were making a
- binary search tree, we didn't insert an element into a tree by 
-modifying some tree in place. Our function for inserting into a binary 
-search tree actually returned a new tree, because it can't change the 
-old one.</p>
-<p>While functions being unable to change state is good because it helps
- us reason about our programs, there's one problem with that. If a 
-function can't change anything in the world, how is it supposed to tell 
-us what it calculated? In order to tell us what it calculated, it has to
- change the state of an output device (usually the state of the screen),
- which then emits photons that travel to our brain and change the state 
-of our mind, man.</p>
-<p>Do not despair, all is not lost. It turns out that Haskell actually 
-has a really clever system for dealing with functions that have 
-side-effects that neatly separates the part of our program that is pure 
-and the part of our program that is impure, which does all the dirty 
-work like talking to the keyboard and the screen. With those two parts 
-separated, we can still reason about our pure program and take advantage
- of all the things that purity offers, like laziness, robustness and 
-modularity while efficiently communicating with the outside world.</p>
+<p>Haskell は純粋関数型言語だと話してきました。命令型言語では、コンピュータに一連のステップを実行させることで物事を進めるのが一般的ですが、関数型プログラミングはむしろ「ものごとが何であるか」を定義することです。Haskell では、関数は変数の中身を変えるような状態の変更ができません（関数が状態を変えるとき、その関数は <i>副作用</i> を持つと言います）。Haskell の関数にできるのは、与えられた引数から何らかの結果を返すことだけ。同じ引数で2回呼べば、必ず同じ結果を返します。命令型の世界から来ると窮屈に思えるかもしれませんが、実は本当に素敵な性質だと見てきました。命令型言語では、ただ数値を計算するはずの単純な関数が、計算のついでに余計な悪さをしないという保証がありません。たとえば二分探索木を作ったとき、要素を挿入するのに既存の木をその場で書き換えはしませんでした。挿入関数は新しい木を返したのです。古い木を変更できないからです。</p>
+<p>関数が状態を変えられないことはプログラムについて推論しやすくなるので良いことですが、1つ問題があります。関数が世界を何も変えられないなら、計算結果をどうやって伝えればいいのでしょう？　計算結果を伝えるには、何らかの出力デバイス（普通は画面）の状態を変える必要があります。そして画面が放った光子が脳まで届いて、私たちの心の状態を変える、というわけです。</p>
+<p>悲観することはありません、全部失われたわけではありません。Haskell には実は、副作用を持つ関数を扱うための賢い仕組みがあります。プログラムの純粋な部分と、キーボードや画面とやり取りする「汚れ仕事」をする非純粋な部分をきれいに分離してくれるのです。両者が分離されていれば、純粋なプログラムについて推論し続けられて、遅延評価・堅牢性・モジュール性といった純粋性の恩恵をすべて享受しつつ、外の世界とも効率良くやり取りできます。</p>
 <a name="hello-world"></a><h2>Hello, world!</h2>
 
-<p>Up until now, we've always loaded our functions into GHCI to test 
-them out and play with them. We've also explored the standard library 
-functions that way. But now, after eight or so chapters, we're finally 
-going to write our first <i>real</i> Haskell program! Yay! And sure enough, we're going to do the good old <span class="fixed">"hello, world"</span> schtick.</p>
-<div class="hintbox"><em>Hey!</em> For the purposes of this chapter, I'm
- going to assume you're using a unix-y environment for learning Haskell.
- If you're in Windows, I'd suggest you download <a href="http://www.cygwin.com/">Cygwin</a>, which is a Linux-like environment for Windows, A.K.A. just what you need.</div>
-<p>So, for starters, punch in the following in your favorite text editor:</p>
+<p>これまで、関数を試して遊ぶときはずっと GHCi に読み込んでいました。標準ライブラリの関数も同じやり方で見てきました。8 章ほど経ってようやく、初めての <i>本物</i> の Haskell プログラムを書きます！　やった！　もちろん、お約束の <span class="fixed">"hello, world"</span> ネタからです。</p>
+<div class="hintbox"><em>Hey!</em>　この章では、Haskell を学ぶのに unix 系の環境を使っている前提で書きます。Windows なら、Linux ライクな環境を提供する <a href="http://www.cygwin.com/">Cygwin</a> をダウンロードするのがおすすめ。</div>
+<p>では、お気に入りのテキストエディタに次を入力してみてください：</p>
 <pre name="code" class="haskell:hs">main = putStrLn "hello, world"
 </pre>
-<p>We just defined a name called <span class="fixed">main</span> and in it we call a function called <span class="fixed">putStrLn</span> with the parameter <span class="fixed">"hello, world"</span>. Looks pretty much run of the mill, but it isn't, as we'll see in just a few moments. Save that file as <span class="fixed">helloworld.hs</span>.</p>
-<p>And now, we're going to do something we've never done before. We're 
-actually going to compile our program! I'm so excited! Open up your 
-terminal and navigate to the directory where <span class="fixed">helloworld.hs</span> is located and do the following:</p>
+<p><span class="fixed">main</span> という名前を定義し、その中で <span class="fixed">putStrLn</span> 関数を引数 <span class="fixed">"hello, world"</span> で呼んでいます。ありふれた見た目ですが実はそうでもない、というのをすぐ見ます。これを <span class="fixed">helloworld.hs</span> として保存してください。</p>
+<p>さて、これまでやったことのないことをします。プログラムをコンパイルするのです！　ワクワク！　ターミナルを開いて <span class="fixed">helloworld.hs</span> のあるディレクトリに移動し、以下を実行：</p>
 <pre name="code" class="plain">$ ghc --make helloworld
 [1 of 1] Compiling Main             ( helloworld.hs, helloworld.o )
 Linking helloworld ...
 </pre>
-<p>Okay! With any luck, you got something like this and now you can run your program by doing <span class="fixed">./helloworld</span>.</p> 
+<p>OK！　うまくいけばこんな感じになり、<span class="fixed">./helloworld</span> でプログラムを実行できます。</p>
 <pre name="code" class="haskell:hs">$ ./helloworld
 hello, world
 </pre>
-<p>And there we go, our first compiled program that printed out something to the terminal. How extraordinarily boring!</p>
-<p>Let's examine what we wrote. First, let's look at the type of the function <span class="fixed">putStrLn</span>.</p>
+<p>これが私たちの最初のコンパイル済みプログラム。端末に何かを表示できました。なんと退屈な！</p>
+<p>書いたものを調べてみます。まず <span class="fixed">putStrLn</span> 関数の型から：</p>
 <pre name="code" class="haskell:hs">ghci&gt; :t putStrLn
 putStrLn :: String -&gt; IO ()
 ghci&gt; :t putStrLn "hello, world"
 putStrLn "hello, world" :: IO ()
 </pre>
-<p>We can read the type of <span class="fixed">putStrLn</span> like this: <span class="fixed">putStrLn</span> takes a string and returns an <em>I/O action</em> that has a result type of <span class="fixed">()</span>
- (i.e. the empty tuple, also know as unit). An I/O action is something 
-that, when performed, will carry out an action with a side-effect 
-(that's usually either reading from the input or printing stuff to the 
-screen) and will also contain some kind of return value inside it. 
-Printing a string to the terminal doesn't really have any kind of 
-meaningful return value, so a dummy value of <span class="fixed">()</span> is used.</p>
-<div class="hintbox">The empty tuple is a value of <span class="fixed">()</span> and it also has a type of <span class="fixed">()</span>.</div>
-<p>So, when will an I/O action be performed? Well, this is where <span class="fixed">main</span> comes in. An I/O action will be performed when we give it a name of <span class="fixed">main</span> and then run our program.</p>
-<p>Having your whole program be just one I/O action seems kind of limiting. That's why we can use <i>do</i> syntax to glue together several I/O actions into one. Take a look at the following example:</p>
+<p><span class="fixed">putStrLn</span> の型はこう読めます：「<span class="fixed">putStrLn</span> は文字列を取り、結果型 <span class="fixed">()</span>（空タプル、ユニットとも呼ばれる）の <em>IOアクション</em> を返す」。IOアクションとは、実行されると副作用を伴う動作（普通は入力からの読み取りか画面への出力）を行い、何らかの戻り値を内部に含むものです。文字列を端末に表示することには意味のある戻り値がないので、ダミー値の <span class="fixed">()</span> を使います。</p>
+<div class="hintbox">空タプルの値は <span class="fixed">()</span>、型も <span class="fixed">()</span> です。</div>
+<p>では、IOアクションはいつ実行されるのでしょう？　ここで <span class="fixed">main</span> が出てきます。IOアクションに <span class="fixed">main</span> という名前を付けてプログラムを走らせると、実行されます。</p>
+<p>プログラム全体がIOアクション1つだけ、というのは窮屈そうですね。そこで <i>do</i> 構文で複数のIOアクションを1つにまとめられます。次の例を見てください：</p>
 <pre name="code" class="haskell:hs">main = do
     putStrLn "Hello, what's your name?"
     name &lt;- getLine
     putStrLn ("Hey " ++ name ++ ", you rock!")
 </pre>
-<p>Ah, interesting, new syntax! And this reads pretty much like an 
-imperative program. If you compile it and try it out, it will probably 
-behave just like you expect it to. Notice that we said <i>do</i> and 
-then we laid out a series of steps, like we would in an imperative 
-program. Each of these steps is an I/O action. By putting them together 
-with <i>do</i> syntax, we glued them into one I/O action. The action that we got has a type of <span class="fixed">IO ()</span>, because that's the type of the last I/O action inside.</p>
-<p>Because of that, <span class="fixed">main</span> always has a type signature of <span class="fixed">main :: IO <i>something</i></span>, where <span class="fixed"><i>something</i></span> is some concrete type. By convention, we don't usually specify a type declaration for <span class="fixed">main</span>.</p>
-<p>An interesting thing that we haven't met before is the third line, which states <span class="fixed">name &lt;- getLine</span>. It looks like it reads a line from the input and stores it into a variable called <span class="fixed">name</span>. Does it really? Well, let's examine the type of <span class="fixed">getLine</span>.</p>
+<p>面白い、新しい構文！　ほぼ命令型プログラムのように読めます。コンパイルして試せば、たぶん想像通りに動きます。<i>do</i> と書いて、命令型プログラムのように一連のステップを並べているのに注目。各ステップが IOアクション。<i>do</i> 構文でまとめることで、それらを1つのIOアクションに糊付けしました。できたアクションの型は <span class="fixed">IO ()</span>。中の最後のIOアクションの型がそれだからです。</p>
+<p>そのため、<span class="fixed">main</span> の型シグネチャは常に <span class="fixed">main :: IO <i>何か</i></span>（<span class="fixed"><i>何か</i></span> は具体型）です。慣習として <span class="fixed">main</span> には型宣言を書かないのが普通です。</p>
+<p>これまで出てこなかった面白い行が3行目の <span class="fixed">name &lt;- getLine</span>。入力から1行を読み取って <span class="fixed">name</span> という変数に保存しているように見えます。本当にそうでしょうか？　<span class="fixed">getLine</span> の型を調べてみましょう。</p>
 <pre name="code" class="haskell:hs">ghci&gt; :t getLine
 getLine :: IO String
 </pre>
 
-<p>Aha, o-kay. <span class="fixed">getLine</span> is an I/O action that contains a result type of <span class="fixed">String</span>.
- That makes sense, because it will wait for the user to input something 
-at the terminal and then that something will be represented as a string.
- So what's up with <span class="fixed">name &lt;- getLine</span> then? You can read that piece of code like this: <em>perform the I/O action <span class="fixed">getLine</span> and then bind its result value to <span class="fixed">name</span></em>. <span class="fixed">getLine</span> has a type of <span class="fixed">IO String</span>, so <span class="fixed">name</span> will have a type of <span class="fixed">String</span>.
- You can think of an I/O action as a box with little feet that will go 
-out into the real world and do something there (like write some graffiti
- on a wall) and maybe bring back some data. Once it's fetched that data 
-for you, the only way to open the box and get the data inside it is to 
-use the <span class="fixed">&lt;-</span> construct. And if we're taking 
-data out of an I/O action, we can only take it out when we're inside 
-another I/O action. This is how Haskell manages to neatly separate the 
-pure and impure parts of our code. <span class="fixed">getLine</span> is in a sense impure because its result value is not guaranteed to be the same when performed twice. That's why it's sort of <i>tainted</i> with the <span class="fixed">IO</span>
- type constructor and we can only get that data out in I/O code. And 
-because I/O code is tainted too, any computation that depends on tainted
- I/O data will have a tainted result.</p>
-<p>When I say <i>tainted</i>, I don't mean tainted in such a way that we
- can never use the result contained in an I/O action ever again in pure 
-code. No, we temporarily <i>un-taint</i> the data inside an I/O action when we bind it to a name. When we do <span class="fixed">name &lt;- getLine</span>, <span class="fixed">name</span>
- is just a normal string, because it represents what's inside the box. 
-We can have a really complicated function that, say, takes your name (a 
-normal string) as a parameter and tells you your fortune and your whole 
-life's future based on your name. We can do this:</p>
+<p>なるほど。<span class="fixed">getLine</span> は結果型 <span class="fixed">String</span> を含む IOアクション。納得です。端末でのユーザー入力を待ち、それを文字列として表現するからです。では <span class="fixed">name &lt;- getLine</span> は何をしているのでしょう？　こう読めます：<em>IOアクション <span class="fixed">getLine</span> を実行し、その結果値を <span class="fixed">name</span> に束縛する</em>。<span class="fixed">getLine</span> の型は <span class="fixed">IO String</span> なので、<span class="fixed">name</span> の型は <span class="fixed">String</span>。IOアクションは「現実世界に出ていって何かしてきて、データを持ち帰ってくる小さな足の付いた箱」と思えます。データを持ち帰ったら、箱を開けて中のデータを取り出す唯一の方法が <span class="fixed">&lt;-</span> 構文。IOアクションからデータを取り出せるのは、別のIOアクションの中でだけ。これが Haskell が純粋部と非純粋部をきれいに分ける仕組みです。<span class="fixed">getLine</span> はある意味で非純粋です。2 回実行して同じ結果が返るとは限らないからです。だから <span class="fixed">IO</span> 型コンストラクタで「色付け」され、IOコードの中でしかデータを取り出せません。IOコードも色付けされているので、色付きIOデータに依存する計算結果も色付きになります。</p>
+<p>「色付き」と言っても、IOアクションの結果を純粋コードでは絶対に使えない、ということではありません。名前に束縛したときに一時的に「色を抜く」のです。<span class="fixed">name &lt;- getLine</span> したとき、<span class="fixed">name</span> はただの普通の文字列。箱の中身を表しているからです。たとえば、あなたの名前（ただの文字列）を受け取って人生の運勢を占う複雑な関数を作っているとします。こうできます：</p>
 <pre name="code" class="haskell:hs">main = do
     putStrLn "Hello, what's your name?"
     name &lt;- getLine
     putStrLn $ "Read this carefully, because this is your future: " ++ tellFortune name
 </pre>
-<p>and <span class="fixed">tellFortune</span> (or any of the functions it passes <span class="fixed">name</span> to) doesn't have to know anything about I/O, it's just a normal <span class="fixed">String -&gt; String</span> function!</p>
-<p>Take a look at this piece of code. Is it valid?</p>
+<p><span class="fixed">tellFortune</span>（や <span class="fixed">name</span> を渡す先の関数）は I/O について何も知らなくても良いのです。ただの <span class="fixed">String -&gt; String</span> 関数！</p>
+<p>このコードを見てください。妥当でしょうか？</p>
 <pre name="code" class="haskell:hs">nameTag = "Hello, my name is " ++ getLine
 </pre>
-<p>If you said no, go eat a cookie. If you said yes, drink a bowl of 
-molten lava. Just kidding, don't! The reason that this doesn't work is 
-that <span class="fixed">++</span> requires both its parameters to be lists over the same type. The left parameter has a type of <span class="fixed">String</span> (or <span class="fixed">[Char]</span> if you will), whilst <span class="fixed">getLine</span> has a type of <span class="fixed">IO String</span>.
- You can't concatenate a string and an I/O action. We first have to get 
-the result out of the I/O action to get a value of type <span class="fixed">String</span> and the only way to do that is to say something like <span class="fixed">name &lt;- getLine</span>
- inside some other I/O action. If we want to deal with impure data, we 
-have to do it in an impure environment. So the taint of impurity spreads
- around much like the undead scourge and it's in our best interest to 
-keep the I/O parts of our code as small as possible.</p>
-<p>Every I/O action that gets performed has a result encapsulated within
- it. That's why our previous example program could also have been 
-written like this:</p>
+<p>「いいえ」と答えたならクッキーをどうぞ。「はい」と答えた人もまあ気にしないで。これが動かない理由は、<span class="fixed">++</span> が両側の引数を「同じ型のリスト」にすることを求めるからです。左の引数の型は <span class="fixed">String</span>（あるいは <span class="fixed">[Char]</span>）、<span class="fixed">getLine</span> の型は <span class="fixed">IO String</span>。文字列と IOアクションは連結できません。まず IOアクションから結果を取り出して <span class="fixed">String</span> 型の値にする必要があります。そのためには、別の IOアクションの中で <span class="fixed">name &lt;- getLine</span> のように書く必要があります。非純粋データを扱うには非純粋な環境にいる必要がある。だから非純粋さの「色」は周囲に広がりがちで、コードの I/O 部分はできるだけ小さく保つのが得策です。</p>
+<p>実行されるすべての IOアクションは、結果を内部にカプセル化しています。だから前の例はこうも書けます：</p>
 <pre name="code" class="haskell:hs">main = do
     foo &lt;- putStrLn "Hello, what's your name?"
     name &lt;- getLine
     putStrLn ("Hey " ++ name ++ ", you rock!")
 </pre>
-<p>However, <span class="fixed">foo</span> would just have a value of <span class="fixed">()</span>, so doing that would be kind of moot. Notice that we didn't bind the last <span class="fixed">putStrLn</span> to anything. That's because in a <i>do</i> block, <em>the last action cannot be bound to a name</em>
- like the first two were. We'll see exactly why that is so a bit later 
-when we venture off into the world of monads. For now, you can think of 
-it in the way that the <i>do</i> block automatically extracts the value from the last action and binds it to its own result.</p>
-<p>Except for the last line, every line in a <i>do</i> block that doesn't bind can also be written with a bind. So <span class="fixed">putStrLn "BLAH"</span> can be written as <span class="fixed">_ &lt;- putStrLn "BLAH"</span>. But that's useless, so we leave out the <span class="fixed">&lt;-</span> for I/O actions that don't contain an important result, like <span class="fixed">putStrLn <i>something</i></span>.</p>
-<p>Beginners sometimes think that doing</p>
+<p>とはいえ、<span class="fixed">foo</span> は単に <span class="fixed">()</span> の値にしかならないので、こう書く意味はあまりありません。最後の <span class="fixed">putStrLn</span> は何にも束縛していないことに注目。<i>do</i> ブロックでは <em>最後のアクションは名前に束縛できない</em> のです。理由は後でモナドの世界に踏み込んだときに見ます。今のところは、<i>do</i> ブロックは最後のアクションから値を取り出して、その値を自身の結果に束縛するもの、と考えてください。</p>
+<p>最終行を除き、束縛しない <i>do</i> ブロックの各行は束縛付きでも書けます。<span class="fixed">putStrLn "BLAH"</span> は <span class="fixed">_ &lt;- putStrLn "BLAH"</span> と書けます。ただ無駄なので、<span class="fixed">putStrLn <i>何か</i></span> のような重要な結果を持たない IOアクションでは <span class="fixed">&lt;-</span> を省略します。</p>
+<p>初心者はよく</p>
 <pre name="code" class="haskell:hs">name = getLine
 </pre>
-<p>will read from the input and then bind the value of that to <span class="fixed">name</span>. Well, it won't, all this does is give the <span class="fixed">getLine</span> I/O action a different name called, well, <span class="fixed">name</span>.
- Remember, to get the value out of an I/O action, you have to perform it
- inside another I/O action by binding it to a name with <span class="fixed">&lt;-</span>.</p>
-<p>I/O actions will only be performed when they are given a name of <span class="fixed">main</span> or when they're inside a bigger I/O action that we composed with a <i>do</i> block. We can also use a <i>do</i> block to glue together a few I/O actions and then we can use that I/O action in another <i>do</i> block and so on. Either way, they'll be performed only if they eventually fall into <span class="fixed">main</span>.</p>
-<p>Oh, right, there's also one more case when I/O actions will be 
-performed. When we type out an I/O action in GHCI and press return, it 
-will be performed.</p>
+<p>と書くと、入力から読み取ってその値を <span class="fixed">name</span> に束縛できると思いがちです。実際にはそうはならず、これは <span class="fixed">getLine</span> IOアクションに <span class="fixed">name</span> という別名を付けるだけです。覚えておいてください。IOアクションから値を取り出すには、別の IOアクションの中で <span class="fixed">&lt;-</span> を使って名前に束縛する必要があります。</p>
+<p>IOアクションが実行されるのは、<span class="fixed">main</span> という名前を与えられたときか、<i>do</i> ブロックで合成したより大きな IOアクションの中にいるとき。<i>do</i> ブロックでいくつかの IOアクションを糊付けし、そのIOアクションを別の <i>do</i> ブロックで使うこともできます。いずれにせよ、最終的に <span class="fixed">main</span> に行き着いたものだけが実行されます。</p>
+<p>あ、そうそう、もう1つ IOアクションが実行されるケースがありました。GHCi で IOアクションを入力して return を押したときも実行されます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; putStrLn "HEEY"
 HEEY
 </pre>
-<p>Even when we just punch out a number or call a function in GHCI and 
-press return, it will evaluate it (as much as it needs) and then call <span class="fixed">show</span> on it and then it will print that string to the terminal using <span class="fixed">putStrLn</span> implicitly.</p>
-<p>Remember <i>let</i> bindings? If you don't, refresh your memory on them by reading <a href="syntax-in-functions.html#let-it-be">this section</a>. They have to be in the form of <span class="fixed">let <i>bindings</i> in <i>expression</i></span>, where <span class="fixed"><i>bindings</i></span> are names to be given to expressions and <span class="fixed"><i>expression</i></span> is the expression that is to be evaluated that sees them. We also said that in list comprehensions, the <i>in</i> part isn't needed. Well, you can use them in <i>do</i> blocks pretty much like you use them in list comprehensions. Check this out:</p>
+<p>GHCi で数を打ったり関数を呼んで return を押したときも、必要な分だけ評価して <span class="fixed">show</span> を適用し、暗黙の <span class="fixed">putStrLn</span> で端末に表示します。</p>
+<p><i>let</i> 束縛を覚えていますか？　忘れているなら <a href="syntax-in-functions.html#let-it-be">このセクション</a> で復習を。形式は <span class="fixed">let <i>束縛</i> in <i>式</i></span>。<span class="fixed"><i>束縛</i></span> は式に与える名前、<span class="fixed"><i>式</i></span> はそれを使って評価される式。リスト内包表記では <i>in</i> 部分が不要だとも話しました。<i>do</i> ブロックでもリスト内包表記と同じように使えます。これを見てください：</p>
 <pre name="code" class="haskell:hs">import Data.Char
 
 main = do
@@ -180,11 +94,9 @@ main = do
         bigLastName = map toUpper lastName
     putStrLn $ "hey " ++ bigFirstName ++ " " ++ bigLastName ++ ", how are you?"
 </pre>
-<p>See how the I/O actions in the <i>do</i> block are lined up? Also notice how the <i>let</i> is lined up with the I/O actions and the names of the <i>let</i> are lined up with each other? That's good practice, because indentation is important in Haskell. Now, we did <span class="fixed">map toUpper firstName</span>, which turns something like <span class="fixed">"John"</span> into a much cooler string like <span class="fixed">"JOHN"</span>. We bound that uppercased string to a name and then used it in a string later on that we printed to the terminal.</p>
-<p>You may be wondering when to use <span class="fixed">&lt;-</span> and when to use <i>let</i> bindings? Well, remember, <span class="fixed">&lt;-</span> is (for now) for performing I/O actions and binding their results to names. <span class="fixed">map toUpper firstName</span>, however, isn't an I/O action. It's a pure expression in Haskell. So use <span class="fixed">&lt;-</span> when you want to bind results of I/O actions to names and you can use <i>let</i> bindings to bind pure expressions to names. Had we done something like <span class="fixed">let firstName = getLine</span>, we would have just called the <span class="fixed">getLine</span> I/O action a different name and we'd still have to run it through a <span class="fixed">&lt;-</span> to perform it.</p>
-<p>Now we're going to make a program that continuously reads a line and 
-prints out the same line with the words reversed. The program's 
-execution will stop when we input a blank line. This is the program:</p>
+<p><i>do</i> ブロック内の IOアクションが揃っているのに注目。<i>let</i> も IOアクションと揃っており、<i>let</i> 内の名前同士も揃っています。インデントは Haskell で重要なので、これは良い習慣。<span class="fixed">map toUpper firstName</span> は <span class="fixed">"John"</span> のような文字列を <span class="fixed">"JOHN"</span> のようなクールな文字列に変えます。大文字化された文字列を名前に束縛し、後で端末に表示する文字列の中で使っています。</p>
+<p><span class="fixed">&lt;-</span> と <i>let</i> 束縛をいつ使い分けるか気になるかもしれません。<span class="fixed">&lt;-</span> は（今のところ）IOアクションを実行して結果を名前に束縛するためのもの。<span class="fixed">map toUpper firstName</span> は IOアクションではなく純粋な式です。だから IOアクションの結果を束縛するときは <span class="fixed">&lt;-</span>、純粋な式を束縛するときは <i>let</i>。<span class="fixed">let firstName = getLine</span> と書いてしまうと、<span class="fixed">getLine</span> IOアクションに別名を付けただけで、実行するにはやはり <span class="fixed">&lt;-</span> が必要です。</p>
+<p>次は、行を継続的に読み取って単語を逆順にした行を出力するプログラムを作ります。空行が入力されたら終わるようにします：</p>
 <pre name="code" class="haskell:hs">main = do 
     line &lt;- getLine
     if null line
@@ -196,33 +108,17 @@ execution will stop when we input a blank line. This is the program:</p>
 reverseWords :: String -&gt; String
 reverseWords = unwords . map reverse . words
 </pre>
-<p>To get a feel of what it does, you can run it before we go over the code.</p>
-<div class="hintbox"><em>Protip</em>: To run a program you can either compile it and then run the produced executable file by doing <span class="fixed">ghc --make helloworld</span> and then <span class="fixed">./helloworld</span> or you can use the <span class="fixed">runhaskell</span> command like so: <span class="fixed">runhaskell helloworld.hs</span> and your program will be executed on the fly.</div>
-<p>First, let's take a look at the <span class="fixed">reverseWords</span> function. It's just a normal function that takes a string like <span class="fixed">"hey there man"</span> and then calls <span class="fixed">words</span> with it to produce a list of words like <span class="fixed">["hey","there","man"]</span>. Then we map <span class="fixed">reverse</span> on the list, getting <span class="fixed">["yeh","ereht","nam"]</span> and then we put that back into one string by using <span class="fixed">unwords</span> and the final result is <span class="fixed">"yeh ereht nam"</span>. See how we used function composition here. Without function composition, we'd have to write something like <span class="fixed">reverseWords st = unwords (map reverse (words st))</span>.</p>
-<p>What about <span class="fixed">main</span>? First, we get a line from the terminal by performing <span class="fixed">getLine</span> call that line <span class="fixed">line</span>. And now, we have a conditional expression. Remember that in Haskell, every <i>if</i> must have a corresponding <i>else</i> because every expression has to have some sort of value. We make the <i>if</i>
- so that when a condition is true (in our case, the line that we entered
- is blank), we perform one I/O action and when it isn't, the I/O action 
-under the <i>else</i> is performed. That's why in an I/O <i>do</i> block, <i>if</i>s have to have a form of <span class="fixed">if <i>condition</i> then <i>I/O action</i> else <i>I/O action</i>.</span>
-</p><p>Let's first take a look at what happens under the <i>else</i> clause. Because, we have to have exactly one I/O action after the <i>else</i>, we use a <i>do</i> block to glue together two I/O actions into one. You could also write that part out as:</p>
+<p>動作の感触を掴むために、コード解説の前に動かしてみてください。</p>
+<div class="hintbox"><em>Protip</em>: プログラムを実行するには、コンパイルして生成された実行ファイルを動かす（<span class="fixed">ghc --make helloworld</span> の後 <span class="fixed">./helloworld</span>）か、<span class="fixed">runhaskell helloworld.hs</span> のように <span class="fixed">runhaskell</span> コマンドで直接実行できます。</div>
+<p>まず <span class="fixed">reverseWords</span> 関数を見ましょう。普通の関数で、<span class="fixed">"hey there man"</span> のような文字列を取り、<span class="fixed">words</span> を呼んで <span class="fixed">["hey","there","man"]</span> という単語リストにします。リストに <span class="fixed">reverse</span> を map すると <span class="fixed">["yeh","ereht","nam"]</span>、これを <span class="fixed">unwords</span> でまた1つの文字列に戻して最終結果は <span class="fixed">"yeh ereht nam"</span>。関数合成を使っていることに注目。合成なしなら <span class="fixed">reverseWords st = unwords (map reverse (words st))</span> と書く必要があります。</p>
+<p><span class="fixed">main</span> は？　まず <span class="fixed">getLine</span> で端末から行を取得し、<span class="fixed">line</span> と呼ぶ。次に条件式。Haskell ではあらゆる <i>if</i> に対応する <i>else</i> が必要でした。すべての式は何らかの値を持たねばならないからです。条件が真（ここでは入力行が空）なら一方の IOアクション、偽なら <i>else</i> 配下のIOアクションが実行される、という形。だから I/O の <i>do</i> ブロックでの <i>if</i> は <span class="fixed">if <i>条件</i> then <i>IOアクション</i> else <i>IOアクション</i></span> という形になります。</p><p>まず <i>else</i> 節の中身から。<i>else</i> の後ろには IOアクションがちょうど1つ必要なので、<i>do</i> ブロックで2つのIOアクションを糊付けします。こう書くこともできます：</p>
 <pre name="code" class="haskell:hs">        else (do
             putStrLn $ reverseWords line
             main)
 </pre>
-<p>This makes it more explicit that the <i>do</i> block can be viewed as one I/O action, but it's uglier. Anyway, inside the <i>do</i> block, we call <span class="fixed">reverseWords</span> on the line that we got from <span class="fixed">getLine</span> and then print that out to the terminal. After that, we just perform <span class="fixed">main</span>. It's called recursively and that's okay, because <span class="fixed">main</span> is itself an I/O action. So in a sense, we go back to the start of the program.</p>
-<p>Now what happens when <span class="fixed">null line</span> holds true? What's after the <i>then</i> is performed in that case. If we look up, we'll see that it says <span class="fixed">then return ()</span>. If you've done imperative languages like C, Java or Python, you're probably thinking that you know what this <span class="fixed">return</span> does and chances are you've already skipped this really long paragraph. Well, here's the thing: <em>the <span class="fixed">return</span> in Haskell is really nothing like the <span class="fixed">return</span> in most other languages!</em> It has the same name, which confuses a lot of people, but in reality it's quite different. In imperative languages, <span class="fixed">return</span>
- usually ends the execution of a method or subroutine and makes it 
-report some sort of value to whoever called it. In Haskell (in I/O 
-actions specifically), it makes an I/O action out of a pure value. If 
-you think about the box analogy from before, it takes a value and wraps 
-it up in a box. The resulting I/O action doesn't actually do anything, 
-it just has that value encapsulated as its result. So in an I/O context,
- <span class="fixed">return "haha"</span> will have a type of <span class="fixed">IO String</span>. What's the point of just transforming a pure value into an I/O action that doesn't do anything? Why taint our program with <span class="fixed">IO</span>
- more than it has to be? Well, we needed some I/O action to carry out in
- the case of an empty input line. That's why we just made a bogus I/O 
-action that doesn't do anything by writing <span class="fixed">return ()</span>. </p>
-<p>Using <span class="fixed">return</span> doesn't cause the I/O <i>do</i>
- block to end in execution or anything like that. For instance, this 
-program will quite happily carry out all the way to the last line:</p>
+<p>これだと <i>do</i> ブロックが1つのIOアクションだとより明示できますが、見た目が悪いです。ともかく <i>do</i> ブロック内で、<span class="fixed">getLine</span> から得た行に <span class="fixed">reverseWords</span> を適用して端末に出力し、その後 <span class="fixed">main</span> を実行します。再帰的に呼ばれていますが大丈夫です。<span class="fixed">main</span> 自身がIOアクションだからです。ある意味、プログラムの最初に戻っています。</p>
+<p><span class="fixed">null line</span> が真なら？　その場合 <i>then</i> の後ろが実行されます。上を見ると <span class="fixed">then return ()</span> とあります。C・Java・Python のような命令型言語の経験があるなら、この <span class="fixed">return</span> は分かっていると思って長い段落を読み飛ばしたかもしれません。しかし：<em>Haskell の <span class="fixed">return</span> は、他のほとんどの言語の <span class="fixed">return</span> とはまるで違います！</em>　名前が同じなので多くの人が混乱しますが、実態はかなり別物です。命令型言語では <span class="fixed">return</span> は普通、メソッドやサブルーチンの実行を終わらせ、呼び出し元に何らかの値を返します。Haskell の（特にIOアクションでの）<span class="fixed">return</span> は、純粋な値から IOアクションを作ります。先ほどの箱のアナロジーで言えば、値を取って箱に包むようなもの。できた IOアクションは実は何もせず、その値を結果としてカプセル化しているだけ。なので I/O 文脈で <span class="fixed">return "haha"</span> の型は <span class="fixed">IO String</span>。純粋な値を「何もしない」IOアクションに変えて何の役に立つの？　なぜ必要以上に <span class="fixed">IO</span> で色を付けるの？　ここでは、入力行が空のときに何かしらの IOアクションを実行する必要があったので、<span class="fixed">return ()</span> で何もしないダミーの IOアクションを作っているのです。</p>
+<p><span class="fixed">return</span> を使ったからと言って I/O の <i>do</i> ブロックの実行が終わるわけではありません。たとえば次のプログラムは最後の行まで普通に実行されます：</p>
 <pre name="code" class="haskell:hs">main = do
     return ()
     return "HAHAHA"
@@ -231,32 +127,22 @@ program will quite happily carry out all the way to the last line:</p>
     return 4
     putStrLn line
 </pre>
-<p>All these <span class="fixed">return</span>s do is that they make I/O
- actions that don't really do anything except have an encapsulated 
-result and that result is thrown away because it isn't bound to a name. 
-We can use <span class="fixed">return</span> in combination with <span class="fixed">&lt;-</span> to bind stuff to names.</p>
+<p>これらの <span class="fixed">return</span> は、結果をカプセル化するだけの「何もしない」IOアクションを作ります。結果は名前に束縛されていないので捨てられます。<span class="fixed">return</span> と <span class="fixed">&lt;-</span> を組み合わせれば、名前に束縛できます。</p>
 <pre name="code" class="haskell:hs">main = do
     a &lt;- return "hell"
     b &lt;- return "yeah!"
     putStrLn $ a ++ " " ++ b
 </pre>
-<p>So you see, <span class="fixed">return</span> is sort of the opposite to <span class="fixed">&lt;-</span>. While <span class="fixed">return</span> takes a value and wraps it up in a box, <span class="fixed">&lt;-</span>
- takes a box (and performs it) and takes the value out of it, binding it
- to a name. But doing this is kind of redundant, especially since you 
-can use <i>let</i> bindings in <i>do</i> blocks to bind to names, like so: </p>
+<p>このように、<span class="fixed">return</span> は <span class="fixed">&lt;-</span> のある種の逆です。<span class="fixed">return</span> は値を取って箱に包む、<span class="fixed">&lt;-</span> は箱を取り（実行して）中の値を取り出して名前に束縛する。とはいえ、こういう書き方は冗長です。<i>do</i> ブロックでは <i>let</i> 束縛で名前に束縛できますから：</p>
 <pre name="code" class="haskell:hs">main = do
     let a = "hell"
         b = "yeah"
     putStrLn $ a ++ " " ++ b
 </pre>
-<p>When dealing with I/O <i>do</i> blocks, we mostly use <span class="fixed">return</span>
- either because we need to create an I/O action that doesn't do anything
- or because we don't want the I/O action that's made up from a <i>do</i> block to have the result value of its last action, but we want it to have a different result value, so we use <span class="fixed">return</span> to make an I/O action that always has our desired result contained and we put it at the end.</p>
-<div class="hintbox">A <i>do</i> block can also have just one I/O 
-action. In that case, it's the same as just writing the I/O action. Some
- people would prefer writing <span class="fixed">then do return ()</span> in this case because the <i>else</i> also has a <i>do</i>.</div>
-<p>Before we move on to files, let's take a look at some functions that are useful when dealing with I/O.</p>
-<p><span class="label function">putStr</span> is much like <span class="fixed">putStrLn</span> in that it takes a string as a parameter and returns an I/O action that will print that string to the terminal, only <span class="fixed">putStr</span> doesn't jump into a new line after printing out the string while <span class="fixed">putStrLn</span> does.</p>
+<p>I/O の <i>do</i> ブロックで <span class="fixed">return</span> を使うのは、何もしないIOアクションを作りたいときか、<i>do</i> ブロックから作られるIOアクションに「最後のアクションの結果値」とは別の結果値を持たせたいときです。後者なら、<span class="fixed">return</span> で望む結果を持つIOアクションを作って末尾に置きます。</p>
+<div class="hintbox"><i>do</i> ブロックは IOアクション 1 つだけでも構いません。その場合、その IOアクションをそのまま書くのと同じ。<i>else</i> 側に <i>do</i> があるので、対称性のために <span class="fixed">then do return ()</span> と書きたい人もいます。</div>
+<p>ファイルに進む前に、I/O で便利な関数をいくつか見ておきます。</p>
+<p><span class="label function">putStr</span> は <span class="fixed">putStrLn</span> によく似ていて、文字列を取って端末に出力する IOアクションを返します。違いは、<span class="fixed">putStr</span> は出力後に改行しない、<span class="fixed">putStrLn</span> は改行する、という点です。</p>
 <pre name="code" class="haskell:hs">main = do   putStr "Hey, "
             putStr "I'm "
             putStrLn "Andy!" 
@@ -264,8 +150,8 @@ action. In that case, it's the same as just writing the I/O action. Some
 <pre name="code" class="plain">$ runhaskell putstr_test.hs
 Hey, I'm Andy!
 </pre>
-<p>Its type signature is <span class="fixed">putStr :: String -&gt; IO ()</span>, so the result encapsulated within the resulting I/O action is the unit. A dud value, so it doesn't make sense to bind it.</p>
-<p><span class="label function">putChar</span> takes a character and returns an I/O action that will print it out to the terminal.</p>
+<p>型シグネチャは <span class="fixed">putStr :: String -&gt; IO ()</span>。結果はユニットなので、束縛する意味はありません。</p>
+<p><span class="label function">putChar</span> は文字を取り、それを端末に出力するIOアクションを返します。</p>
 <pre name="code" class="haskell:hs">main = do   putChar 't'
             putChar 'e'
             putChar 'h'
@@ -273,18 +159,15 @@ Hey, I'm Andy!
 <pre name="code" class="plain">$ runhaskell putchar_test.hs
 teh
 </pre>
-<p><span class="fixed">putStr</span> is actually defined recursively with the help of <span class="fixed">putChar</span>. The edge condition of <span class="fixed">putStr</span> is the empty string, so if we're printing an empty string, just return an I/O action that does nothing by using <span class="fixed">return ()</span>. If it's not empty, then print the first character of the string by doing <span class="fixed">putChar</span> and then print of them using <span class="fixed">putStr</span>.</p>
+<p><span class="fixed">putStr</span> は実は <span class="fixed">putChar</span> を使って再帰的に定義されています。<span class="fixed">putStr</span> のエッジ条件は空文字列。空文字列を出力するなら <span class="fixed">return ()</span> で何もしないIOアクションを返すだけ。空でなければ、先頭文字を <span class="fixed">putChar</span> で出力し、残りを <span class="fixed">putStr</span> で出力します。</p>
 <pre name="code" class="haskell:hs">putStr :: String -&gt; IO ()
 putStr [] = return ()
 putStr (x:xs) = do
     putChar x
     putStr xs
 </pre>
-<p>See how we can use recursion in I/O, just like we can use it in pure 
-code. Just like in pure code, we define the edge case and then think 
-what the result actually is. It's an action that first outputs the first
- character and then outputs the rest of the string.</p>
-<p><span class="label function">print</span> takes a value of any type that's an instance of <span class="fixed">Show</span> (meaning that we know how to represent it as a string), calls <span class="fixed">show</span> with that value to stringify it and then outputs that string to the terminal. Basically, it's just <span class="fixed">putStrLn . show</span>. It first runs <span class="fixed">show</span> on a value and then feeds that to <span class="fixed">putStrLn</span>, which returns an I/O action that will print out our value.</p>
+<p>純粋コードと同じく、I/O でも再帰を使えるのが分かりますね。エッジケースを定義し、結果が何であるかを考える。先頭文字を出力してから残りの文字列を出力するアクション、というわけです。</p>
+<p><span class="label function">print</span> は <span class="fixed">Show</span> のインスタンス（文字列として表せると分かっている）の任意の値を取り、<span class="fixed">show</span> で文字列化してから端末に出力します。要するに <span class="fixed">putStrLn . show</span>。<span class="fixed">show</span> を値に適用してから <span class="fixed">putStrLn</span> に渡し、値を出力する IOアクションを返します。</p>
 <pre name="code" class="haskell:hs">main = do   print True
             print 2
             print "haha"
@@ -298,7 +181,7 @@ True
 3.2
 [3,4,3]
 </pre>
-<p>As you can see, it's a very handy function. Remember how we talked about how I/O actions are performed only when they fall into <span class="fixed">main</span> or when we try to evaluate them in the GHCI prompt? When we type out a value (like <span class="fixed">3</span> or <span class="fixed">[1,2,3]</span>) and press the return key, GHCI actually uses <span class="fixed">print</span> on that value to display it on our terminal! </p>
+<p>本当に便利な関数です。IOアクションが実行されるのは <span class="fixed">main</span> に行き着くか GHCi プロンプトで評価しようとするときだけ、と話しました。<span class="fixed">3</span> や <span class="fixed">[1,2,3]</span> のような値を入力して return すると、GHCi は実は内部でその値に <span class="fixed">print</span> を呼んで端末に表示しているのです！</p>
 <pre name="code" class="haskell:hs">ghci&gt; 3
 3
 ghci&gt; print 3
@@ -308,8 +191,8 @@ ghci&gt; map (++"!") ["hey","ho","woo"]
 ghci&gt; print (map (++"!") ["hey","ho","woo"])
 ["hey!","ho!","woo!"]
 </pre>
-<p>When we want to print out strings, we usually use <span class="fixed">putStrLn</span> because we don't want the quotes around them, but for printing out values of other types to the terminal, <span class="fixed">print</span> is used the most.</p>
-<p><span class="function label">getChar</span> is an I/O action that reads a character from the input. Thus, its type signature is <span class="fixed">getChar :: IO Char</span>, because the result contained within the I/O action is a <span class="fixed">Char</span>. Note that due to buffering, reading of the characters won't actually happen until the user mashes the return key.</p>
+<p>文字列を出力したいときは引用符が付かない <span class="fixed">putStrLn</span> を普通使いますが、それ以外の型の値を端末に表示するときは <span class="fixed">print</span> が一番使われます。</p>
+<p><span class="function label">getChar</span> は入力から1文字を読み取るIOアクション。型シグネチャは <span class="fixed">getChar :: IO Char</span>。バッファリングのため、ユーザーが return を押すまで実際の読み取りは始まりません。</p>
 <pre name="code" class="haskell:hs">main = do   
     c &lt;- getChar
     if c /= ' '
@@ -318,25 +201,13 @@ ghci&gt; print (map (++"!") ["hey","ho","woo"])
             main
         else return ()
 </pre>
-<p>This program looks like it should read a character and then check if 
-it's a space. If it is, halt execution and if it isn't, print it to the 
-terminal and then do the same thing all over again. Well, it kind of 
-does, only not in the way you might expect. Check this out:</p>
+<p>このプログラムは文字を読んで空白かチェックし、空白なら停止、そうでなければ端末に出力してまた同じことを繰り返す、というふうに見えます。実際そう動くのですが、想像とはちょっと違う動き方です：</p>
 <pre name="code" class="plain">$ runhaskell getchar_test.hs
 hello sir
 hello
 </pre>
-<p>The second line is the input. We input <span class="fixed">hello sir</span>
- and then press return. Due to buffering, the execution of the program 
-will begin only when after we've hit return and not after every inputted
- character. But once we press return, it acts on what we've been putting
- in so far. Try playing with this program to get a feel for it!</p>
-<p>The <span class="label function">when</span> function is found in <span class="fixed">Control.Monad</span> (to get access to it, do <span class="fixed">import Control.Monad</span>). It's interesting because in a <i>do</i>
- block it looks like a control flow statement, but it's actually a 
-normal function. It takes a boolean value and an I/O action if that 
-boolean value is <span class="fixed">True</span>, it returns the same I/O action that we supplied to it. However, if it's <span class="fixed">False</span>, it returns the <span class="fixed">return ()</span>,
- action, so an I/O action that doesn't do anything. Here's how we could 
-rewrite the previous piece of code with which we demonstrated <span class="fixed">getChar</span> by using <span class="fixed">when</span>:</p>
+<p>2 行目が入力です。<span class="fixed">hello sir</span> と入れて return。バッファリングのため、return を押すまでプログラムの実行は始まらず、return を押した時点でそれまでの入力に対して動きます。実際に試して感触を掴んでください！</p>
+<p><span class="label function">when</span> 関数は <span class="fixed">Control.Monad</span> にあります（使うには <span class="fixed">import Control.Monad</span>）。面白いことに、<i>do</i> ブロックでは制御フロー文に見えますが、実は普通の関数。真偽値と IOアクションを取り、真偽値が <span class="fixed">True</span> ならそのIOアクションを、<span class="fixed">False</span> なら <span class="fixed">return ()</span>（何もしないIOアクション）を返します。先ほどの <span class="fixed">getChar</span> のコードを <span class="fixed">when</span> で書き直すとこうなります：</p>
 <pre name="code" class="haskell:hs">import Control.Monad 
 
 main = do
@@ -345,28 +216,21 @@ main = do
         putChar c
         main
 </pre>
-<p>So as you can see, it's useful for encapsulating the <span class="fixed">if <i>something</i> then do <i>some I/O action</i> else return ()</span> pattern.</p>
-<p><span class="label function">sequence</span> takes a list of I/O 
-actions and returns an I/O actions that will perform those actions one 
-after the other. The result contained in that I/O action will be a list 
-of the results of all the I/O actions that were performed. Its type 
-signature is <span class="fixed">sequence :: [IO a] -&gt; IO [a]</span>. Doing this:</p>
+<p><span class="fixed">if <i>条件</i> then do <i>あるIOアクション</i> else return ()</span> というパターンをカプセル化するのに便利。</p>
+<p><span class="label function">sequence</span> は IOアクションのリストを取り、それらを順次実行する IOアクションを返します。その IOアクションが含む結果は、実行した各IOアクションの結果のリスト。型シグネチャは <span class="fixed">sequence :: [IO a] -&gt; IO [a]</span>。これは：</p>
 <pre name="code" class="haskell:hs">main = do
     a &lt;- getLine
     b &lt;- getLine
     c &lt;- getLine
     print [a,b,c]
 </pre>
-<p>Is exactly the same as doing this:.</p>
+<p>と書くのは、これとまったく同じです：</p>
 <pre name="code" class="haskell:hs">main = do
     rs &lt;- sequence [getLine, getLine, getLine]
     print rs
 </pre>
-<p>So <span class="fixed">sequence [getLine, getLine, getLine]</span> makes an I/O action that will perform <span class="fixed">getLine</span>
- three times. If we bind that action to a name, the result is a list of 
-all the results, so in our case, a list of three things that the user 
-entered at the prompt.</p>
-<p>A common pattern with <span class="fixed">sequence</span> is when we map functions like <span class="fixed">print</span> or <span class="fixed">putStrLn</span> over lists. Doing <span class="fixed">map print [1,2,3,4]</span> won't create an I/O action. It will create a list of I/O actions, because that's like writing <span class="fixed">[print 1, print 2, print 3, print 4]</span>. If we want to transform that list of I/O actions into an I/O action, we have to sequence it.</p>
+<p><span class="fixed">sequence [getLine, getLine, getLine]</span> は <span class="fixed">getLine</span> を3 回実行する IOアクションを作ります。これを名前に束縛すると、結果は全結果のリスト。今回はユーザーがプロンプトで入力した3つの文字列のリストです。</p>
+<p><span class="fixed">sequence</span> でよくあるパターンは、<span class="fixed">print</span> や <span class="fixed">putStrLn</span> のような関数をリストに map した結果に対して使うこと。<span class="fixed">map print [1,2,3,4]</span> は IOアクションではなく、IOアクションのリストを作ります（<span class="fixed">[print 1, print 2, print 3, print 4]</span> と同じ）。これを 1 つの IOアクションにするには sequence します。</p>
 <pre name="code" class="haskell:hs">ghci&gt; sequence (map print [1,2,3,4,5])
 1
 2
@@ -375,10 +239,8 @@ entered at the prompt.</p>
 5
 [(),(),(),(),()]
 </pre>
-<p>What's with the <span class="fixed">[(),(),(),(),()]</span> at the 
-end? Well, when we evaluate an I/O action in GHCI, it's performed and 
-then its result is printed out, unless that result is <span class="fixed">()</span>, in which case it's not printed out. That's why evaluating <span class="fixed">putStrLn "hehe"</span> in GHCI just prints out <span class="fixed">hehe</span> (because the contained result in <span class="fixed">putStrLn "hehe"</span> is <span class="fixed">()</span>). But when we do <span class="fixed">getLine</span> in GHCI, the result of that I/O action is printed out, because <span class="fixed">getLine</span> has a type of <span class="fixed">IO String</span>.</p>
-<p>Because mapping a function that returns an I/O action over a list and then sequencing it is so common, the utility functions <span class="label function">mapM</span> and <span class="label function">mapM_</span> were introduced. <span class="fixed">mapM</span> takes a function and a list, maps the function over the list and then sequences it. <span class="fixed">mapM_</span> does the same, only it throws away the result later. We usually use <span class="fixed">mapM_</span> when we don't care what result our sequenced I/O actions have.</p>
+<p>末尾の <span class="fixed">[(),(),(),(),()]</span> は何でしょう？　GHCi で IOアクションを評価すると、実行された後に結果が表示されます（結果が <span class="fixed">()</span> の場合は表示されません）。だから GHCi で <span class="fixed">putStrLn "hehe"</span> を評価すると <span class="fixed">hehe</span> しか表示されません（<span class="fixed">putStrLn "hehe"</span> の結果は <span class="fixed">()</span>）。<span class="fixed">getLine</span> を GHCi で評価すると、結果も表示されます（型が <span class="fixed">IO String</span> なので）。</p>
+<p>「IOアクションを返す関数をリストに map し、それを sequence する」のはとてもよくあるので、ユーティリティ関数 <span class="label function">mapM</span> と <span class="label function">mapM_</span> が用意されています。<span class="fixed">mapM</span> は関数とリストを取り、関数をリストに map してから sequence。<span class="fixed">mapM_</span> は同じですが結果を捨てます。sequence した IOアクションの結果に興味がないときは <span class="fixed">mapM_</span> を使います。</p>
 <pre name="code" class="haskell:hs">ghci&gt; mapM print [1,2,3]
 1
 2
@@ -389,7 +251,7 @@ ghci&gt; mapM_ print [1,2,3]
 2
 3
 </pre>
-<p><span class="label function">forever</span> takes an I/O action and returns an I/O action that just repeats the I/O action it got forever. It's located in <span class="fixed">Control.Monad</span>. This little program will indefinitely ask the user for some input and spit it back to him, CAPSLOCKED:</p>
+<p><span class="label function">forever</span> は IOアクションを取り、それを永遠に繰り返す IOアクションを返します。<span class="fixed">Control.Monad</span> にあります。この小さなプログラムはユーザーに入力を求め続け、それを大文字化して返します：</p>
 <pre name="code" class="haskell:hs">import Control.Monad
 import Data.Char
 
@@ -398,11 +260,7 @@ main = forever $ do
     l &lt;- getLine
     putStrLn $ map toUpper l
 </pre>
-<p><span class="label function">forM</span> (located in <span class="fixed">Control.Monad</span>) is like <span class="fixed">mapM</span>,
- only that it has its parameters switched around. The first parameter is
- the list and the second one is the function to map over that list, 
-which is then sequenced. Why is that useful? Well, with some creative 
-use of lambdas and <i>do</i> notation, we can do stuff like this:</p>
+<p><span class="label function">forM</span>（<span class="fixed">Control.Monad</span> にあります）は <span class="fixed">mapM</span> と同じですが引数の順序が逆。第 1 引数がリスト、第 2 引数がリストに map する関数で、それを sequence します。何が便利？　ラムダと <i>do</i> 記法をうまく組み合わせるとこんなことができます：</p>
 <pre name="code" class="haskell:hs">import Control.Monad
 
 main = do 
@@ -413,15 +271,8 @@ main = do
     putStrLn "The colors that you associate with 1, 2, 3 and 4 are: "
     mapM putStrLn colors
 </pre>
-<p>The <span class="fixed">(\a -&gt; do ... )</span> is a function that 
-takes a number and returns an I/O action. We have to surround it with 
-parentheses, otherwise the lambda thinks the last two I/O actions belong
- to it. Notice that we do <span class="fixed">return color</span> in the inside <i>do</i> block. We do that so that the I/O action which the <i>do</i> block defines has the result of our color contained within it. We actually didn't have to do that, because <span class="fixed">getLine</span> already has that contained within it. Doing <span class="fixed">color &lt;- getLine</span> and then <span class="fixed">return color</span> is just unpacking the result from <span class="fixed">getLine</span> and then repackaging it again, so it's the same as just doing <span class="fixed">getLine</span>. The <span class="fixed">forM</span> (called with its two parameters) produces an I/O action, whose result we bind to <span class="fixed">colors</span>. <span class="fixed">colors</span> is just a normal list that holds strings. At the end, we print out all those colors by doing <span class="fixed">mapM putStrLn colors</span>.</p>
-<p>You can think of <span class="fixed">forM</span> as meaning: make an 
-I/O action for every element in this list. What each I/O action will do 
-can depend on the element that was used to make the action. Finally, 
-perform those actions and bind their results to something. We don't have
- to bind it, we can also just throw it away.</p>
+<p><span class="fixed">(\a -&gt; do ... )</span> は数を取って IOアクションを返す関数です。括弧で囲まないと、ラムダが後続の 2 つのIOアクションも取り込んでしまいます。内側の <i>do</i> ブロックで <span class="fixed">return color</span> しているのに注目。これで <i>do</i> ブロックが定義する IOアクションが色の結果を含むようにしています。実際には <span class="fixed">getLine</span> がすでに結果を含んでいるので不要なのですが。<span class="fixed">color &lt;- getLine</span> から <span class="fixed">return color</span> は、<span class="fixed">getLine</span> から結果を取り出してまた包み直しているだけで、結局 <span class="fixed">getLine</span> と同じ。<span class="fixed">forM</span>（2引数で呼ばれた）は IOアクションを生成し、その結果を <span class="fixed">colors</span> に束縛します。<span class="fixed">colors</span> はただの文字列リスト。最後に <span class="fixed">mapM putStrLn colors</span> ですべての色を出力します。</p>
+<p><span class="fixed">forM</span> は「リストの各要素に対し IOアクションを作る。各IOアクションの動作は元になった要素に依存して構わない。最後にそれらを実行して結果を何かに束縛する」と捉えられます。束縛は必須ではなく、捨ててもOK。</p>
 <pre name="code" class="plain">$ runhaskell form_test.hs
 Which color do you associate with the number 1?
 white
@@ -437,40 +288,19 @@ blue
 red
 orange
 </pre>
-<p>We could have actually done that without <span class="fixed">forM</span>, only with <span class="fixed">forM</span> it's more readable. Normally we write <span class="fixed">forM</span> when we want to map and sequence some actions that we define there on the spot using <i>do</i> notation. In the same vein, we could have replaced the last line with <span class="fixed">forM colors putStrLn</span>.</p>
-<p>In this section, we learned the basics of input and output. We also 
-found out what I/O actions are, how they enable us to do input and 
-output and when they are actually performed. To reiterate, I/O actions 
-are values much like any other value in Haskell. We can pass them as 
-parameters to functions and functions can return I/O actions as results.
- What's special about them is that if they fall into the <span class="fixed">main</span>
- function (or are the result in a GHCI line), they are performed. And 
-that's when they get to write stuff on your screen or play Yakety Sax 
-through your speakers. Each I/O action can also encapsulate a result 
-with which it tells you what it got from the real world.</p>
-<p>Don't think of a function like <span class="fixed">putStrLn</span> as
- a function that takes a string and prints it to the screen. Think of it
- as a function that takes a string and returns an I/O action. That I/O 
-action will, when performed, print beautiful poetry to your terminal.</p>
-<a name="files-and-streams"></a><h2>Files and streams</h2>
+<p>これは <span class="fixed">forM</span> なしでもできますが、<span class="fixed">forM</span> のほうが読みやすいです。通常 <span class="fixed">forM</span> は、その場で <i>do</i> 記法で定義したアクションを map ＆ sequence したいときに使います。同じく最終行は <span class="fixed">forM colors putStrLn</span> と書き換えられます。</p>
+<p>このセクションで入出力の基礎を学びました。IOアクションが何で、入出力をどう実現し、いつ実行されるか分かりました。改めて、IOアクションは Haskell の他の値と同様、ただの値です。関数に引数として渡せますし、関数が結果として返すこともできます。特別なのは、<span class="fixed">main</span> 関数に行き着く（あるいは GHCi 行の結果になる）と実行される点。実行されると画面に何かを書いたり、スピーカーから音楽を流したりします。各 IOアクションはまた、現実世界から得たものを伝える結果をカプセル化することもできます。</p>
+<p><span class="fixed">putStrLn</span> のような関数を「文字列を取って画面に出力する関数」と捉えてはいけません。「文字列を取って IOアクションを返す関数」と捉えてください。その IOアクションは、実行されたときに端末へ美しい詩を印字します。</p>
+<a name="files-and-streams"></a><h2>ファイルとストリーム</h2>
 
-<p><span class="fixed">getChar</span> is an I/O action that reads a single character from the terminal. <span class="fixed">getLine</span>
- is an I/O action that reads a line from the terminal. These two are 
-pretty straightforward and most programming languages have some 
-functions or statements that are parallel to them. But now, let's meet <span class="label function">getContents</span>. <span class="fixed">getContents</span> is an I/O action that reads everything from the standard input until it encounters an end-of-file character. Its type is <span class="fixed">getContents :: IO String</span>. What's cool about <span class="fixed">getContents</span> is that it does lazy I/O. When we do <span class="fixed">foo &lt;- getContents</span>, it doesn't read all of the input at once, store it in memory and then bind it to <span class="fixed">foo</span>. No, it's lazy! It'll say: <i>"Yeah yeah, I'll read the input from the terminal later as we go along, when you really need it!"</i>. </p>
-<p><span class="fixed">getContents</span> is really useful when we're 
-piping the output from one program into the input of our program. In 
-case you don't know how piping works in unix-y systems, here's a quick 
-primer. Let's make a text file that contains the following little haiku:</p>
+<p><span class="fixed">getChar</span> は端末から 1 文字を読む IOアクション。<span class="fixed">getLine</span> は端末から 1 行を読む IOアクション。多くのプログラミング言語に対応するものがあります。次に <span class="label function">getContents</span> を見ます。<span class="fixed">getContents</span> は標準入力から EOF（ファイル終端）文字に出会うまで全部読む IOアクション。型は <span class="fixed">getContents :: IO String</span>。<span class="fixed">getContents</span> のクールな点は、遅延 I/O であること。<span class="fixed">foo &lt;- getContents</span> としても、入力を全部一度に読んでメモリに格納してから <span class="fixed">foo</span> に束縛するのではありません。遅延的に「はいはい、必要になったときに端末から入力を読みますよ！」と言うわけです。</p>
+<p><span class="fixed">getContents</span> は、あるプログラムの出力をパイプで自分のプログラムの入力に流し込むときにとても便利。Unix 系のパイプを知らない人のためにざっくり説明します。次の俳句が書かれたテキストファイルを作ります：</p>
 <pre name="code" class="plain">I'm a lil' teapot
 What's with that airplane food, huh?
 It's so small, tasteless 
 </pre>
-<p>Yeah, the haiku sucks, what of it? If anyone knows of any good haiku tutorials, let me know.</p>
-<p>Now, recall the little program we wrote when we were introducing the <span class="fixed">forever</span>
- function. It prompted the user for a line, returned it to him in 
-CAPSLOCK and then did that all over again, indefinitely. Just so you 
-don't have to scroll all the way back, here it is again:</p>
+<p>俳句のセンスがイマイチなのは認めます。良い俳句の指南書があったら教えてください。</p>
+<p>先ほど <span class="fixed">forever</span> を紹介したとき書いた小プログラムを思い出してください。ユーザーから 1 行受け取り、大文字化して返し、繰り返す、というやつ。スクロールしなくて済むようにもう一度載せます：</p>
 <pre name="code" class="haskell:hs">import Control.Monad
 import Data.Char
 
@@ -479,10 +309,7 @@ main = forever $ do
     l &lt;- getLine
     putStrLn $ map toUpper l
 </pre>
-<p>We'll save that program as <span class="fixed">capslocker.hs</span> 
-or something and compile it. And then, we're going to use a unix pipe to
- feed our text file directly to our little program. We're going to use 
-the help of the GNU <i>cat</i> program, which prints out a file that's given to it as an argument. Check it out, booyaka!</p>
+<p>これを <span class="fixed">capslocker.hs</span> として保存してコンパイルします。次に Unix パイプで、テキストファイルを直接このプログラムに流します。GNU の <i>cat</i> プログラム（与えられたファイルを表示する）の力を借りて、こうします：</p>
 <pre name="code" class="plain">$ ghc --make capslocker 
 [1 of 1] Compiling Main             ( capslocker.hs, capslocker.o )
 Linking capslocker ...
@@ -496,39 +323,29 @@ WHAT'S WITH THAT AIRPLANE FOOD, HUH?
 IT'S SO SMALL, TASTELESS
 capslocker &lt;stdin&gt;: hGetLine: end of file
 </pre>
-<p>As you can see, piping the output of one program (in our case that was <i>cat</i>) to the input of another (<i>capslocker</i>) is done with the <span class="fixed">|</span> character. What we've done is pretty much equivalent to just running <i>capslocker</i>,
- typing our haiku at the terminal and then issuing an end-of-file 
-character (that's usually done by pressing Ctrl-D). It's like running <i>cat haiku.txt</i> and saying: “Wait, don't print this out to the terminal, tell it to <i>capslocker</i> instead!”.</p>
-<p>So what we're essentially doing with that use of <span class="fixed">forever</span> is taking the input and transforming it into some output. That's why we can use <span class="fixed">getContents</span> to make our program even shorter and better:</p>
+<p>あるプログラム（ここでは <i>cat</i>）の出力を別のプログラム（<i>capslocker</i>）の入力にパイプするのは <span class="fixed">|</span> でやります。ここでやったことは、<i>capslocker</i> を起動して端末で俳句を打ち込み、EOF（普通は Ctrl-D）を送るのとほぼ等価です。「待って、これを端末に出さないで、代わりに <i>capslocker</i> に渡して！」と <i>cat haiku.txt</i> に伝えるようなものです。</p>
+<p><span class="fixed">forever</span> を使ったあのプログラムは、要するに入力を受け取って何かに変換しているだけ。だから <span class="fixed">getContents</span> を使えばさらに短くて良いプログラムにできます：</p>
 <pre name="code" class="haskell:hs">import Data.Char
 
 main = do
     contents &lt;- getContents
     putStr (map toUpper contents)
 </pre>
-<p>We run the <span class="fixed">getContents</span> I/O action and name the string it produces <span class="fixed">contents</span>. Then, we map <span class="fixed">toUpper</span> over that string and print that to the terminal. Keep in mind that because strings are basically lists, which are lazy, and <span class="fixed">getContents</span>
- is I/O lazy, it won't try to read the whole content at once and store 
-it into memory before printing out the capslocked version. Rather, it 
-will print out the capslocked version as it reads it, because it will 
-only read a line from the input when it really needs to.</p>
+<p><span class="fixed">getContents</span> IOアクションを実行し、得られた文字列を <span class="fixed">contents</span> と名付けます。次にその文字列に <span class="fixed">toUpper</span> を map して端末に出力。文字列はリスト（遅延）で、<span class="fixed">getContents</span> も遅延 I/O なので、全内容を一度にメモリへ読み込んでから出力するのではなく、必要に応じて入力から 1 行ずつ読みながら大文字版を出力していきます。</p>
 <pre name="code" class="plain">$ cat haiku.txt | ./capslocker
 I'M A LIL' TEAPOT
 WHAT'S WITH THAT AIRPLANE FOOD, HUH?
 IT'S SO SMALL, TASTELESS
 </pre>
-<p>Cool, it works. What if we just run <i>capslocker</i> and try to type in the lines ourselves?</p>
+<p>動きました。では <i>capslocker</i> をそのまま起動して自分で行を入力してみたら？</p>
 <pre name="code" class="plain">$ ./capslocker
 hey ho
 HEY HO
 lets go
 LETS GO
 </pre>
-<p>We got out of that by pressing Ctrl-D. Pretty nice! As you can see, 
-it prints out our capslocked input back to us line by line. When the 
-result of <span class="fixed">getContents</span> is bound to <span class="fixed">contents</span>,
- it's not represented in memory as a real string, but more like a 
-promise that it will produce the string eventually. When we map <span class="fixed">toUpper</span> over <span class="fixed">contents</span>, that's also a promise to map that function over the eventual contents. And finally when <span class="fixed">putStr</span> happens, it says to the previous promise: <i>"Hey, I need a capslocked line!"</i>. It doesn't have any lines yet, so it says to <span class="fixed">contents</span>: <i>"Hey, how about actually getting a line from the terminal?"</i>. So that's when <span class="fixed">getContents</span> actually reads from the terminal and gives a line to the code that asked it to produce something tangible. That code then maps <span class="fixed">toUpper</span> over that line and gives it to <span class="fixed">putStr</span>, which prints it. And then, <span class="fixed">putStr</span> says: <i>"Hey, I need the next line, come on!"</i> and this repeats until there's no more input, which is signified by an end-of-file character.</p>
-<p>Let's make program that takes some input and prints out only those lines that are shorter than 10 characters. Observe:</p>
+<p>Ctrl-D で終了しました。素敵！　大文字化された入力が行ごとに返されます。<span class="fixed">getContents</span> の結果が <span class="fixed">contents</span> に束縛されたとき、実際の文字列としてメモリに表現されるのではなく「いずれ文字列を生み出す」という約束のような形になっています。<span class="fixed">toUpper</span> を <span class="fixed">contents</span> に map するのも「いずれの内容に関数を map する」という約束。最後に <span class="fixed">putStr</span> が「大文字化された行が欲しい！」と前の約束に伝えると、まだ行が無いので <span class="fixed">contents</span> に「端末から実際に 1 行取ってきて」と要求します。そこで初めて <span class="fixed">getContents</span> が端末から読み、要求元のコードに行を渡します。コードは <span class="fixed">toUpper</span> を map して <span class="fixed">putStr</span> に渡し、<span class="fixed">putStr</span> が出力。その後 <span class="fixed">putStr</span> は「次の行ちょうだい！」と要求し、入力が尽きる（EOF）まで繰り返します。</p>
+<p>入力を受け取って、10 文字未満の行だけを出力するプログラムを作ります：</p>
 <pre name="code" class="haskell:hs">main = do
     contents &lt;- getContents
     putStr (shortLinesOnly contents)
@@ -540,14 +357,8 @@ shortLinesOnly input =
         result = unlines shortLines
     in  result
 </pre>
-<p>We've made our I/O part of the program as short as possible. Because 
-our program is supposed to take some input and print out some output 
-based on the input, we can implement it by reading the input contents, 
-running a function on them and then printing out what the function gave 
-back.</p>
-<p>The <span class="fixed">shortLinesOnly</span> function works like this: it takes a string, like <span class="fixed">"short\nlooooooooooooooong\nshort again"</span>. That string has three lines, two of them are short and the middle one is long. It runs the <span class="fixed">lines</span> function on that string, which converts it to <span class="fixed">["short", "looooooooooooooong", "short again"]</span>, which we then bind to the name <span class="fixed">allLines</span>.
- That list of string is then filtered so that only those lines that are 
-shorter than 10 characters remain in the list, producing <span class="fixed">["short", "short again"]</span>. And finally, <span class="fixed">unlines</span> joins that list into a single newline delimited string, giving <span class="fixed">"short\nshort again"</span>. Let's give it a go.</p>
+<p>I/O 部分をできるだけ短くしました。入力を受け取って、入力に基づいて出力するプログラムなので、入力を読んで関数で加工し、結果を出力するという形で実装できます。</p>
+<p><span class="fixed">shortLinesOnly</span> は次のように動きます：たとえば <span class="fixed">"short\nlooooooooooooooong\nshort again"</span> を取り、3 行のうち 2 行が短く、真ん中が長い。<span class="fixed">lines</span> でこれを <span class="fixed">["short", "looooooooooooooong", "short again"]</span> にし、<span class="fixed">allLines</span> に束縛。10 文字未満の行だけにフィルタして <span class="fixed">["short", "short again"]</span>。最後に <span class="fixed">unlines</span> で改行区切りの単一文字列にして <span class="fixed">"short\nshort again"</span>。試してみます。</p>
 <pre name="code" class="plain:hs">i'm short
 so am i
 i am a loooooooooong line!!!
@@ -564,13 +375,8 @@ i'm short
 so am i
 short
 </pre>
-<p>We pipe the contents of <i>shortlines.txt</i> into the output of <i>shortlinesonly</i> and as the output, we only get the short lines.</p>
-<p>This pattern of getting some string from the input, transforming it 
-with a function and then outputting that is so common that there exists a
- function which makes that even easier, called <span class="label function">interact</span>. <span class="fixed">interact</span> takes a function of type <span class="fixed">String -&gt; String</span>
- as a parameter and returns an I/O action that will take some input, run
- that function on it and then print out the function's result. Let's 
-modify our program to use that.</p>
+<p><i>shortlines.txt</i> の内容を <i>shortlinesonly</i> にパイプすると、短い行だけが出力されます。</p>
+<p>「入力を文字列として受け取り、関数で変換して出力する」というパターンはとてもよくあるので、それを楽にする関数 <span class="label function">interact</span> があります。<span class="fixed">interact</span> は <span class="fixed">String -&gt; String</span> 型の関数を取り、入力にその関数を適用して結果を出力する IOアクションを返します。プログラムを書き換えてみます。</p>
 <pre name="code" class="haskell:hs">main = interact shortLinesOnly
 
 shortLinesOnly :: String -&gt; String
@@ -580,33 +386,23 @@ shortLinesOnly input =
         result = unlines shortLines
     in  result
 </pre>
-<p>Just to show that this can be achieved in much less code (even though
- it will be less readable) and to demonstrate our function composition 
-skill, we're going to rework that a bit further.</p>
+<p>もっと少ないコードで実現できることを示すため、また関数合成スキルを披露するために、さらにこねてみます（読みづらくはなりますが）。</p>
 <pre name="code" class="haskell:hs">main = interact $ unlines . filter ((&lt;10) . length) . lines
 </pre>
-<p>Wow, we actually reduced that to just one line, which is pretty cool!</p>
-<p><span class="fixed">interact</span> can be used to make programs that
- are piped some contents into them and then dump some result out or it 
-can be used to make programs that appear to take a line of input from 
-the user, give back some result based on that line and then take another
- line and so on. There isn't actually a real distinction between the 
-two, it just depends on how the user is supposed to use them.</p>
-<p>Let's make a program that continuously reads a line and then tells us if the line is a palindrome or not. We could just use <span class="fixed">getLine</span> to read a line, tell the user if it's a palindrome and then run <span class="fixed">main</span> all over again. But it's simpler if we use <span class="fixed">interact</span>. When using <span class="fixed">interact</span>,
- think about what you need to do to transform some input into the 
-desired output. In our case, we have to replace each line of the input 
-with either <span class="fixed">"palindrome"</span> or <span class="fixed">"not a palindrome"</span>. So we have to write a function that transforms something like <span class="fixed">"elephant\nABCBA\nwhatever"</span> into <span class="fixed">"not a palindrome\npalindrome\nnot a palindrome"</span>. Let's do this!</p>
+<p>1 行に圧縮できました！</p>
+<p><span class="fixed">interact</span> は、内容をパイプで流し込まれて結果を吐き出すプログラムにも、ユーザーから 1 行ずつ入力を受け取って結果を返すように見えるプログラムにも使えます。両者に本質的な区別はなく、使い方次第です。</p>
+<p>1 行を継続的に読み込んで、その行が回文（パリンドローム）かどうかを返すプログラムを作ります。<span class="fixed">getLine</span> で読み、回文か伝え、<span class="fixed">main</span> を再帰呼び出し、でも良いですが <span class="fixed">interact</span> のほうが簡単。<span class="fixed">interact</span> を使うときは、入力をどう望む出力に変換するかを考えます。今回は、各行を <span class="fixed">"palindrome"</span> か <span class="fixed">"not a palindrome"</span> に置き換える。<span class="fixed">"elephant\nABCBA\nwhatever"</span> のようなものを <span class="fixed">"not a palindrome\npalindrome\nnot a palindrome"</span> に変換する関数を書きます！</p>
 <pre name="code" class="haskell:hs">respondPalindromes contents = unlines (map (\xs -&gt; if isPalindrome xs then "palindrome" else "not a palindrome") (lines contents))
     where   isPalindrome xs = xs == reverse xs
 </pre>
-<p>Let's write this in point-free.</p>
+<p>ポイントフリーで書き直すと：</p>
 <pre name="code" class="haskell:hs">respondPalindromes = unlines . map (\xs -&gt; if isPalindrome xs then "palindrome" else "not a palindrome") . lines
     where   isPalindrome xs = xs == reverse xs
 </pre>
-<p>Pretty straightforward. First it turns something like <span class="fixed">"elephant\nABCBA\nwhatever"</span> into <span class="fixed">["elephant", "ABCBA", "whatever"]</span> and then it maps that lambda over it, giving <span class="fixed">["not a palindrome", "palindrome", "not a palindrome"]</span> and then <span class="fixed">unlines</span> joins that list into a single, newline delimited string. Now we can do</p>
+<p>シンプル。まず <span class="fixed">"elephant\nABCBA\nwhatever"</span> を <span class="fixed">["elephant", "ABCBA", "whatever"]</span> に分解し、ラムダを map して <span class="fixed">["not a palindrome", "palindrome", "not a palindrome"]</span> を得て、<span class="fixed">unlines</span> で改行区切りの単一文字列に。あとは：</p>
 <pre name="code" class="haskell:hs">main = interact respondPalindromes
 </pre>
-<p>Let's test this out:</p>
+<p>動かしてみましょう：</p>
 <pre name="code" class="plain">$ runhaskell palindromes.hs
 hehe
 not a palindrome
@@ -616,51 +412,30 @@ cookie
 not a palindrome
 
 </pre>
-<p>Even though we made a program that transforms one big string of input
- into another, it acts like we made a program that does it line by line.
- That's because Haskell is lazy and it wants to print the first line of 
-the result string, but it can't because it doesn't have the first line 
-of the input yet. So as soon as we give it the first line of input, it 
-prints the first line of the output. We get out of the program by 
-issuing an end-of-line character.</p>
-<p>We can also use this program by just piping a file into it. Let's say we have this file:</p>
+<p>入力の大きな文字列をまるごと別の文字列に変換するプログラムを書いたのに、行ごとに動いているように見えます。これは Haskell が遅延評価で、結果文字列の最初の行を出力したいけれど、入力の最初の行がまだないから出力できない、という連鎖。入力の最初の行が与えられた途端、最初の行を出力します。EOL（行末）文字でプログラムを終了させます。</p>
+<p>このプログラムにファイルをパイプで流し込むこともできます。次のファイルがあるとします：</p>
 <pre name="code" class="plain">dogaroo
 radar
 rotor
 madam
 </pre>
-<p>and we save it as <span class="fixed">words.txt</span>. This is what we get by piping it into our program:</p>
+<p>これを <span class="fixed">words.txt</span> として保存。プログラムにパイプすると：</p>
 <pre name="code" class="plain">$ cat words.txt | runhaskell palindromes.hs
 not a palindrome
 palindrome
 palindrome
 palindrome
 </pre>
-<p>Again, we get the same output as if we had run our program and put in
- the words ourselves at the standard input. We just don't see the input 
-that <span class="fixed">palindromes.hs</span> because the input came from the file and not from us typing the words in.</p>
-<p>So now you probably see how lazy I/O works and how we can use it to 
-our advantage. You can just think in terms of what the output is 
-supposed to be for some given input and write a function to do that 
-transformation. In lazy I/O, nothing is eaten from the input until it 
-absolutely has to be because what we want to print right now depends on 
-that input.</p>
-<p>So far, we've worked with I/O by printing out stuff to the terminal 
-and reading from it. But what about reading and writing files? Well, in a
- way, we've already been doing that. One way to think about reading from
- the terminal is to imagine that it's like reading from a (somewhat 
-special) file. Same goes for writing to the terminal, it's kind of like 
-writing to a file. We can call these two files <span class="fixed">stdout</span> and <span class="fixed">stdin</span>, meaning <i>standard output</i> and <i>standard input</i>,
- respectively. Keeping that in mind, we'll see that writing to and 
-reading from files is very much like writing to the standard output and 
-reading from the standard input.</p>
-<p>We'll start off with a really simple program that opens a file called <i>girlfriend.txt</i>, which contains a verse from Avril Lavigne's #1&nbsp;hit <i>Girlfriend</i>, and just prints out out to the terminal. Here's <i>girlfriend.txt</i>:</p>
+<p>自分でプログラムを起動して標準入力に単語を打ち込んだのと同じ結果が得られます。違うのは、<span class="fixed">palindromes.hs</span> への入力がファイルから来ているので画面に見えない点だけ。</p>
+<p>遅延 I/O がどう働くか、どう活用できるか、感触が掴めたと思います。「ある入力に対して出力はこう」と考えて、その変換を行う関数を書けばよい。遅延 I/O では、今まさに必要にならない限り入力は消費されません。</p>
+<p>これまで I/O は端末への出力・端末からの読み取りでやってきました。ファイルの読み書きは？　ある意味すでにやってきたとも言えます。端末からの読み取りは「ちょっと特殊なファイル」からの読み取りと考えられます。書き込みも同じく。これらを <span class="fixed">stdout</span>（<i>標準出力</i>）と <span class="fixed">stdin</span>（<i>標準入力</i>）と呼びます。これを念頭に置けば、ファイル読み書きと標準入出力はかなり似ていることが分かるでしょう。</p>
+<p>まずは <i>girlfriend.txt</i> という、Avril Lavigne の代表曲の歌詞の一節が入ったファイルを開いて端末に出力する、ごくシンプルなプログラムから。<i>girlfriend.txt</i> はこちら：</p>
 <pre name="code" class="plain">Hey! Hey! You! You! 
 I don't like your girlfriend! 
 No way! No way! 
 I think you need a new one!
 </pre>
-<p>And here's our program:</p>
+<p>そしてプログラム：</p>
 <pre name="code" class="haskell:hs">import System.IO
 
 main = do
@@ -669,56 +444,28 @@ main = do
     putStr contents
     hClose handle
 </pre>
-<p>Running it, we get the expected result:</p>
+<p>実行すると期待通りの結果：</p>
 <pre name="code" class="plain">$ runhaskell girlfriend.hs
 Hey! Hey! You! You!
 I don't like your girlfriend!
 No way! No way!
 I think you need a new one!
 </pre>
-<p>Let's go over this line by line. The first line is just four 
-exclamations, to get our attention. In the second line, Avril tells us 
-that she doesn't like our current romantic partner. The third line 
-serves to emphasize that disapproval, whereas the fourth line suggests 
-we should seek out a new girlfriend.</p>
-<p>Let's also go over the program line by line! Our program is several I/O actions glued together with a <i>do</i> block. In the first line of the <i>do</i> block, we notice a new function called <span class="label function">openFile</span>. This is its type signature: <span class="fixed">openFile :: FilePath -&gt; IOMode -&gt; IO Handle</span>. If you read that out loud, it states: <span class="fixed">openFile</span> takes a file path and an <span class="fixed">IOMode</span> and returns an I/O action that will open a file and have the file's associated handle encapsulated as its result.</p>
-<p><span class="fixed">FilePath</span> is just a <a href="making-our-own-types-and-typeclasses.html#type-synonyms">type synonym</a> for <span class="fixed">String</span>, simply defined as:</p>
+<p>歌詞を 1 行ずつ追ってみましょう。1 行目は注意を引くためのかけ声。2 行目で Avril が「あなたの恋人が好きじゃない」と告げ、3 行目はその否定を強調、4 行目は「新しい恋人を見つけるべきだ」と続きます。</p>
+<p>プログラムも 1 行ずつ見ていきましょう！　いくつかの IOアクションを <i>do</i> ブロックで糊付けしたものです。<i>do</i> の最初の行に <span class="label function">openFile</span> という新顔。型シグネチャは <span class="fixed">openFile :: FilePath -&gt; IOMode -&gt; IO Handle</span>。読み下すと：<span class="fixed">openFile</span> はファイルパスと <span class="fixed">IOMode</span> を取り、ファイルを開いて関連ハンドルを結果としてカプセル化する IOアクションを返す。</p>
+<p><span class="fixed">FilePath</span> は <span class="fixed">String</span> の <a href="making-our-own-types-and-typeclasses.html#type-synonyms">型シノニム</a>です：</p>
 <pre name="code" class="haskell:hs">type FilePath = String
 </pre>
-<p><span class="fixed">IOMode</span> is a type that's defined like this:</p>
+<p><span class="fixed">IOMode</span> はこう定義された型：</p>
 <pre name="code" class="haskell:hs">data IOMode = ReadMode | WriteMode | AppendMode | ReadWriteMode
 </pre>
 
-<p>Just like our type that represents the seven possible values for the 
-days of the week, this type is an enumeration that represents what we 
-want to do with our opened file. Very simple. Just note that this type 
-is <span class="fixed">IOMode</span> and not <span class="fixed">IO Mode</span>. <span class="fixed">IO Mode</span> would be the type of an I/O action that has a value of some type <span class="fixed">Mode</span> as its result, but <span class="fixed">IOMode</span> is just a simple enumeration.</p>
-<p>Finally, it returns an I/O action that will open the specified file 
-in the specified mode. If we bind that action to something we get a <span class="fixed">Handle</span>. A value of type <span class="fixed">Handle</span>
- represents where our file is. We'll use that handle so we know which 
-file to read from. It would be stupid to read a file but not bind that 
-read to a handle because we wouldn't be able to do anything with the 
-file. So in our case, we bound the handle to <span class="fixed">handle</span>.</p>
-<p>In the next line, we see a function called <span class="label function">hGetContents</span>. It takes a <span class="fixed">Handle</span>, so it knows which file to get the contents from and returns an <span class="fixed">IO String</span> — an I/O action that holds as its result the contents of the file. This function is pretty much like <span class="fixed">getContents</span>. The only difference is that <span class="fixed">getContents</span> will automatically read from the standard input (that is from the terminal), whereas <span class="fixed">hGetContents</span> takes a file handle which tells it which file to read from. In all other respects, they work the same. And just like <span class="fixed">getContents</span>, <span class="fixed">hGetContents</span>
- won't attempt to read the file at once and store it in memory, but it 
-will read it as needed. That's really cool because we can treat <span class="fixed">contents</span> as the whole contents of the file, but it's not really loaded in memory. So if this were a really huge file, doing <span class="fixed">hGetContents</span> wouldn't choke up our memory, but it would read only what it needed to from the file, when it needed to.</p>
-<p>Note the difference between the handle used to identify a file and the contents of the file, bound in our program to <span class="fixed">handle</span> and <span class="fixed">contents</span>.
- The handle is just something by which we know what our file is. If you 
-imagine your whole file system to be a really big book and each file is a
- chapter in the book, the handle is a bookmark that shows where you're 
-currently reading (or writing) a chapter, whereas the contents are the 
-actual chapter.</p>
-<p>With <span class="fixed">putStr contents</span> we just print the contents out to the standard output and then we do <span class="label function">hClose</span>,
- which takes a handle and returns an I/O action that closes the file. 
-You have to close the file yourself after opening it with <span class="fixed">openFile</span>!</p>
-<p>Another way of doing what we just did is to use the <span class="label function">withFile</span> function, which has a type signature of <span class="fixed">withFile :: FilePath -&gt; IOMode -&gt; (Handle -&gt; IO a) -&gt; IO a</span>. It takes a path to a file, an <span class="fixed">IOMode</span>
- and then it takes a function that takes a handle and returns some I/O 
-action. What it returns is an I/O action that will open that file, do 
-something we want with the file and then close it. The result 
-encapsulated in the final I/O action that's returned is the same as the 
-result of the I/O action that the function we give it returns. This 
-might sound a bit complicated, but it's really simple, especially with 
-lambdas, here's our previous example rewritten to use <span class="fixed">withFile</span>:</p>
+<p>曜日の 7 つの値を表す型と同じく、これは「開いたファイルで何をするか」を表す列挙型。シンプル。<span class="fixed">IOMode</span> であって <span class="fixed">IO Mode</span> ではない点に注意。<span class="fixed">IO Mode</span> なら「<span class="fixed">Mode</span> 型を結果として持つ IOアクション」の型ですが、<span class="fixed">IOMode</span> は単なる列挙です。</p>
+<p>結局この関数は、指定モードで指定ファイルを開く IOアクションを返します。それを束縛すると <span class="fixed">Handle</span> が得られます。<span class="fixed">Handle</span> 型の値は「ファイルがどこにあるか」を表します。このハンドル経由でどのファイルから読み出すか分かります。ハンドルに束縛しないとファイルを操作できないので意味がない。今回は <span class="fixed">handle</span> に束縛しました。</p>
+<p>次の行には <span class="label function">hGetContents</span>。<span class="fixed">Handle</span> を取って、どのファイルの内容を取得するか分かり、<span class="fixed">IO String</span>（ファイルの内容を結果として持つ IOアクション）を返します。<span class="fixed">getContents</span> とほぼ同じで、違いは <span class="fixed">getContents</span> が標準入力（端末）から読むのに対し、<span class="fixed">hGetContents</span> はファイルハンドルでどこから読むかを指定する点。それ以外は同じ。<span class="fixed">getContents</span> 同様、<span class="fixed">hGetContents</span> もファイル全体を一気に読んでメモリへ格納するのではなく、必要に応じて読みます。これがクールで、<span class="fixed">contents</span> をファイル全内容として扱えますが、実際にはメモリ上に乗っていません。巨大ファイルでもメモリを圧迫せず、必要な分だけ必要なときに読みます。</p>
+<p>ファイルを識別する「ハンドル」とファイルの「内容」（ここでは <span class="fixed">handle</span> と <span class="fixed">contents</span>）の違いに注意。ハンドルはファイルを識別する印。ファイルシステム全体を 1 冊の本、各ファイルを章だと思えば、ハンドルは「今どの章を読んで（書いて）いるか」を示すしおり、内容は実際の章にあたります。</p>
+<p><span class="fixed">putStr contents</span> で内容を標準出力に出し、<span class="label function">hClose</span> でハンドルを取りファイルを閉じるIOアクションを返します。<span class="fixed">openFile</span> で開いたら自分で閉じる必要があります！</p>
+<p>同じことをする別の方法に <span class="label function">withFile</span> があります。型シグネチャは <span class="fixed">withFile :: FilePath -&gt; IOMode -&gt; (Handle -&gt; IO a) -&gt; IO a</span>。ファイルパス、<span class="fixed">IOMode</span>、そして「ハンドルを取って IOアクションを返す関数」を取り、ファイルを開いて何かをして閉じる IOアクションを返します。最終的に返る IOアクションの結果は、与えた関数のIOアクションの結果と同じ。少し複雑そうですが、ラムダを使えば簡単。前の例を <span class="fixed">withFile</span> で書き換えると：</p>
 <pre name="code" class="haskell:hs">import System.IO   
   
 main = do   
@@ -726,16 +473,7 @@ main = do
         contents &lt;- hGetContents handle   
         putStr contents)
 </pre>
-<p>As you can see, it's very similar to the previous piece of code. <span class="fixed">(\handle -&gt; ... )</span>
- is the function that takes a handle and returns an I/O action and it's 
-usually done like this, with a lambda. The reason it has to take a 
-function that returns an I/O action instead of just taking an I/O action
- to do and then close the file is because the I/O action that we'd pass 
-to it wouldn't know on which file to operate. This way, <span class="fixed">withFile</span>
- opens the file and then passes the handle to the function we gave it. 
-It gets an I/O action back from that function and then makes an I/O 
-action that's just like it, only it closes the file afterwards. Here's 
-how we can make our own <span class="fixed">withFile</span> function:</p>
+<p>前のコードによく似ています。<span class="fixed">(\handle -&gt; ... )</span> はハンドルを取って IOアクションを返す関数で、普通こうラムダで書きます。ただの IOアクションではなく「IOアクションを返す関数」を取る理由は、IOアクション単体ではどのファイルを操作するか分からないから。こうすれば <span class="fixed">withFile</span> がファイルを開いて、与えた関数にハンドルを渡し、関数からIOアクションを受け取って、それと同じだが終了後にファイルを閉じるIOアクションに変換できます。自前 <span class="fixed">withFile</span>：</p>
 <pre name="code" class="haskell:hs">withFile' :: FilePath -&gt; IOMode -&gt; (Handle -&gt; IO a) -&gt; IO a
 withFile' path mode f = do
     handle &lt;- openFile path mode 
@@ -744,30 +482,11 @@ withFile' path mode f = do
     return result
 </pre>
 
-<p>We know the result will be an I/O action so we can just start off with a <i>do</i>. First we open the file and get a handle from it. Then, we apply <span class="fixed">handle</span> to our function to get back the I/O action that does all the work. We bind that action to <span class="fixed">result</span>, close the handle and then do <span class="fixed">return result</span>. By <span class="fixed">return</span>ing the result encapsulated in the I/O action that we got from <span class="fixed">f</span>, we make it so that our I/O action encapsulates the same result as the one we got from <span class="fixed">f handle</span>. So if <span class="fixed">f handle</span>
- returns an action that will read a number of lines from the standard 
-input and write them to a file and have as its result encapsulated the 
-number of lines it read, if we used that with <span class="fixed">withFile'</span>, the resulting I/O action would also have as its result the number of lines read.</p>
-<p>Just like we have <span class="fixed">hGetContents</span> that works like <span class="fixed">getContents</span> but for a specific file, there's also <span class="label function">hGetLine</span>, <span class="label function">hPutStr</span>, <span class="label function">hPutStrLn</span>, <span class="label function">hGetChar</span>, etc. They work just like their counterparts without the <i>h</i>,
- only they take a handle as a parameter and operate on that specific 
-file instead of operating on standard input or standard output. Example:
- <span class="fixed">putStrLn</span> is a function that takes a string 
-and returns an I/O action that will print out that string to the 
-terminal and a newline after it. <span class="fixed">hPutStrLn</span> 
-takes a handle and a string and returns an I/O action that will write 
-that string to the file associated with the handle and then put a 
-newline after it. In the same vein, <span class="fixed">hGetLine</span> takes a handle and returns an I/O action that reads a line from its file.</p>
-<p>Loading files and then treating their contents as strings is so 
-common that we have these three nice little functions to make our work 
-even easier:</p>
+<p>結果は IOアクションだと分かっているので <i>do</i> で始められます。まずファイルを開いてハンドルを得ます。次に <span class="fixed">handle</span> を関数に適用して全作業をする IOアクションを取得。それを <span class="fixed">result</span> に束縛し、ハンドルを閉じてから <span class="fixed">return result</span>。<span class="fixed">f</span> から得た IOアクションの結果を <span class="fixed">return</span> することで、自前 IOアクションが <span class="fixed">f handle</span> と同じ結果をカプセル化するようにしています。<span class="fixed">f handle</span> が「標準入力から数行読んでファイルに書き、読んだ行数を結果としてカプセル化」するアクションなら、<span class="fixed">withFile'</span> で使った結果のIOアクションの結果も「読んだ行数」になります。</p>
+<p><span class="fixed">getContents</span> に対する <span class="fixed">hGetContents</span> のように、<span class="label function">hGetLine</span>、<span class="label function">hPutStr</span>、<span class="label function">hPutStrLn</span>、<span class="label function">hGetChar</span> など、<i>h</i> なしの関数の対応版があります。標準入出力ではなくハンドルが指す特定ファイルを操作するだけで、それ以外は同じ動き。例：<span class="fixed">putStrLn</span> は文字列を取って端末に出力（改行付き）するIOアクションを返しますが、<span class="fixed">hPutStrLn</span> はハンドルと文字列を取って、そのハンドルに対応するファイルに文字列を書き込み（改行付き）するIOアクションを返します。<span class="fixed">hGetLine</span> はハンドルを取り、そのファイルから 1 行読むIOアクションを返します。</p>
+<p>ファイルを読み込んで内容を文字列として扱うのは超頻繁なので、便利な小さな関数が 3 つあります：</p>
 <p>
-<span class="label function">readFile</span> has a type signature of <span class="fixed">readFile :: FilePath -&gt; IO String</span>. 
-Remember, <span class="fixed">FilePath</span> is just a fancy name for <span class="fixed">String</span>. 
-<span class="fixed">readFile</span> takes a path to a file and returns 
-an I/O action that will read that file (lazily, of course) and bind its 
-contents to something as a string. 
-It's usually more handy than doing <span class="fixed">openFile</span> and binding it to a handle and then doing <span class="fixed">hGetContents</span>.
-Here's how we could have written our previous example with <span class="fixed">readFile</span>:
+<span class="label function">readFile</span> の型は <span class="fixed">readFile :: FilePath -&gt; IO String</span>。<span class="fixed">FilePath</span> は <span class="fixed">String</span> の別名でしたね。<span class="fixed">readFile</span> はファイルパスを取り、そのファイルを（もちろん遅延で）読み、内容を文字列として束縛できる IOアクションを返します。<span class="fixed">openFile</span> でハンドルに束縛して <span class="fixed">hGetContents</span> するより便利。前の例を <span class="fixed">readFile</span> で書き換えると：
 </p>
 <pre name="code" class="haskell:hs">import System.IO
 
@@ -776,15 +495,10 @@ main = do
     putStr contents
 </pre>
 <p>
-Because we don't get a handle with which to identify our file, we can't 
-close it manually, so Haskell does that for us when we use <span class="fixed">readFile</span>.
+ハンドルが手元にないので手動で閉じられませんが、<span class="fixed">readFile</span> なら Haskell が代わりに閉じてくれます。
 </p>
 <p>
-<span class="label function">writeFile</span> has a type of <span class="fixed">writeFile :: FilePath -&gt; String -&gt; IO ()</span>.
-It takes a path to a file and a string to write to that file and returns
- an I/O action that will do the writing. If such a file already exists, 
-it will be stomped down to zero length before being written on. Here's 
-how to turn <i>girlfriend.txt</i> into a CAPSLOCKED version and write it to <i>girlfriendcaps.txt</i>:
+<span class="label function">writeFile</span> の型は <span class="fixed">writeFile :: FilePath -&gt; String -&gt; IO ()</span>。ファイルパスと書き込む文字列を取り、書き込みを行う IOアクションを返します。同名ファイルが既にあれば長さ 0 にされた後に書かれます。<i>girlfriend.txt</i> を大文字化版にして <i>girlfriendcaps.txt</i> に書く例：
 </p>
 <pre name="code" class="haskell:hs">import System.IO   
 import Data.Char
@@ -800,10 +514,8 @@ I DON'T LIKE YOUR GIRLFRIEND!
 NO WAY! NO WAY!
 I THINK YOU NEED A NEW ONE!
 </pre>
-<p><span class="label function">appendFile</span> has a type signature that's just like <span class="fixed">writeFile</span>, only <span class="fixed">appendFile</span> doesn't truncate the file to zero length if it already exists but it appends stuff to it.</p>
-<p>Let's say we have a file <i>todo.txt</i> that has one task per line 
-that we have to do. Now let's make a program that takes a line from the 
-standard input and adds that to our to-do list.</p>
+<p><span class="label function">appendFile</span> は <span class="fixed">writeFile</span> と同じ型シグネチャですが、ファイルが既存でも切り詰めずに末尾に追記します。</p>
+<p>1 行に 1 タスクずつ書かれた <i>todo.txt</i> があるとします。標準入力から 1 行受け取って TODO リストに追加するプログラム：</p>
 <pre name="code" class="haskell:hs">import System.IO   
   
 main = do   
@@ -821,59 +533,27 @@ Iron the dishes
 Dust the dog
 Take salad out of the oven
 </pre>
-<p>We needed to add the <span class="fixed">"\n"</span> to the end of each line because <span class="fixed">getLine</span> doesn't give us a newline character at the end.</p>
-<p>Ooh, one more thing. We talked about how doing <span class="fixed">contents &lt;- hGetContents handle</span> doesn't cause the whole file to be read at once and stored in-memory. It's I/O lazy, so doing this:</p>
+<p><span class="fixed">getLine</span> は末尾に改行を付けてくれないので、各行末に <span class="fixed">"\n"</span> を付けています。</p>
+<p>もう 1 つ。<span class="fixed">contents &lt;- hGetContents handle</span> でファイル全体を一度に読みメモリに格納するわけではない、と話しました。遅延 I/O だから：</p>
 <pre name="code" class="haskell:hs">main = do 
     withFile "something.txt" ReadMode (\handle -&gt; do
         contents &lt;- hGetContents handle
         putStr contents)
 </pre>
-<p>is actually like connecting a pipe from the file to the output. Just 
-like you can think of lists as streams, you can also think of files as 
-streams. This will read one line at a time and print it out to the 
-terminal as it goes along. So you may be asking, how wide is this pipe 
-then? How often will the disk be accessed? Well, for text files, the 
-default buffering is line-buffering usually. That means that the 
-smallest part of the file to be read at once is one line. That's why in 
-this case it actually reads a line, prints it to the output, reads the 
-next line, prints it, etc. For binary files, the default buffering is 
-usually block-buffering. That means that it will read the file chunk by 
-chunk. The chunk size is some size that your operating system thinks is 
-cool.</p>
-<p>You can control how exactly buffering is done by using the <span class="fixed">hSetBuffering</span> function. It takes a handle and a <span class="fixed">BufferMode</span> and returns an I/O action that sets the buffering. <span class="fixed">BufferMode</span> is a simple enumeration data type and the possible values it can hold are: <span class="fixed">NoBuffering</span>, <span class="fixed">LineBuffering</span> or <span class="fixed">BlockBuffering (Maybe Int)</span>. The <span class="fixed">Maybe Int</span> is for how big the chunk should be, in bytes. If it's <span class="fixed">Nothing</span>, then the operating system determines the chunk size. <span class="fixed">NoBuffering</span> means that it will be read one character at a time. <span class="fixed">NoBuffering</span> usually sucks as a buffering mode because it has to access the disk so much.</p>
-<p>Here's our previous piece of code, only it doesn't read it line by line but reads the whole file in chunks of 2048 bytes.</p>
+<p>これは実質、ファイルから出力へパイプを繋ぐようなもの。リストをストリームと考えられるように、ファイルもストリームと考えられます。1 行ずつ読んで、進めながら端末に出します。「パイプの太さは？　ディスクアクセスの頻度は？」と思うかも。テキストファイルではデフォルトのバッファリングは普通、行バッファリングで、最小読み込み単位は 1 行です。だから 1 行読んで出力、次の行を読んで出力、と続きます。バイナリファイルでは普通ブロックバッファリングで、チャンク単位で読みます。チャンクサイズは OS が決めます。</p>
+<p>バッファリングの細かい制御は <span class="fixed">hSetBuffering</span> でできます。ハンドルと <span class="fixed">BufferMode</span> を取り、バッファリングを設定する IOアクションを返します。<span class="fixed">BufferMode</span> はシンプルな列挙データ型で、<span class="fixed">NoBuffering</span>、<span class="fixed">LineBuffering</span>、<span class="fixed">BlockBuffering (Maybe Int)</span> のいずれかを取ります。<span class="fixed">Maybe Int</span> はチャンクサイズ（バイト）。<span class="fixed">Nothing</span> なら OS がチャンクサイズを決めます。<span class="fixed">NoBuffering</span> は 1 文字ずつ読みます。ディスクアクセスが多すぎてだいたい遅いです。</p>
+<p>先ほどのコードを、行ではなく 2048 バイトのチャンク単位で読むように書き換えます：</p>
 <pre name="code" class="haskell:hs">main = do 
     withFile "something.txt" ReadMode (\handle -&gt; do
         hSetBuffering handle $ BlockBuffering (Just 2048)
         contents &lt;- hGetContents handle
         putStr contents)
 </pre>
-<p>Reading files in bigger chunks can help if we want to minimize disk access or when our file is actually a slow network resource.</p>
-<p>We can also use <span class="label function">hFlush</span>, which is a
- function that takes a handle and returns an I/O action that will flush 
-the buffer of the file associated with the handle. When we're doing 
-line-buffering, the buffer is flushed after every line. When we're doing
- block-buffering, it's after we've read a chunk. It's also flushed after
- closing a handle. That means that when we've reached a newline 
-character, the reading (or writing) mechanism reports all the data so 
-far. But we can use <span class="fixed">hFlush</span> to force that 
-reporting of data that has been read so far. After flushing, the data is
- available to other programs that are running at the same time.</p>
-<p>Think of reading a block-buffered file like this: your toilet bowl is
- set to flush itself after it has one gallon of water inside it. So you 
-start pouring in water and once the gallon mark is reached, that water 
-is automatically flushed and the data in the water that you've poured in
- so far is read. But you can flush the toilet manually too by pressing 
-the button on the toilet. This makes the toilet flush and all the water 
-(data) inside the toilet is read. In case you haven't noticed, flushing 
-the toilet manually is a metaphor for <span class="fixed">hFlush</span>.
- This is not a very great analogy by programming analogy standards, but I
- wanted a real world object that can be flushed for the punchline.</p>
-<p>We already made a program to add a new item to our to-do list in <i>todo.txt</i>,
- now let's make a program to remove an item. I'll just paste the code 
-and then we'll go over the program together so you see that it's really 
-easy. We'll be using a few new functions from <span class="fixed">System.Directory</span> and one new function from <span class="fixed">System.IO</span>, but they'll all be explained.</p>
-<p>Anyway, here's the program for removing an item from <i>todo.txt</i>:</p>
+<p>大きなチャンクで読むのは、ディスクアクセスを減らしたいときや、ネットワーク越しの遅いファイルのときに役立ちます。</p>
+<p><span class="label function">hFlush</span> は、ハンドルを取って、関連ファイルのバッファをフラッシュする IOアクションを返す関数。行バッファリングなら 1 行ごと、ブロックバッファリングならチャンク読み込み後にバッファがフラッシュされ、ハンドルを閉じたときも同様。<span class="fixed">hFlush</span> でこれを強制できます。フラッシュ後、データは同時に動く他プログラムから利用できます。</p>
+<p>ブロックバッファのファイル読み込みは、流し台が一杯になったら水が一気に流れる、というイメージ。手動で栓を抜けばすぐ流れる、それが <span class="fixed">hFlush</span>。プログラミング比喩としては平凡ですが、流れてくれる現実物を例にしたかったので。</p>
+<p><i>todo.txt</i> に項目を追加するプログラムは既に作りました。今度は項目を削除するプログラム。コードを貼って一緒に見ていきます。<span class="fixed">System.Directory</span> から新しい関数をいくつか、<span class="fixed">System.IO</span> から 1 つ使いますが全部説明します。</p>
+<p>これが <i>todo.txt</i> から項目を削除するプログラム：</p>
 <pre name="code" class="haskell:hs">import System.IO
 import System.Directory
 import Data.List
@@ -896,29 +576,12 @@ main = do
     removeFile "todo.txt"
     renameFile tempName "todo.txt"
 </pre>
-<p>At first, we just open <i>todo.txt</i> in read mode and bind its handle to <span class="fixed">handle</span>.
-</p><p>Next up, we use a function that we haven't met before which is from <span class="fixed">System.IO</span> — <span class="label function">openTempFile</span>.
- Its name is pretty self-explanatory. It takes a path to a temporary 
-directory and a template name for a file and opens a temporary file. We 
-used <span class="fixed">"."</span> for the temporary directory, because <span class="fixed">.</span> denotes the current directory on just about any OS. We used <span class="fixed">"temp"</span> as the template name for the temporary file, which means that the temporary file will be named <i>temp</i>
- plus some random characters. It returns an I/O action that makes the 
-temporary file and the result in that I/O action is a pair of values: 
-the name of the temporary file and a handle. We could just open a normal
- file called <i>todo2.txt</i> or something like that but it's better practice to use <span class="fixed">openTempFile</span> so you know you're probably not overwriting anything.
-</p>
-<p>The reason we didn't use <span class="fixed">getCurrentDirectory</span> to get the current directory and then pass it to <span class="fixed">openTempFile</span> but instead just passed <span class="fixed">"."</span> to <span class="fixed">openTempFile</span> is because <span class="fixed">.</span> refers to the current directory on unix-like system and Windows
-</p><p>Next up, we bind the contents of <i>todo.txt</i> to <span class="fixed">contents</span>. Then, split that string into a list of strings, each string one line. So <span class="fixed">todoTasks</span> is now something like <span class="fixed">["Iron the dishes", "Dust the dog", "Take salad out of the oven"]</span>. We zip the numbers from 0 onwards and that list with a function that takes a number, like 3, and a string, like <span class="fixed">"hey"</span> and returns <span class="fixed">"3 - hey"</span>, so <span class="fixed">numberedTasks</span> is <span class="fixed">["0 - Iron the dishes", "1 - Dust the dog" ...</span>. We join that list of strings into a single newline delimited string with <span class="fixed">unlines</span> and print that string out to the terminal. Note that instead of doing that, we could have also done <span class="fixed">mapM putStrLn numberedTasks</span></p>
-<p>We ask the user which one they want to delete and wait for them to 
-enter a number. Let's say they want to delete number 1, which is <span class="fixed">Dust the dog</span>, so they punch in <span class="fixed">1</span>. <span class="fixed">numberString</span> is now <span class="fixed">"1"</span> and because we want a number, not a string, we run <span class="fixed">read</span> on that to get <span class="fixed">1</span> and bind that to <span class="fixed">number</span>.</p>
-<p>Remember the <span class="fixed">delete</span> and <span class="fixed">!!</span> functions from <span class="fixed">Data.List</span>. <span class="fixed">!!</span> returns an element from a list with some index and <span class="fixed">delete</span> deletes the first occurence of an element in a list and returns a new list without that occurence. <span class="fixed">(todoTasks !! number)</span> (number is now <span class="fixed">1</span>) returns <span class="fixed">"Dust the dog"</span>. We bind <span class="fixed">todoTasks</span> without the first occurence of <span class="fixed">"Dust the dog"</span> to <span class="fixed">newTodoItems</span> and then join that into a single string with <span class="fixed">unlines</span>
- before writing it to the temporary file that we opened. The old file is
- now unchanged and the temporary file contains all the lines that the 
-old one does, except the one we deleted.</p>
-<p>After that we close both the original and the temporary files and then we remove the original one with <span class="label function">removeFile</span>, which, as you can see, takes a path to a file and deletes it. After deleting the old <i>todo.txt</i>, we use <span class="label function">renameFile</span> to rename the temporary file to <i>todo.txt</i>. Be careful, <span class="fixed">removeFile</span> and <span class="fixed">renameFile</span> (which are both in <span class="fixed">System.Directory</span> by the way) take file paths as their parameters, not handles.</p>
-<p>And that's that! We could have done this in even fewer lines, but we 
-were very careful not to overwrite any existing files and politely asked
- the operating system to tell us where we can put our temporary file. 
-Let's give this a go!</p>
+<p>まず <i>todo.txt</i> を読み取りモードで開き、ハンドルを <span class="fixed">handle</span> に束縛します。</p><p>次に未出の関数 — <span class="fixed">System.IO</span> の <span class="label function">openTempFile</span>。名前のとおり、一時ディレクトリのパスとファイル名のテンプレートを取って一時ファイルを開きます。一時ディレクトリに <span class="fixed">"."</span> を使うのは、ほぼどの OS でもカレントディレクトリを示すから。テンプレート名に <span class="fixed">"temp"</span> を使うので、一時ファイル名は <i>temp</i> に何かランダムな文字が付いたものになります。返り値の IOアクションは一時ファイルを作り、結果として（一時ファイル名, ハンドル）のペアを返します。<i>todo2.txt</i> のような普通のファイルを開いてもいいですが、<span class="fixed">openTempFile</span> のほうが既存ファイルを上書きしてしまわず安全です。</p>
+<p><span class="fixed">getCurrentDirectory</span> でカレントディレクトリを取得して <span class="fixed">openTempFile</span> に渡さず、直接 <span class="fixed">"."</span> を渡したのは、<span class="fixed">.</span> が Unix 系でも Windows でもカレントディレクトリを意味するからです。</p><p>次に <i>todo.txt</i> の内容を <span class="fixed">contents</span> に束縛し、行ごとの文字列リストに分解。<span class="fixed">todoTasks</span> は <span class="fixed">["Iron the dishes", "Dust the dog", "Take salad out of the oven"]</span> のような状態に。0 始まりの数字とリストを zip し、たとえば 3 と <span class="fixed">"hey"</span> から <span class="fixed">"3 - hey"</span> を作る関数で結合すると、<span class="fixed">numberedTasks</span> は <span class="fixed">["0 - Iron the dishes", "1 - Dust the dog" ...</span>。これを <span class="fixed">unlines</span> で改行区切りの単一文字列にして端末に出力。代わりに <span class="fixed">mapM putStrLn numberedTasks</span> でも OK。</p>
+<p>削除したい番号をユーザーに尋ね、入力を待ちます。番号 1（<span class="fixed">Dust the dog</span>）を削除したいとして <span class="fixed">1</span> と入力すると、<span class="fixed">numberString</span> は <span class="fixed">"1"</span>。数値が欲しいので <span class="fixed">read</span> をかけて <span class="fixed">1</span> を <span class="fixed">number</span> に束縛します。</p>
+<p><span class="fixed">Data.List</span> の <span class="fixed">delete</span> と <span class="fixed">!!</span> を覚えていますか。<span class="fixed">!!</span> はリストから添字で要素を取り、<span class="fixed">delete</span> はリスト内の最初の出現を削除した新しいリストを返します。<span class="fixed">(todoTasks !! number)</span>（number は <span class="fixed">1</span>）で <span class="fixed">"Dust the dog"</span> が得られ、それを <span class="fixed">todoTasks</span> から最初の出現だけ削除したものを <span class="fixed">newTodoItems</span> に束縛、<span class="fixed">unlines</span> で 1 つの文字列にして開いた一時ファイルに書き込みます。元ファイルは無傷、一時ファイルは削除した行以外を含みます。</p>
+<p>その後、両方のファイルを閉じ、<span class="label function">removeFile</span>（ファイルパスを取って削除）で元の <i>todo.txt</i> を削除し、<span class="label function">renameFile</span> で一時ファイルの名前を <i>todo.txt</i> に変えます。<span class="fixed">removeFile</span> と <span class="fixed">renameFile</span>（どちらも <span class="fixed">System.Directory</span> にあります）はハンドルではなくファイルパスを取る点に注意。</p>
+<p>これで完成！　もっと短く書くこともできましたが、既存ファイルを上書きしないよう気を付け、OS に一時ファイルの置き場所を丁寧に尋ねました。動かしてみましょう！</p>
 <pre name="code" class="plain">$ runhaskell deletetodo.hs
 These are your TO-DO items:
 0 - Iron the dishes
@@ -941,36 +604,14 @@ Which one do you want to delete?
 $ cat todo.txt
 Take salad out of the oven
 </pre>
-<a name="command-line-arguments"></a><h2>Command line arguments</h2>
+<a name="command-line-arguments"></a><h2>コマンドライン引数</h2>
 
-<p>Dealing with command line arguments is pretty much a necessity if you
- want to make a script or application that runs on a terminal. Luckily, 
-Haskell's standard library has a nice way of getting command line 
-arguments of a program.</p>
-<p>In the previous section, we made one program for adding a to-do item 
-to our to-do list and one program for removing an item. There are two 
-problems with the approach we took. The first one is that we just 
-hardcoded the name of our to-do file in our code. We just decided that 
-the file will be named <i>todo.txt</i> and that the user will never have a need for managing several to-do lists.</p>
-<p>One way to solve that is to always ask the user which file they want 
-to use as their to-do list. We used that approach when we wanted to know
- which item the user wants to delete. It works, but it's not so good, 
-because it requires the user to run the program, wait for the program to
- ask something and then tell that to the program. That's called an 
-interactive program and the difficult bit with interactive command line 
-programs is this — what if you want to automate the execution of that 
-program, like with a batch script? It's harder to make a batch script 
-that interacts with a program than a batch script that just calls one 
-program or several of them.</p>
-<p>That's why it's sometimes better to have the user tell the program 
-what they want when they run the program, instead of having the program 
-ask the user once it's run. And what better way to have the user tell 
-the program what they want it to do when they run it than via command 
-line arguments!</p>
-<p>The <span class="fixed">System.Environment</span> module has two cool I/O actions. One is <span class="label function">getArgs</span>, which has a type of <span class="fixed">getArgs :: IO [String]</span>
- and is an I/O action that will get the arguments that the program was 
-run with and have as its contained result a list with the arguments. <span class="label function">getProgName</span> has a type of <span class="fixed">getProgName :: IO String</span> and is an I/O action that contains the program name.</p>
-<p>Here's a small program that demonstrates how these two work:</p>
+<p>端末で動くスクリプトやアプリを作るならコマンドライン引数の扱いは必須です。Haskell の標準ライブラリにはコマンドライン引数を取得する素敵な方法があります。</p>
+<p>前のセクションで TODO 追加・削除のプログラムをそれぞれ作りましたが、2 つ問題があります。1 つ目は、TODO ファイル名がコードにハードコードされていること。<i>todo.txt</i> 固定で、ユーザーが複数の TODO リストを管理するニーズに応えられません。</p>
+<p>解決策の 1 つは、毎回ユーザーに使うファイルを尋ねること。削除したい項目を尋ねたときと同じ方式です。動きはしますが、プログラムを起動して質問を待ち、答える、というインタラクティブな流れは、バッチスクリプトで自動化したいときには扱いにくくなります。プログラムを 1 つ呼ぶだけのバッチに比べ、対話するバッチを書くのは大変。</p>
+<p>だから、起動後に質問するのではなく、起動時にユーザーが望むことをプログラムに伝えてもらうのが良い場面があります。それにはコマンドライン引数が最適！</p>
+<p><span class="fixed">System.Environment</span> モジュールには 2 つのクールな IOアクションがあります。1 つは <span class="label function">getArgs</span>（型は <span class="fixed">getArgs :: IO [String]</span>）。プログラム起動時の引数のリストを結果として持つ IOアクション。<span class="label function">getProgName</span>（型は <span class="fixed">getProgName :: IO String</span>）はプログラム名を結果として持つ IOアクションです。</p>
+<p>これらの動作を示す小さなプログラム：</p>
 <pre name="code" class="haskell:hs"> import System.Environment 
  import Data.List
  
@@ -982,7 +623,7 @@ run with and have as its contained result a list with the arguments. <span class
     putStrLn "The program name is:"
     putStrLn progName
 </pre> 
-<p>We bind <span class="fixed">getArgs</span> and <span class="fixed">progName</span> to <span class="fixed">args</span> and <span class="fixed">progName</span>. We say <span class="fixed">The arguments are:</span> and then for every argument in <span class="fixed">args</span>, we do <span class="fixed">putStrLn</span>. Finally, we also print out the program name. Let's compile this as <span class="fixed">arg-test</span>.</p>
+<p><span class="fixed">getArgs</span>・<span class="fixed">getProgName</span> の結果をそれぞれ <span class="fixed">args</span>・<span class="fixed">progName</span> に束縛。<span class="fixed">"The arguments are:"</span> と表示してから <span class="fixed">args</span> の各引数を <span class="fixed">putStrLn</span>。最後にプログラム名も出力。<span class="fixed">arg-test</span> としてコンパイル：</p>
 <pre name="code" class="plain">$ ./arg-test first second w00t "multi word arg"
 The arguments are:
 first
@@ -992,24 +633,16 @@ multi word arg
 The program name is:
 arg-test
 </pre>
-<p>Nice. Armed with this knowledge you could create some cool command 
-line apps. In fact, let's go ahead and make one. In the previous 
-section, we made a separate program for adding tasks and a separate 
-program for deleting them. Now, we're going to join that into one 
-program, what it does will depend on the command line arguments. We're 
-also going to make it so it can operate on different files, not just <i>todo.txt</i>.</p>
-<p>We'll call it simply <i>todo</i> and it'll be able to do (haha!) three different things:</p>
+<p>これを武器にクールなコマンドラインアプリが作れます。実際に作ってみます。前のセクションでは追加と削除を別プログラムにしましたが、今度は 1 つに統合し、コマンドライン引数で動作を切り替えるようにします。<i>todo.txt</i> 固定ではなく、別のファイルでも動かせるようにします。</p>
+<p>名前は <i>todo</i>。3 つの異なる動作ができます：</p>
 <ul>
-    <li>View tasks</li>
-    <li>Add tasks</li>
-    <li>Delete tasks</li>
+    <li>タスクの表示</li>
+    <li>タスクの追加</li>
+    <li>タスクの削除</li>
 </ul>
-<p>We're not going to concern ourselves with possible bad input too much right now.</p>
-<p>Our program will be made so that if we want to add the task <span class="fixed">Find the magic sword of power</span> to the file <i>todo.txt</i>, we have to punch in <span class="fixed">todo add todo.txt "Find the magic sword of power"</span> in our terminal. To view the tasks we'll just do <span class="fixed">todo view todo.txt</span> and to remove the task with the index of 2, we'll do <span class="fixed">todo remove todo.txt 2</span>.</p>
-<p>We'll start by making a dispatch association list. It's going to be a
- simple association list that has command line arguments as keys and 
-functions as their corresponding values. All these functions will be of 
-type <span class="fixed">[String] -&gt; IO ()</span>. They're going to take the argument list as a parameter and return an I/O action that does the viewing, adding, deleting, etc.</p>
+<p>ここでは不正入力への対応はあまり気にしません。</p>
+<p>たとえば <span class="fixed">Find the magic sword of power</span> を <i>todo.txt</i> に追加したいなら、端末で <span class="fixed">todo add todo.txt "Find the magic sword of power"</span> と入力。表示は <span class="fixed">todo view todo.txt</span>、添字 2 のタスクを削除するなら <span class="fixed">todo remove todo.txt 2</span>。</p>
+<p>まずはディスパッチ用の連想リストから作ります。キーがコマンドライン引数、対応する値が関数。すべての関数は型 <span class="fixed">[String] -&gt; IO ()</span>。引数リストを取って、表示・追加・削除などを行う IOアクションを返します。</p>
 <pre name="code" class="haskell:hs">import System.Environment 
 import System.Directory
 import System.IO
@@ -1021,32 +654,21 @@ dispatch =  [ ("add", add)
             , ("remove", remove)
             ]
 </pre>
-<p>We have yet to define <span class="fixed">main</span>, <span class="fixed">add</span>, <span class="fixed">view</span> and <span class="fixed">remove</span>, so let's start with <span class="fixed">main</span>:</p>
+<p><span class="fixed">main</span>、<span class="fixed">add</span>、<span class="fixed">view</span>、<span class="fixed">remove</span> はまだ未定義。<span class="fixed">main</span> から：</p>
 <pre name="code" class="haskell:hs">main = do
     (command:args) &lt;- getArgs
     let (Just action) = lookup command dispatch
     action args
 </pre>
-<p>First, we get the arguments and bind them to <span class="fixed">(command:args)</span>. If you remember your pattern matching, this means that the first argument will get bound to <span class="fixed">command</span> and the rest of them will get bound to <span class="fixed">args</span>. If we call our program like <span class="fixed">todo add todo.txt "Spank the monkey"</span>, <span class="fixed">command</span> will be <span class="fixed">"add"</span> and <span class="fixed">args</span> will be <span class="fixed">["todo.xt", "Spank the monkey"]</span>.</p>
-<p>In the next line, we look up our command in the dispatch list. Because <span class="fixed">"add"</span> points to <span class="fixed">add</span>, we get <span class="fixed">Just add</span> as a result. We use pattern matching again to extract our function out of the <span class="fixed">Maybe</span>. What happens if our command isn't in the dispatch list? Well then the lookup will return <span class="fixed">Nothing</span>,
- but we said we won't concern ourselves with failing gracefully too 
-much, so the pattern matching will fail and our program will throw a 
-fit.</p>
-<p>Finally, we call our <span class="fixed">action</span> function with 
-the rest of the argument list. That will return an I/O action that 
-either adds an item, displays a list of items or deletes an item and 
-because that action is part of the <span class="fixed">main</span> <i>do</i> block, it will get performed. If we follow our concrete example so far and our <span class="fixed">action</span> function is <span class="fixed">add</span>, it will get called with <span class="fixed">args</span> (so <span class="fixed">["todo.txt", "Spank the monkey"]</span>) and return an I/O action that adds <span class="fixed">Spank the monkey</span> to <i>todo.txt</i>.</p>
-<p>Great! All that's left now is to implement <span class="fixed">add</span>, <span class="fixed">view</span> and <span class="fixed">remove</span>. Let's start with <span class="fixed">add</span>:</p>
+<p>まず引数を取得して <span class="fixed">(command:args)</span> に束縛。パターンマッチを思い出せば、最初の引数が <span class="fixed">command</span>、残りが <span class="fixed">args</span> に束縛されます。<span class="fixed">todo add todo.txt "Buy some milk"</span> のように呼ぶと、<span class="fixed">command</span> は <span class="fixed">"add"</span>、<span class="fixed">args</span> は <span class="fixed">["todo.txt", "Buy some milk"]</span>。</p>
+<p>次の行でディスパッチリストからコマンドを引きます。<span class="fixed">"add"</span> は <span class="fixed">add</span> を指すので結果は <span class="fixed">Just add</span>。再びパターンマッチで <span class="fixed">Maybe</span> から関数を取り出します。コマンドがリストになければ <span class="fixed">Nothing</span> が返りますが、丁寧な失敗処理は気にしないと言ったので、パターンマッチが失敗してプログラムは騒ぎ出します。</p>
+<p>最後に <span class="fixed">action</span> 関数を残りの引数リストで呼びます。返るIOアクションは項目の追加・表示・削除のいずれかを行い、<span class="fixed">main</span> <i>do</i> ブロックに含まれるので実行されます。具体例を続けると、<span class="fixed">action</span> が <span class="fixed">add</span> なら <span class="fixed">args</span>（<span class="fixed">["todo.txt", "Buy some milk"]</span>）で呼ばれ、<i>todo.txt</i> に <span class="fixed">Buy some milk</span> を追加するIOアクションを返します。</p>
+<p>あとは <span class="fixed">add</span>、<span class="fixed">view</span>、<span class="fixed">remove</span> を実装するだけ。<span class="fixed">add</span> から：</p>
 <pre name="code" class="haskell:hs">add :: [String] -&gt; IO ()
 add [fileName, todoItem] = appendFile fileName (todoItem ++ "\n")
 </pre>
-<p>If we call our program like <span class="fixed">todo add todo.txt "Spank the monkey"</span>, the <span class="fixed">"add"</span> will get bound to <span class="fixed">command</span> in the first pattern match in the <span class="fixed">main</span> block, whereas <span class="fixed">["todo.txt", "Spank the monkey"]</span>
- will get passed to the function that we get from the dispatch list. So,
- because we're not dealing with bad input right now, we just pattern 
-match against a list with those two elements right away and return an 
-I/O action that appends that line to the end of the file, along with a 
-newline character.</p>
-<p>Next, let's implement the list viewing functionality. If we want to view the items in a file, we do <span class="fixed">todo view todo.txt</span>. So in the first pattern match, <span class="fixed">command</span> will be <span class="fixed">"view"</span> and <span class="fixed">args</span> will be <span class="fixed">["todo.txt"]</span>.</p>
+<p><span class="fixed">todo add todo.txt "Buy some milk"</span> のように呼ぶと、<span class="fixed">main</span> 内の最初のパターンマッチで <span class="fixed">"add"</span> が <span class="fixed">command</span> に束縛され、<span class="fixed">["todo.txt", "Buy some milk"]</span> がディスパッチリストから取り出した関数に渡されます。不正入力は気にしないので、その 2 要素のリストにいきなりパターンマッチし、ファイル末尾に行＋改行を追記する IOアクションを返します。</p>
+<p>次は表示機能。ファイルの項目を表示するには <span class="fixed">todo view todo.txt</span>。最初のパターンマッチで <span class="fixed">command</span> が <span class="fixed">"view"</span>、<span class="fixed">args</span> が <span class="fixed">["todo.txt"]</span>。</p>
 <pre name="code" class="haskell:hs">view :: [String] -&gt; IO ()
 view [fileName] = do
     contents &lt;- readFile fileName
@@ -1054,16 +676,8 @@ view [fileName] = do
         numberedTasks = zipWith (\n line -&gt; show n ++ " - " ++ line) [0..] todoTasks
     putStr $ unlines numberedTasks
 </pre>
-<p>We already did pretty much the same thing in the program that only 
-deleted tasks when we were displaying the tasks so that the user can 
-choose one for deletion, only here we just display the tasks.</p>
-<p>And finally, we're going to implement <span class="fixed">remove</span>.
- It's going to be very similar to the program that only deleted the 
-tasks, so if you don't understand how deleting an item here works, check
- out the explanation under that program. The main difference is that 
-we're not hardcoding <i>todo.txt</i> but getting it as an argument. 
-We're also not prompting the user for the task number to delete, we're 
-getting it as an argument.</p>
+<p>削除専用のプログラムでも、削除対象を選ばせるためにタスクを表示していました。ほぼ同じ処理。ここでは表示するだけ。</p>
+<p>最後に <span class="fixed">remove</span>。削除専用プログラムと似ています。動作が分からなければそちらの解説を参照。違いは、<i>todo.txt</i> をハードコードせず引数で受け取る点と、削除番号もユーザーに尋ねず引数で受け取る点。</p>
 <pre name="code" class="haskell:hs">remove :: [String] -&gt; IO ()
 remove [fileName, numberString] = do
     handle &lt;- openFile fileName ReadMode
@@ -1078,11 +692,8 @@ remove [fileName, numberString] = do
     removeFile fileName
     renameFile tempName fileName
 </pre>
-<p>We opened up the file based on <span class="fixed">fileName</span> 
-and opened a temporary file, deleted the line with the index that the 
-user wants to delete, wrote that to the temporary file, removed the 
-original file and renamed the temporary file back to <span class="fixed">fileName</span>.</p>
-<p>Here's the whole program at once, in all its glory!</p>
+<p><span class="fixed">fileName</span> でファイルを開き、一時ファイルも開いて、ユーザー指定の添字の行を削除し、結果を一時ファイルに書いて、元ファイルを削除し、一時ファイルを <span class="fixed">fileName</span> にリネームします。</p>
+<p>これがプログラム全体！</p>
 <pre name="code" class="haskell:hs">import System.Environment 
 import System.Directory
 import System.IO
@@ -1124,19 +735,9 @@ remove [fileName, numberString] = do
     renameFile tempName fileName
 </pre>
 
-<p>To summarize our solution: we made a dispatch association that maps 
-from commands to functions that take some command line arguments and 
-return an I/O action. We see what the command is and based on that we 
-get the appropriate function from the dispatch list. We call that 
-function with the rest of the command line arguments to get back an I/O 
-action that will do the appropriate thing and then just perform that 
-action!</p>
-<p>In other languages, we might have implemented this with a big switch 
-case statement or whatever, but using higher order functions allows us 
-to just tell the dispatch list to give us the appropriate function and 
-then tell that function to give us an I/O action for some command line 
-arguments.</p>
-<p>Let's try our app out!</p>
+<p>解法まとめ：コマンドから「コマンドライン引数を取り IOアクションを返す関数」へのディスパッチ連想リストを作りました。コマンドを見て対応する関数を取り出し、残りの引数で関数を呼んで返ったIOアクションを実行するだけ！</p>
+<p>他の言語では巨大な switch-case でやるところを、高階関数のおかげで「ディスパッチリストから関数を取り出し、引数を渡して IOアクションを得る」という流れに落とし込めます。</p>
+<p>動かしてみましょう！</p>
 <pre name="code" class="plain">$ ./todo view todo.txt
 0 - Iron the dishes
 1 - Dust the dog
@@ -1157,61 +758,21 @@ $ ./todo view todo.txt
 1 - Dust the dog
 2 - Pick up children from drycleaners
 </pre>
-<p>Another cool thing about this is that it's easy to add extra 
-functionality. Just add an entry in the dispatch association list and 
-implement the corresponding function and you're laughing! As an 
-exercise, you can try implementing a <span class="fixed">bump</span> function that will take a file and a task number and return an I/O action that bumps that task to the top of the to-do list.</p>
-<p>You could make this program fail a bit more gracefully in case of bad input (for example, if someone runs <span class="fixed">todo UP YOURS HAHAHAHA</span>) by making an I/O action that just reports there has been an error (say, <span class="fixed">errorExit :: IO ()</span>)
- and then check for possible erronous input and if there is erronous 
-input, perform the error reporting I/O action. Another way is to use 
-exceptions, which we will meet soon.</p>
-<a name="randomness"></a><h2>Randomness</h2>
+<p>このやり方のもう 1 つの利点は、機能追加が楽なこと。ディスパッチリストに項目を加えて対応関数を実装するだけ！　練習として、ファイルとタスク番号を取って、そのタスクを TODO リストの先頭に押し上げる IOアクションを返す <span class="fixed">bump</span> 関数を実装してみてください。</p>
+<p>不正入力（たとえば <span class="fixed">todo UP YOURS HAHAHAHA</span>）に対してより穏やかに失敗させるには、エラー報告用の IOアクション（<span class="fixed">errorExit :: IO ()</span> など）を作って、不正入力を検出してそれを実行する方法があります。もう 1 つは例外を使う方法。すぐ後で扱います。</p>
+<a name="randomness"></a><h2>乱数</h2>
 
-<p>Many times while programming, you need to get some random data. Maybe
- you're making a game where a die needs to be thrown or you need to 
-generate some test data to test out your program. There are a lot of 
-uses for random data when programming. Well, actually, pseudo-random, 
-because we all know that the only true source of randomness is a monkey 
-on a unicycle with a cheese in one hand and its butt in the other. In 
-this section, we'll take a look at how to make Haskell generate 
-seemingly random data.</p>
-<p>In most other programming languages, you have functions that give you
- back some random number. Each time you call that function, you get back
- a (hopefully) different random number. How about Haskell? Well, 
-remember, Haskell is a pure functional language. What that means is that
- it has referential transparency. What THAT means is that a function, if
- given the same parameters twice, must produce the same result twice. 
-That's really cool because it allows us to reason differently about 
-programs and it enables us to defer evaluation until we really need it. 
-If I call a function, I can be sure that it won't do any funny stuff 
-before giving me the results. All that matters are its results. However,
- this makes it a bit tricky for getting random numbers. If I have a 
-function like this:</p>
+<p>プログラミングでは乱数データが欲しくなることが多々あります。サイコロを振るゲームを作るとか、テストデータを生成するとか。実際には擬似乱数ですが（真の乱数源は一輪車の上で片手にチーズを持った猿、というのは置いておいて）。このセクションでは Haskell で擬似的な乱数データを生成する方法を見ます。</p>
+<p>多くの言語では乱数を返す関数があり、呼ぶたびに（できれば）違う乱数を返します。Haskell では？　Haskell は純粋関数型言語なので参照透過性があります。同じ引数で 2 回呼べば同じ結果を返さなければなりません。これはプログラムについて違う考え方ができるし、評価を必要なときまで遅延できる素敵な性質ですが、乱数取得には少し厄介。たとえばこんな関数：</p>
 <pre name="code" class="haskell:hs">randomNumber :: (Num a) =&gt; a
 randomNumber = 4
 </pre>
-<p>It's not very useful as a random number function because it will always return <span class="fixed">4</span>, even though I can assure you that the 4 is completely random, because I used a die to determine it.</p>
-<p>How do other languages make seemingly random numbers? Well, they take
- various info from your computer, like the current time, how much and 
-where you moved your mouse and what kind of noises you made behind your 
-computer and based on that, give a number that looks really random. The 
-combination of those factors (that randomness) is probably different in 
-any given moment in time, so you get a different random number.</p>
-<p>Ah. So in Haskell, we can make a random number then if we make a 
-function that takes as its parameter that randomness and based on that 
-returns some number (or other data type).</p>
-<p>Enter the <span class="fixed">System.Random</span> module. It has all
- the functions that satisfy our need for randomness. Let's just dive 
-into one of the functions it exports then, namely <span class="label function">random</span>. Here's its type: <span class="fixed">random :: (RandomGen g, Random a) =&gt; g -&gt; (a, g)</span>. Whoa! Some new typeclasses in this type declaration up in here! The <span class="label class">RandomGen</span> typeclass is for types that can act as sources of randomness. The <span class="label class">Random</span> typeclass is for things that can take on random values. A boolean value can take on a random value, namely <span class="fixed">True</span> or <span class="fixed">False</span>.
- A number can also take up a plethora of different random values. Can a 
-function take on a random value? I don't think so, probably not! If we 
-try to translate the type declaration of <span class="fixed">random</span>
- to English, we get something like: it takes a random generator (that's 
-our source of randomness) and returns a random value and a new random 
-generator. Why does it also return a new generator as well as a random 
-value? Well, we'll see in a moment.</p>
-<p>To use our <span class="fixed">random</span> function, we have to get our hands on one of those random generators. The <span class="fixed">System.Random</span> module exports a cool type, namely <span class="label type">StdGen</span> that is an instance of the <span class="fixed">RandomGen</span> typeclass. We can either make a <span class="fixed">StdGen</span> manually or we can tell the system to give us one based on a multitude of sort of random stuff.</p>
-<p>To manually make a random generator, use the <span class="label function">mkStdGen</span> function. It has a type of <span class="fixed">mkStdGen :: Int -&gt; StdGen</span>. It takes an integer and based on that, gives us a random generator. Okay then, let's try using <span class="fixed">random</span> and <span class="fixed">mkStdGen</span> in tandem to get a (hardly random) number.</p>
+<p>常に <span class="fixed">4</span> を返すので乱数関数としては使えません。サイコロを振って 4 を出したのでこの 4 は完全にランダムですが（笑）。</p>
+<p>他の言語はどう「ランダムっぽい」数を作っているのか？　現在時刻、マウスの移動量や位置、コンピュータ周辺の音などコンピュータからさまざまな情報を取り、それを基にランダムに見える数を返します。それらの組み合わせは時々刻々違うので毎回違う数が得られる、という具合。</p>
+<p>なるほど。だから Haskell でも、ランダム性を引数として取り、それを基に数（や他のデータ型）を返す関数を作れば乱数が作れます。</p>
+<p>そこで <span class="fixed">System.Random</span> モジュール。乱数のニーズを満たす関数が揃っています。エクスポートされている <span class="label function">random</span> から見ましょう。型は <span class="fixed">random :: (RandomGen g, Random a) =&gt; g -&gt; (a, g)</span>。新しい型クラスが 2 つ！　<span class="label class">RandomGen</span> は乱数源として振る舞える型のためのもの、<span class="label class">Random</span> はランダムな値を取りうる型のためのもの。真偽値は <span class="fixed">True</span>・<span class="fixed">False</span> のランダムな値を取れます。数も多種のランダムな値を取れる。関数はランダムな値を取れるか？　たぶん無理！　<span class="fixed">random</span> の型を読み解くと「乱数生成器（乱数源）を取り、ランダムな値と新しい乱数生成器を返す」となります。なぜ生成器も返すのでしょう？　すぐ分かります。</p>
+<p><span class="fixed">random</span> を使うには乱数生成器を手に入れる必要があります。<span class="fixed">System.Random</span> がエクスポートする <span class="label type">StdGen</span> 型は <span class="fixed">RandomGen</span> のインスタンス。手動で作ることも、システムにそれっぽいものを作らせることもできます。</p>
+<p>手動なら <span class="label function">mkStdGen</span>。型は <span class="fixed">mkStdGen :: Int -&gt; StdGen</span>。整数を取って乱数生成器を返します。<span class="fixed">random</span> と <span class="fixed">mkStdGen</span> を組み合わせて（あまりランダムに見えない）数を得てみます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; random (mkStdGen 100)
 </pre>
 <pre name="code" class="plain">&lt;interactive&gt;:1:0:
@@ -1219,24 +780,19 @@ value? Well, we'll see in a moment.</p>
       `Random a' arising from a use of `random' at &lt;interactive&gt;:1:0-20
     Probable fix: add a type signature that fixes these type variable(s)
 </pre>
-<p>What's this? Ah, right, the <span class="fixed">random</span> function can return a value of any type that's part of the <span class="fixed">Random</span>
- typeclass, so we have to inform Haskell what kind of type we want. Also
- let's not forget that it returns a random value and a random generator 
-in a pair.</p>
+<p>これは何？　あ、そうか、<span class="fixed">random</span> は <span class="fixed">Random</span> 型クラスの任意の型を返せるので、どの型が欲しいか Haskell に教える必要があります。ペアで「ランダムな値」と「新しい乱数生成器」を返す点も忘れずに。</p>
 <pre name="code" class="haskell:hs">ghci&gt; random (mkStdGen 100) :: (Int, StdGen)
 (-1352021624,651872571 1655838864)
 </pre>
-<p>Finally! A number that looks kind of random! The first component of 
-the tuple is our number whereas the second component is a textual 
-representation of our new random generator. What happens if we call <span class="fixed">random</span> with the same random generator again?</p>
+<p>やっと！　ランダムっぽい数！　タプルの第 1 要素が数、第 2 要素が新しい乱数生成器のテキスト表現。同じ生成器で再度 <span class="fixed">random</span> を呼ぶと？</p>
 <pre name="code" class="haskell:hs">ghci&gt; random (mkStdGen 100) :: (Int, StdGen)
 (-1352021624,651872571 1655838864)
 </pre>
-<p>Of course. The same result for the same parameters. So let's try giving it a different random generator as a parameter.</p>
+<p>当然、同じ引数なら同じ結果。違う乱数生成器を渡してみます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; random (mkStdGen 949494) :: (Int, StdGen)
 (539963926,466647808 1655838864)
 </pre>
-<p>Alright, cool, great, a different number. We can use the type annotation to get different types back from that function. </p>
+<p>違う数になりました。型注釈で違う型を取り出すこともできます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; random (mkStdGen 949488) :: (Float, StdGen)
 (0.8938442,1597344447 1655838864)
 ghci&gt; random (mkStdGen 949488) :: (Bool, StdGen)
@@ -1244,15 +800,8 @@ ghci&gt; random (mkStdGen 949488) :: (Bool, StdGen)
 ghci&gt; random (mkStdGen 949488) :: (Integer, StdGen)
 (1691547873,1597344447 1655838864)
 </pre>
-<p>Let's make a function that simulates tossing a coin three times. If <span class="fixed">random</span>
- didn't return a new generator along with a random value, we'd have to 
-make this function take three random generators as a parameter and then 
-return coin tosses for each of them. But that sounds wrong because if 
-one generator can make a random value of type <span class="fixed">Int</span>
- (which can take on a load of different values), it should be able to 
-make three coin tosses (which can take on precisely eight combinations).
- So this is where <span class="fixed">random</span> returning a new generator along with a value really comes in handy.</p>
-<p>We'll represent a coin with a simple <span class="fixed">Bool</span>. <span class="fixed">True</span> is tails, <span class="fixed">False</span> is heads.</p>
+<p>コインを 3 回投げるシミュレーションを作りましょう。もし <span class="fixed">random</span> が値だけでなく新しい生成器も返さなかったら、引数に乱数生成器を 3 つ取って各回のコインを返さねばなりません。でもそれは変です。1 つの生成器が <span class="fixed">Int</span> のさまざまな値を作れるなら、コイントス 3 回（合計 8 通り）も作れるはず。だから値と一緒に新しい生成器を返してくれるのが便利。</p>
+<p>コインは <span class="fixed">Bool</span> で表します。<span class="fixed">True</span> が裏、<span class="fixed">False</span> が表とします。</p>
 <pre name="code" class="haskell:hs">threeCoins :: StdGen -&gt; (Bool, Bool, Bool)
 threeCoins gen = 
     let (firstCoin, newGen) = random gen
@@ -1260,12 +809,7 @@ threeCoins gen =
         (thirdCoin, newGen'') = random newGen'
     in  (firstCoin, secondCoin, thirdCoin)
 </pre>
-<p>We call <span class="fixed">random</span> with the generator we got 
-as a parameter to get a coin and a new generator. Then we call it again,
- only this time with our new generator, to get the second coin. We do 
-the same for the third coin. Had we called it with the same generator 
-every time, all the coins would have had the same value and we'd only be
- able to get <span class="fixed">(False, False, False)</span> or <span class="fixed">(True, True, True)</span> as a result.</p>
+<p>引数で受け取った生成器で <span class="fixed">random</span> を呼んでコインと新生成器を得ます。新生成器で再度呼んで 2 枚目、また呼んで 3 枚目。同じ生成器を毎回使ったら全部同じになってしまい、<span class="fixed">(False, False, False)</span> か <span class="fixed">(True, True, True)</span> しか得られません。</p>
 <pre name="code" class="haskell:hs">ghci&gt; threeCoins (mkStdGen 21)
 (True,True,True)
 ghci&gt; threeCoins (mkStdGen 22)
@@ -1275,11 +819,8 @@ ghci&gt; threeCoins (mkStdGen 943)
 ghci&gt; threeCoins (mkStdGen 944)
 (True,True,True)
 </pre>
-<p>Notice that we didn't have to do <span class="fixed">random gen :: (Bool, StdGen)</span>.
- That's because we already specified that we want booleans in the type 
-declaration of the function. That's why Haskell can infer that we want a
- boolean value in this case.</p>
-<p>So what if we want to flip four coins? Or five? Well, there's a function called <span class="label function">randoms</span> that takes a generator and returns an infinite sequence of values based on that generator.</p>
+<p><span class="fixed">random gen :: (Bool, StdGen)</span> と型注釈する必要がないことに注目。関数の型宣言で真偽値が欲しいと指定しているので、Haskell が推論できます。</p>
+<p>4 枚や 5 枚投げたいときは？　<span class="label function">randoms</span> 関数があります。生成器を取り、それを基にした無限列を返します。</p>
 <pre name="code" class="haskell:hs">ghci&gt; take 5 $ randoms (mkStdGen 11) :: [Int]
 [-1807975507,545074951,-1015194702,-1622477312,-502893664]
 ghci&gt; take 5 $ randoms (mkStdGen 11) :: [Bool]
@@ -1287,16 +828,12 @@ ghci&gt; take 5 $ randoms (mkStdGen 11) :: [Bool]
 ghci&gt; take 5 $ randoms (mkStdGen 11) :: [Float]
 [7.904789e-2,0.62691015,0.26363158,0.12223756,0.38291094]
 </pre>
-<p>Why doesn't <span class="fixed">randoms</span> return a new generator as well as a list? We could implement the <span class="fixed">randoms</span> function very easily like this:</p>
+<p>なぜ <span class="fixed">randoms</span> は新しい生成器も返さないのでしょう？　簡単に実装するとこうなります：</p>
 <pre name="code" class="haskell:hs">randoms' :: (RandomGen g, Random a) =&gt; g -&gt; [a]
 randoms' gen = let (value, newGen) = random gen in value:randoms' newGen
 </pre>
-<p>A recursive definition. We get a random value and a new generator 
-from the current generator and then make a list that has the value as 
-its head and random numbers based on the new generator as its tail. 
-Because we have to be able to potentially generate an infinite amount of
- numbers, we can't give the new random generator back.</p>
-<p>We could make a function that generates a finite stream of numbers and a new generator like this:</p>
+<p>再帰定義です。現在の生成器からランダムな値と新生成器を得て、値を先頭、新生成器による乱数を尾にしたリストを作ります。無限に生成できる必要があるので、新生成器は返せません。</p>
+<p>有限長の列と新生成器を返す関数なら：</p>
 <pre name="code" class="haskell:hs">finiteRandoms :: (RandomGen g, Random a, Num n) =&gt; n -&gt; g -&gt; ([a], g)
 finiteRandoms 0 gen = ([], gen)
 finiteRandoms n gen = 
@@ -1304,38 +841,21 @@ finiteRandoms n gen =
         (restOfList, finalGen) = finiteRandoms (n-1) newGen
     in  (value:restOfList, finalGen)
 </pre>
-<p>Again, a recursive definition. We say that if we want 0 numbers, we 
-just return an empty list and the generator that was given to us. For 
-any other number of random values, we first get one random number and a 
-new generator. That will be the head. Then we say that the tail will be <i>n - 1</i>
- numbers generated with the new generator. Then we return the head and 
-the rest of the list joined and the final generator that we got from 
-getting the <i>n - 1</i> random numbers.</p> 
-<p>What if we want a random value in some sort of range? All the random 
-integers so far were outrageously big or small. What if we want to to 
-throw a die? Well, we use <span class="label function">randomR</span> for that purpose. It has a type of <span class="fixed">randomR :: (RandomGen g, Random a) :: (a, a) -&gt; g -&gt; (a, g)</span>, meaning that it's kind of like <span class="fixed">random</span>,
- only it takes as its first parameter a pair of values that set the 
-lower and upper bounds and the final value produced will be within those
- bounds.</p><p>
+<p>再びの再帰定義。0 個欲しければ空リストと与えられた生成器を返す。それ以外なら 1 つ取って先頭に、残りの <i>n - 1</i> 個は新生成器で生成して尾に。最後に頭と尾を連結して、<i>n - 1</i> 個取った後の最終生成器も返します。</p>
+<p>ある範囲のランダム値が欲しいときは？　これまでの整数は大きすぎたり小さすぎたり。サイコロを振りたいときは <span class="label function">randomR</span>。型は <span class="fixed">randomR :: (RandomGen g, Random a) :: (a, a) -&gt; g -&gt; (a, g)</span>。<span class="fixed">random</span> に似ていますが、第 1 引数で下限・上限を指定し、生成される値はその範囲に収まります。</p>
+<p>
 </p><pre name="code" class="haskell:hs">ghci&gt; randomR (1,6) (mkStdGen 359353)
 (6,1494289578 40692)
 ghci&gt; randomR (1,6) (mkStdGen 35935335)
 (3,1250031057 40692)
 </pre>
-<p>There's also <span class="label function">randomRs</span>, which produces a stream of random values within our defined ranges. Check this out:</p>
+<p><span class="label function">randomRs</span> は、指定範囲内の乱数の列を生成します：</p>
 <pre name="code" class="haskell:hs">ghci&gt; take 10 $ randomRs ('a','z') (mkStdGen 3) :: [Char]
 "ndkxbvmomg"
 </pre>
-<p>Nice, looks like a super secret password or something.</p>
-<p>You may be asking yourself, what does this section have to do with 
-I/O anyway? We haven't done anything concerning I/O so far. Well, so far
- we've always made our random number generator manually by making it 
-with some arbitrary integer. The problem is, if we do that in our real 
-programs, they will always return the same random numbers, which is no 
-good for us. That's why <span class="fixed">System.Random</span> offers the <span class="label function">getStdGen</span> I/O action, which has a type of <span class="fixed">IO StdGen</span>.
- When your program starts, it asks the system for a good random number 
-generator and stores that in a so called global generator. <span class="fixed">getStdGen</span> fetches you that global random generator when you bind it to something. </p>
-<p>Here's a simple program that generates a random string.</p>
+<p>秘密のパスワードみたいに見えますね。</p>
+<p>「ところでこのセクション、I/O と何の関係が？」と思うかも。これまで I/O に関する話はしていません。これまでは整数を渡して手動で乱数生成器を作っていました。問題は、本番のプログラムでこれをやると常に同じ乱数が返ること。これだとマズい。だから <span class="fixed">System.Random</span> は <span class="label function">getStdGen</span> という IOアクション（型 <span class="fixed">IO StdGen</span>）を提供します。プログラム起動時にシステムが良い乱数生成器を選び、グローバル生成器として保存。<span class="fixed">getStdGen</span> はそのグローバル生成器を取得します。</p>
+<p>ランダムな文字列を生成するシンプルなプログラム：</p>
 <pre name="code" class="haskell:hs">import System.Random
 
 main = do
@@ -1351,7 +871,7 @@ nzdceoconysdgcyqjruo
 $ runhaskell random_string.hs
 bakzhnnuzrkgvesqplrx
 </pre>
-<p>Be careful though, just performing <span class="fixed">getStdGen</span> twice will ask the system for the same global generator twice. If you do this:</p>
+<p>注意。<span class="fixed">getStdGen</span> を 2 回実行しても、同じグローバル生成器を 2 回取得するだけです。次のように書くと：</p>
 <pre name="code" class="haskell:hs">import System.Random
 
 main = do
@@ -1360,14 +880,7 @@ main = do
     gen2 &lt;- getStdGen
     putStr $ take 20 (randomRs ('a','z') gen2)
 </pre>
-<p>you will get the same string printed out twice! One way to get two 
-different strings of length 20 is to set up an infinite stream and then 
-take the first 20 characters and print them out in one line and then 
-take the second set of 20 characters and print them out in the second 
-line. For this, we can use the <span class="fixed">splitAt</span> function from <span class="fixed">Data.List</span>,
- which splits a list at some index and returns a tuple that has the 
-first part as the first component and the second part as the second 
-component.</p>
+<p>同じ文字列が 2 回表示されてしまいます！　長さ 20 の異なる文字列 2 つを得るには、無限列を作って最初の 20 文字を 1 行目に、続く 20 文字を 2 行目に出力する方法があります。<span class="fixed">Data.List</span> の <span class="fixed">splitAt</span>（リストを添字で分けてタプルにする）が使えます。</p>
 <pre name="code" class="haskell:hs">import System.Random
 import Data.List
 
@@ -1379,10 +892,7 @@ main = do
     putStrLn first20
     putStr second20
 </pre>
-<p>Another way is to use the <span class="label function">newStdGen</span>
- action, which splits our current random generator into two generators. 
-It updates the global random generator with one of them and encapsulates
- the other as its result.</p>
+<p>もう 1 つの方法は <span class="label function">newStdGen</span> アクション。現在の乱数生成器を 2 つに分け、片方をグローバル生成器に上書きし、もう片方を結果としてカプセル化します。</p>
 <pre name="code" class="haskell:hs">import System.Random
 
 main = do   
@@ -1391,8 +901,8 @@ main = do
     gen' &lt;- newStdGen
     putStr $ take 20 (randomRs ('a','z') gen')   
 </pre>
-<p>Not only do we get a new random generator when we bind <span class="fixed">newStdGen</span> to something, the global one gets updated as well, so if we do <span class="fixed">getStdGen</span> again and bind it to something, we'll get a generator that's not the same as <span class="fixed">gen</span>.</p>
-<p>Here's a little program that will make the user guess which number it's thinking of.</p>
+<p><span class="fixed">newStdGen</span> を束縛すると新しい乱数生成器が手に入るだけでなく、グローバル生成器も更新されるので、再度 <span class="fixed">getStdGen</span> しても <span class="fixed">gen</span> とは違う生成器が得られます。</p>
+<p>プログラムが考えている数を当てさせる小さなプログラム：</p>
 <pre name="code" class="haskell:hs">import System.Random
 import Control.Monad(when)
 
@@ -1413,23 +923,11 @@ askForNumber gen = do
         askForNumber newGen
 </pre>
 
-<p>We make a function <span class="fixed">askForNumber</span>, which 
-takes a random number generator and returns an I/O action that will 
-prompt the user for a number and tell him if he guessed it right. In 
-that function, we first generate a random number and a new generator 
-based on the generator that we got as a parameter and call them <span class="fixed">randNumber</span> and <span class="fixed">newGen</span>. Let's say that the number generated was <span class="fixed">7</span>. Then we tell the user to guess which number we're thinking of. We perform <span class="fixed">getLine</span> and bind its result to <span class="fixed">numberString</span>. When the user enters <span class="fixed">7</span>, <span class="fixed">numberString</span> becomes <span class="fixed">"7"</span>. Next, we use <span class="fixed">when</span> to check if the string the user entered is an empty string. If it is, an empty I/O action of <span class="fixed">return ()</span> is performed, which effectively ends the program. If it isn't, the action consisting of that <i>do</i> block right there gets performed. We use <span class="fixed">read</span> on <span class="fixed">numberString</span> to convert it to a number, so <span class="fixed">number</span> is now <span class="fixed">7</span>.</p>
-<div class="hintbox"><b>Excuse me!</b> If the user gives us some input here that <span class="fixed">read</span> can't read (like <span class="fixed">"haha"</span>), our program will crash with an ugly error message. If you don't want your program to crash on erronous input, use <span class="label function">reads</span>,
- which returns an empty list when it fails to read a string. When it 
-succeeds, it returns a singleton list with a tuple that has our desired 
-value as one component and a string with what it didn't consume as the 
-other.</div>
-<p>We check if the number that we entered is equal to the one generated 
-randomly and give the user the appropriate message. And then we call <span class="fixed">askForNumber</span>
- recursively, only this time with the new generator that we got, which 
-gives us an I/O action that's just like the one we performed, only it 
-depends on a different generator and we perform it.</p>
-<p><span class="fixed">main</span> consists of just getting a random generator from the system and calling <span class="fixed">askForNumber</span> with it to get the initial action.</p>
-<p>Here's our program in action!</p>
+<p>関数 <span class="fixed">askForNumber</span> は乱数生成器を取り、ユーザーに数を尋ねて当たりかを伝える IOアクションを返します。関数内ではまず引数の生成器から乱数と新生成器を生み、<span class="fixed">randNumber</span> と <span class="fixed">newGen</span> と呼びます。生成された数を <span class="fixed">7</span> としましょう。次にユーザーに考えている数を当てるよう促し、<span class="fixed">getLine</span> の結果を <span class="fixed">numberString</span> に束縛。ユーザーが <span class="fixed">7</span> と入力すると <span class="fixed">numberString</span> は <span class="fixed">"7"</span>。<span class="fixed">when</span> で入力が空文字列かを判定。空なら <span class="fixed">return ()</span> でプログラム終了、そうでなければ <i>do</i> ブロックを実行。<span class="fixed">read</span> で数値に変換して <span class="fixed">number</span> は <span class="fixed">7</span>。</p>
+<div class="hintbox"><b>失礼！</b>　<span class="fixed">read</span> が読めない入力（<span class="fixed">"haha"</span> など）が来ると、プログラムは醜いエラーで落ちます。落ちないようにしたければ <span class="label function">reads</span> を使います。失敗時は空リスト、成功時は欲しい値と未消費文字列のタプルを 1 要素持つリストを返します。</div>
+<p>入力した数と乱数が等しいかを確認して適切なメッセージを表示。その後新しい生成器で <span class="fixed">askForNumber</span> を再帰呼び出し。同じ動きの IOアクションが返り、それを実行します。</p>
+<p><span class="fixed">main</span> はシステムから乱数生成器を取得し、それで <span class="fixed">askForNumber</span> を呼んで初期アクションを得るだけ。</p>
+<p>動作はこう：</p>
 <pre name="code" class="plain">$ runhaskell guess_the_number.hs
 Which number in the range from 1 to 10 am I thinking of? 4
 Sorry, it was 3
@@ -1442,7 +940,7 @@ Sorry, it was 10
 Which number in the range from 1 to 10 am I thinking of?
 
 </pre>
-<p>Another way to make this same program is like this:</p>
+<p>同じプログラムをこうも書けます：</p>
 <pre name="code" class="haskell:hs">import System.Random
 import Control.Monad(when)
 
@@ -1459,87 +957,35 @@ main = do
         newStdGen
         main
 </pre>
-<p>It's very similar to the previous version, only instead of making a 
-function that takes a generator and then calls itself recursively with 
-the new updated generator, we do all the work in <span class="fixed">main</span>. After telling the user whether they were correct in their guess or not, we update the global generator and then call <span class="fixed">main</span> again. Both approaches are valid but I like the first one more since it does less stuff in <span class="fixed">main</span> and also provides us with a function that we can reuse easily.</p>
-<a name="bytestrings"></a><h2>Bytestrings</h2>
+<p>前のバージョンとよく似ていますが、生成器を取って自身を再帰呼び出しする関数を作る代わりに、すべてを <span class="fixed">main</span> でやっています。当たりかどうかを伝えた後、グローバル生成器を更新して再度 <span class="fixed">main</span> を呼びます。どちらのアプローチも妥当ですが、私は最初の方が好きです。<span class="fixed">main</span> がやることが少なく、再利用しやすい関数も得られるので。</p>
+<a name="bytestrings"></a><h2>バイト文字列 (Bytestrings)</h2>
 
-<p>Lists are a cool and useful data structure. So far, we've used them 
-pretty much everywhere. There are a multitude of functions that operate 
-on them and Haskell's laziness allows us to exchange the for and while 
-loops of other languages for filtering and mapping over lists, because 
-evaluation will only happen once it really needs to, so things like 
-infinite lists (and even infinite lists of infinite lists!) are no 
-problem for us. That's why lists can also be used to represent streams, 
-either when reading from the standard input or when reading from files. 
-We can just open a file and read it as a string, even though it will 
-only be accessed when the need arises.</p>
-<p>However, processing files as strings has one drawback: it tends to be slow. As you know, <span class="fixed">String</span> is a type synonym for <span class="fixed">[Char]</span>. <span class="fixed">Char</span>s
- don't have a fixed size, because it takes several bytes to represent a 
-character from, say, Unicode. Furthemore, lists are really lazy. If you 
-have a list like <span class="fixed">[1,2,3,4]</span>, it will be evaluated only when completely necessary. So the whole list is sort of a promise of a list. Remember that <span class="fixed">[1,2,3,4]</span> is syntactic sugar for <span class="fixed">1:2:3:4:[]</span>. When the first element of the list is forcibly evaluated (say by printing it), the rest of the list <span class="fixed">2:3:4:[]</span>
- is still just a promise of a list, and so on. So you can think of lists
- as promises that the next element will be delivered once it really has 
-to and along with it, the promise of the element after it. It doesn't 
-take a big mental leap to conclude that processing a simple list of 
-numbers as a series of promises might not be the most efficient thing in
- the world.</p>
-<p>That overhead doesn't bother us so much most of the time, but it 
-turns out to be a liability when reading big files and manipulating 
-them. That's why Haskell has <em>bytestrings</em>. Bytestrings are sort 
-of like lists, only each element is one byte (or 8 bits) in size. The 
-way they handle laziness is also different. </p>
-<p>Bytestrings come in two flavors: strict and lazy ones. Strict bytestrings reside in <span class="fixed">Data.ByteString</span>
- and they do away with the laziness completely. There are no promises 
-involved; a strict bytestring represents a series of bytes in an array. 
-You can't have things like infinite strict bytestrings. If you evaluate 
-the first byte of a strict bytestring, you have to evaluate it whole. 
-The upside is that there's less overhead because there are no thunks 
-(the technical term for <i>promise</i>) involved. The downside is that they're likely to fill your memory up faster because they're read into memory at once.</p>
-<p>The other variety of bytestrings resides in <span class="fixed">Data.ByteString.Lazy</span>.
- They're lazy, but not quite as lazy as lists. Like we said before, 
-there are as many thunks in a list as there are elements. That's what 
-makes them kind of slow for some purposes. Lazy bytestrings take a 
-different approach — they are stored in chunks (not to be confused with 
-thunks!), each chunk has a size of 64K. So if you evaluate a byte in a 
-lazy bytestring (by printing it or something), the first 64K will be 
-evaluated. After that, it's just a promise for the rest of the chunks. 
-Lazy bytestrings are kind of like lists of strict bytestrings with a 
-size of 64K. When you process a file with lazy bytestrings, it will be 
-read chunk by chunk. This is cool because it won't cause the memory 
-usage to skyrocket and the 64K probably fits neatly into your CPU's L2 
-cache.</p>
-<p>If you look through the <a href="http://www.haskell.org/ghc/docs/latest/html/libraries/bytestring/Data-ByteString-Lazy.html">documentation</a> for <span class="fixed">Data.ByteString.Lazy</span>, you'll see that it has a lot of functions that have the same names as the ones from <span class="fixed">Data.List</span>, only the type signatures have <span class="fixed">ByteString</span> instead of <span class="fixed">[a]</span> and <span class="fixed">Word8</span> instead of <span class="fixed">a</span>
- in them. The functions with the same names mostly act the same as the 
-ones that work on lists. Because the names are the same, we're going to 
-do a qualified import in a script and then load that script into GHCI to
- play with bytestrings. </p>
+<p>リストはクールで便利なデータ構造です。これまでほぼあらゆる場面で使ってきました。リストを操作する関数は山ほどあり、Haskell の遅延評価のおかげで他言語の for/while ループをリストへの map/filter に置き換えられます。評価は本当に必要なときにしか起きないので、無限リスト（さらには無限リストの無限リスト！）も問題なく扱えます。だから標準入力やファイルから読むときも、リストをストリームとして扱えます。ファイルを開いて文字列として読み込んでも、必要なときにしかアクセスされません。</p>
+<p>ただしファイルを文字列として処理するのは遅くなりがち、という欠点があります。<span class="fixed">String</span> は <span class="fixed">[Char]</span> のシノニムでしたね。Unicode 由来の文字 1 つを表すのに数バイトかかるので、<span class="fixed">Char</span> はサイズ固定ではありません。さらにリストはとても遅延的。<span class="fixed">[1,2,3,4]</span> は完全に必要になるまで評価されません。リスト全体が「リストになる約束」のようなもの。<span class="fixed">[1,2,3,4]</span> は <span class="fixed">1:2:3:4:[]</span> の糖衣構文。先頭が（出力などで）強制評価されると、残り <span class="fixed">2:3:4:[]</span> はまだ「約束」のまま、という具合。要するにリストは「次の要素を必要なときに渡す」という約束の連なりで、シンプルな数のリストを「約束の連なり」として処理するのは効率が悪い、と気付きます。</p>
+<p>普段はそのオーバーヘッドが大した問題にはなりませんが、大きなファイルを読み書きするときには負担になります。そこで <em>バイト文字列 (bytestring)</em> です。リストに似ていますが、要素 1 つが 1 バイト（8 ビット）。遅延の扱いも違います。</p>
+<p>バイト文字列には正格版と遅延版の 2 種類があります。正格版は <span class="fixed">Data.ByteString</span> にあり、遅延性を完全に排除しています。約束はなく、配列に並んだバイト列。無限の正格バイト文字列はあり得ません。先頭バイトを評価すれば全体を評価します。利点は thunk（"約束" の専門用語）が無いのでオーバーヘッドが少ないこと。欠点は一度にメモリへ読み込むので消費が早いこと。</p>
+<p>もう 1 つは <span class="fixed">Data.ByteString.Lazy</span> の遅延版。リストほど遅延的ではありません。リストは要素数だけ thunk があり、これが場合によって遅さの原因。遅延バイト文字列は別アプローチ — チャンク（thunk と混同しないこと！）に格納し、各チャンクは 64K。1 バイトを評価すると最初の 64K が評価され、残りはチャンクごとの約束。要するに 64K の正格バイト文字列のリストのようなもの。ファイル処理ではチャンク単位で読まれ、メモリ消費を抑えつつ 64K は CPU の L2 キャッシュにきれいに収まります。</p>
+<p><span class="fixed">Data.ByteString.Lazy</span> の <a href="http://www.haskell.org/ghc/docs/latest/html/libraries/bytestring/Data-ByteString-Lazy.html">ドキュメント</a> を見ると、<span class="fixed">Data.List</span> と同名の関数がたくさんあり、型シグネチャが <span class="fixed">[a]</span> の代わりに <span class="fixed">ByteString</span>、<span class="fixed">a</span> の代わりに <span class="fixed">Word8</span> になっています。同名関数は基本同じ動き。名前が衝突するので qualified import してスクリプトに書き、GHCi で読み込んで遊びます。</p>
 <pre name="code" class="haskell:hs">import qualified Data.ByteString.Lazy as B
 import qualified Data.ByteString as S
 </pre>
-<p><span class="fixed">B</span> has lazy bytestring types and functions, whereas <span class="fixed">S</span> has strict ones. We'll mostly be using the lazy version.</p>
-<p>The function <span class="function label">pack</span> has the type signature <span class="fixed">pack :: [Word8] -&gt; ByteString</span>. What that means is that it takes a list of bytes of type <span class="fixed">Word8</span> and returns a <span class="fixed">ByteString</span>. You can think of it as taking a list, which is lazy, and making it less lazy, so that it's lazy only at 64K intervals.</p>
-<p>What's the deal with that <span class="fixed">Word8</span> type? Well, it's like <span class="fixed">Int</span>, only that it has a much smaller range, namely 0-255. It represents an 8-bit number. And just like <span class="fixed">Int</span>, it's in the <span class="fixed">Num</span> typeclass. For instance, we know that the value <span class="fixed">5</span> is polymorphic in that it can act like any numeral type. Well, it can also take the type of <span class="fixed">Word8</span>.</p>
+<p><span class="fixed">B</span> が遅延バイト文字列、<span class="fixed">S</span> が正格バイト文字列。基本は遅延版を使います。</p>
+<p><span class="function label">pack</span> の型シグネチャは <span class="fixed">pack :: [Word8] -&gt; ByteString</span>。<span class="fixed">Word8</span> 型のバイトのリストを取って <span class="fixed">ByteString</span> を返します。リスト（遅延）を「64K 間隔だけ遅延」に変えるイメージ。</p>
+<p><span class="fixed">Word8</span> 型は何でしょう？　<span class="fixed">Int</span> に似ていますが範囲が 0-255 と狭く、8 ビット数を表します。<span class="fixed">Int</span> 同様 <span class="fixed">Num</span> 型クラスのメンバー。<span class="fixed">5</span> は多相な値なので、任意の数値型として振る舞え、<span class="fixed">Word8</span> にもなれます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; B.pack [99,97,110]
 Chunk "can" Empty
 ghci&gt; B.pack [98..120]
 Chunk "bcdefghijklmnopqrstuvwx" Empty
 </pre>
-<p>As you can see, you usually don't have to worry about the <span class="fixed">Word8</span> too much, because the type system can makes the numbers choose that type. If you try to use a big number, like <span class="fixed">336</span> as a <span class="fixed">Word8</span>, it will just wrap around to <span class="fixed">80</span>.</p>
-<p>We packed only a handful of values into a <span class="fixed">ByteString</span>, so they fit inside one chunk. The <span class="fixed">Empty</span> is like the <span class="fixed">[]</span> for lists.</p>
-<p><span class="label function">unpack</span> is the inverse function of <span class="fixed">pack</span>. It takes a bytestring and turns it into a list of bytes.</p> 
-<p><span class="label function">fromChunks</span> takes a list of strict bytestrings and converts it to a lazy bytestring. <span class="label function">toChunks</span> takes a lazy bytestring and converts it to a list of strict ones.</p>
+<p>普通は <span class="fixed">Word8</span> をそんなに気にしなくて済みます。型システムが数値にこの型を選んでくれます。<span class="fixed">336</span> のような大きな数を <span class="fixed">Word8</span> にしようとすると、ラップアラウンドして <span class="fixed">80</span> になります。</p>
+<p>少数の値を <span class="fixed">ByteString</span> にパックしたので、1 チャンクに収まりました。<span class="fixed">Empty</span> はリストの <span class="fixed">[]</span> 相当。</p>
+<p><span class="label function">unpack</span> は <span class="fixed">pack</span> の逆。バイト文字列をバイトのリストに変換します。</p>
+<p><span class="label function">fromChunks</span> は正格バイト文字列のリストを遅延バイト文字列に変換、<span class="label function">toChunks</span> はその逆。</p>
 <pre name="code" class="haskell:hs">ghci&gt; B.fromChunks [S.pack [40,41,42], S.pack [43,44,45], S.pack [46,47,48]]
 Chunk "()*" (Chunk "+,-" (Chunk "./0" Empty))
 </pre>
-<p>This is good if you have a lot of small strict bytestrings and you 
-want to process them efficiently without joining them into one big 
-strict bytestring in memory first.</p>
-<p>The bytestring version of <span class="fixed">:</span> is called <span class="label function">cons</span>
- It takes a byte and a bytestring and puts the byte at the beginning. 
-It's lazy though, so it will make a new chunk even if the first chunk in
- the bytestring isn't full. That's why it's better to use the strict 
-version of <span class="fixed">cons</span>, <span class="label function">cons'</span> if you're going to be inserting a lot of bytes at the beginning of a bytestring.</p>
+<p>たくさんの小さな正格バイト文字列を、メモリ上で 1 つの大きな正格バイト文字列に結合せず効率良く処理したいときに便利。</p>
+<p>バイト文字列版の <span class="fixed">:</span> は <span class="label function">cons</span>。バイトとバイト文字列を取って先頭に置きます。ただし遅延的なので、最初のチャンクが満杯でなくても新チャンクを作ります。先頭にたくさんのバイトを挿入するなら正格版の <span class="label function">cons'</span> のほうが良いです。</p>
 <pre name="code" class="haskell:hs">ghci&gt; B.cons 85 $ B.pack [80,81,82,84]
 Chunk "U" (Chunk "PQRT" Empty)
 ghci&gt; B.cons' 85 $ B.pack [80,81,82,84]
@@ -1550,17 +996,10 @@ Empty))))))))))
 ghci&gt; foldr B.cons' B.empty [50..60]
 Chunk "23456789:;&lt;" Empty
 </pre>
-<p>As you can see <span class="label function">empty</span> makes an empty bytestring. See the difference between <span class="fixed">cons</span> and <span class="fixed">cons'</span>? With the <span class="fixed">foldr</span>,
- we started with an empty bytestring and then went over the list of 
-numbers from the right, adding each number to the beginning of the 
-bytestring. When we used <span class="fixed">cons</span>, we ended up with one chunk for every byte, which kind of defeats the purpose.</p>
-<p>Otherwise, the bytestring modules have a load of functions that are analogous to those in <span class="fixed">Data.List</span>, including, but not limited to, <span class="fixed">head</span>, <span class="fixed">tail</span>, <span class="fixed">init</span>, <span class="fixed">null</span>, <span class="fixed">length</span>, <span class="fixed">map</span>, <span class="fixed">reverse</span>, <span class="fixed">foldl</span>, <span class="fixed">foldr</span>, <span class="fixed">concat</span>, <span class="fixed">takeWhile</span>, <span class="fixed">filter</span>, etc. </p>
-<p>It also has functions that have the same name and behave the same as some functions found in <span class="fixed">System.IO</span>, only <span class="fixed">String</span>s are replaced with <span class="fixed">ByteString</span>s. For instance, the <span class="fixed">readFile</span> function in <span class="fixed">System.IO</span> has a type of <span class="fixed">readFile :: FilePath -&gt; IO String</span>, while the <span class="label function">readFile</span> from the bytestring modules has a type of <span class="fixed">readFile :: FilePath -&gt; IO ByteString</span>.
- Watch out, if you're using strict bytestrings and you attempt to read a
- file, it will read it into memory at once! With lazy bytestrings, it 
-will read it into neat chunks.</p>
-<p>Let's make a simple program that takes two filenames as command-line 
-arguments and copies the first file into the second file. Note that <span class="fixed">System.Directory</span> already has a function called <span class="fixed">copyFile</span>, but we're going to implement our own file copying function and program anyway.</p>
+<p><span class="label function">empty</span> は空バイト文字列を作ります。<span class="fixed">cons</span> と <span class="fixed">cons'</span> の違いに注目。<span class="fixed">foldr</span> で空バイト文字列から始めて、右からリストを走査して各数をバイト文字列の先頭に追加。<span class="fixed">cons</span> だとバイトごとに 1 チャンクができてしまい、本来の目的に反します。</p>
+<p>その他、バイト文字列モジュールには <span class="fixed">Data.List</span> 由来の関数群（<span class="fixed">head</span>、<span class="fixed">tail</span>、<span class="fixed">init</span>、<span class="fixed">null</span>、<span class="fixed">length</span>、<span class="fixed">map</span>、<span class="fixed">reverse</span>、<span class="fixed">foldl</span>、<span class="fixed">foldr</span>、<span class="fixed">concat</span>、<span class="fixed">takeWhile</span>、<span class="fixed">filter</span> など）と同じ動きの関数がたくさんあります。</p>
+<p><span class="fixed">System.IO</span> 由来の関数も同名で同動作。<span class="fixed">String</span> の代わりに <span class="fixed">ByteString</span> を扱うだけです。<span class="fixed">System.IO</span> の <span class="fixed">readFile</span> は <span class="fixed">readFile :: FilePath -&gt; IO String</span>、バイト文字列モジュールの <span class="label function">readFile</span> は <span class="fixed">readFile :: FilePath -&gt; IO ByteString</span>。注意。正格バイト文字列でファイルを読むと一気にメモリへ読み込みます！　遅延バイト文字列ならチャンクごとに読みます。</p>
+<p>2 つのファイル名をコマンドライン引数で受け取って、最初を 2 つ目にコピーするシンプルなプログラムを作ります。<span class="fixed">System.Directory</span> に <span class="fixed">copyFile</span> はありますが、ここでは自前で実装します。</p>
 <pre name="code" class="haskell:hs">import System.Environment
 import qualified Data.ByteString.Lazy as B
 
@@ -1573,84 +1012,26 @@ copyFile source dest = do
     contents &lt;- B.readFile source
     B.writeFile dest contents
 </pre>
-<p>We make our own function that takes two <span class="fixed">FilePath</span>s (remember, <span class="fixed">FilePath</span> is just a synonym for <span class="fixed">String</span>) and returns an I/O action that will copy one file into another using bytestring. In the <span class="fixed">main</span> function, we just get the arguments and call our function with them to get the I/O action, which is then performed.</p>
+<p>2 つの <span class="fixed">FilePath</span>（<span class="fixed">String</span> のシノニム）を取り、バイト文字列でファイルをコピーする IOアクションを返す関数を自作。<span class="fixed">main</span> は引数を取得して関数を呼び、得た IOアクションを実行するだけ。</p>
 <pre name="code" class="plain">$ runhaskell bytestringcopy.hs something.txt ../../something.txt
 </pre>
-<p>Notice that a program that doesn't use bytestrings could look just like this, the only difference is that we used <span class="fixed">B.readFile</span> and <span class="fixed">B.writeFile</span> instead of <span class="fixed">readFile</span> and <span class="fixed">writeFile</span>.
- Many times, you can convert a program that uses normal strings to a 
-program that uses bytestrings by just doing the necessary imports and 
-then putting the qualified module names in front of some functions. 
-Sometimes, you have to convert functions that you wrote to work on 
-strings so that they work on bytestrings, but that's not hard.</p>
-<p>Whenever you need better performance in a program that reads a lot of
- data into strings, give bytestrings a try, chances are you'll get some 
-good performance boosts with very little effort on your part. I usually 
-write programs by using normal strings and then convert them to use 
-bytestrings if the performance is not satisfactory.</p> 
-<a name="exceptions"></a><h2>Exceptions</h2>
+<p>バイト文字列を使わないプログラムも見た目は同じ。違いは <span class="fixed">readFile</span>/<span class="fixed">writeFile</span> の代わりに <span class="fixed">B.readFile</span>/<span class="fixed">B.writeFile</span> を使う点だけ。普通の文字列を使うプログラムも、必要な import を加えて関数の前に qualified モジュール名を付けるだけでバイト文字列版に変換できることが多いです。文字列用に書いた関数をバイト文字列用に直す必要もありますが、そんなに難しくありません。</p>
+<p>大量のデータを文字列に読み込むプログラムでパフォーマンスが必要なら、ぜひバイト文字列を試してみてください。少ない労力で性能向上が得られることが多いです。私は通常まず普通の文字列で書き、性能が足りなければバイト文字列に変換します。</p>
+<a name="exceptions"></a><h2>例外</h2>
 
-<p>All languages have procedures, functions, and pieces of code that 
-might fail in some way. That's just a fact of life. Different languages 
-have different ways of handling those failures. In C, we usually use 
-some abnormal return value (like <span class="fixed">-1</span> or a null
- pointer) to indicate that what a function returned shouldn't be treated
- like a normal value. Java and C#, on the other hand, tend to use 
-exceptions to handle failure. When an exception is thrown, the control 
-flow jumps to some code that we've defined that does some cleanup and 
-then maybe re-throws the exception so that some other error handling 
-code can take care of some other stuff.</p>
-<p>Haskell has a very good type system. Algebraic data types allow for types like <span class="fixed">Maybe</span> and <span class="fixed">Either</span> and we can use values of those types to represent results that may be there or not. In C, returning, say, <span class="fixed">-1</span>
- on failure is completely a matter of convention. It only has special 
-meaning to humans. If we're not careful, we might treat these abnormal 
-values as ordinary ones and then they can cause havoc and dismay in our 
-code. Haskell's type system gives us some much-needed safety in that 
-aspect. A function <span class="fixed">a -&gt; Maybe b</span> clearly indicates that it it may produce a <span class="fixed">b</span> wrapped in <span class="fixed">Just</span> or that it may return <span class="fixed">Nothing</span>. The type is different from just plain <span class="fixed">a -&gt; b</span> and if we try to use those two functions interchangeably, the compiler will complain at us.</p>
-<p>Despite having expressive types that support failed computations, 
-Haskell still has support for exceptions, because they make more sense 
-in I/O contexts. A lot of things can go wrong when dealing with the 
-outside world because it is so unreliable. For instance, when opening a 
-file, a bunch of things can go wrong. The file might be locked, it might
- not be there at all or the hard disk drive or something might not be 
-there at all. So it's good to be able to jump to some error handling 
-part of our code when such an error occurs.</p>
-<p>Okay, so I/O code (i.e. impure code) can throw exceptions. It makes 
-sense. But what about pure code? Well, it can throw exceptions too. 
-Think about the <span class="fixed">div</span> and <span class="fixed">head</span> functions. They have types of <span class="fixed">(Integral a) =&gt; a -&gt; a -&gt; a</span> and <span class="fixed">[a] -&gt; a</span>, respectively. No <span class="fixed">Maybe</span> or <span class="fixed">Either</span> in their return type and yet they can both fail! <span class="fixed">div</span> explodes in your face if you try to divide by zero and <span class="fixed">head</span> throws a tantrum when you give it an empty list.</p>
+<p>あらゆる言語に「失敗するかもしれないコード」があります。それは事実。失敗の扱い方は言語ごとに異なります。C では <span class="fixed">-1</span> や NULL ポインタなどの異常値で失敗を示すのが普通。Java や C# は例外で失敗を扱います。例外が投げられると、制御は事前に定義したクリーンアップコードに飛び、再 throw して別のエラー処理コードに任せたりします。</p>
+<p>Haskell には強力な型システムがあります。代数的データ型のおかげで <span class="fixed">Maybe</span> や <span class="fixed">Either</span> といった型があり、結果が存在するかどうかを値で表せます。C では <span class="fixed">-1</span> を返すのは慣習でしかなく、特別な意味は人間にしか分かりません。注意しないと異常値を普通の値として扱ってしまい、コードが大荒れに。Haskell の型システムはこの点で安全性を与えます。<span class="fixed">a -&gt; Maybe b</span> という関数は「<span class="fixed">b</span> を <span class="fixed">Just</span> に包んで返すか <span class="fixed">Nothing</span> を返す」と明示。<span class="fixed">a -&gt; b</span> とは別の型なので、両者を入れ替えようとするとコンパイラが文句を言います。</p>
+<p>失敗を表現できる豊かな型がある一方、Haskell には例外もあります。I/O 文脈ではそのほうが自然だからです。外の世界は不安定なので、ファイルを開く際にもロックされていたり、存在しなかったり、ハードディスクが無いことすらあります。エラー時にエラー処理コードへ飛べると便利。</p>
+<p>I/O コード（非純粋）が例外を投げられるのは納得。純粋コードは？　投げられます。<span class="fixed">div</span> や <span class="fixed">head</span> を考えてみてください。型は <span class="fixed">(Integral a) =&gt; a -&gt; a -&gt; a</span> と <span class="fixed">[a] -&gt; a</span>。<span class="fixed">Maybe</span> も <span class="fixed">Either</span> も無いのに、両方とも失敗しえます！　0 で割ると <span class="fixed">div</span> は爆発、空リストに <span class="fixed">head</span> を呼ぶと駄々をこねます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; 4 `div` 0
 *** Exception: divide by zero
 ghci&gt; head []
 *** Exception: Prelude.head: empty list
 </pre>
 
-<p>Pure code can throw exceptions, but it they can only be caught in the I/O part of our code (when we're inside a <i>do</i> block that goes into <span class="fixed">main</span>).
- That's because you don't know when (or if) anything will be evaluated 
-in pure code, because it is lazy and doesn't have a well-defined order 
-of execution, whereas I/O code does.</p>
-<p>Earlier, we talked about how we should spend as little time as 
-possible in the I/O part of our program. The logic of our program should
- reside mostly within our pure functions, because their results are 
-dependant only on the parameters that the functions are called with. 
-When dealing with pure functions, you only have to think about what a 
-function returns, because it can't do anything else. This makes your 
-life easier. Even though doing some logic in I/O is necessary (like 
-opening files and the like), it should preferably be kept to a minimum. 
-Pure functions are lazy by default, which means that we don't know when 
-they will be evaluated and that it really shouldn't matter. However, 
-once pure functions start throwing exceptions, it matters when they are 
-evaluated. That's why we can only catch exceptions thrown from pure 
-functions in the I/O part of our code. And that's bad, because we want 
-to keep the I/O part as small as possible. However, if we don't catch 
-them in the I/O part of our code, our program crashes. The solution? 
-Don't mix exceptions and pure code. Take advantage of Haskell's powerful
- type system and use types like <span class="fixed">Either</span> and <span class="fixed">Maybe</span> to represent results that may have failed.</p>
-<p>That's why we'll just be looking at how to use I/O exceptions for 
-now. I/O exceptions are exceptions that are caused when something goes 
-wrong while we are communicating with the outside world in an I/O action
- that's part of <span class="fixed">main</span>. For example, we can try
- opening a file and then it turns out that the file has been deleted or 
-something. Take a look at this program that opens a file whose name is 
-given to it as a command line argument and tells us how many lines the 
-file has.</p>
+<p>純粋コードでも例外は投げられますが、捕まえられるのは I/O の部分（<span class="fixed">main</span> につながる <i>do</i> ブロックの中）だけです。純粋コードは遅延評価で実行順序が定まらず、いつ・どう評価されるか分かりません。I/O コードは順序が定まっています。</p>
+<p>I/O 部分はできるだけ小さく、というのは前にも話しました。プログラムのロジックは純粋関数に集約すべきです。純粋関数は引数だけに依存し、戻り値だけ考えれば良い。生活が楽になります。ファイルを開くなど I/O も必要ですが、最小限に。純粋関数は遅延的で、いつ評価されるか分からないし、本来気にしなくて良い。でも純粋関数が例外を投げ始めると、いつ評価されるかが重要になります。だから純粋関数の例外を捕まえられるのは I/O 部分だけ。これは厄介です、I/O 部分を小さく保ちたいから。でも捕まえなければクラッシュします。解決策？　例外と純粋コードを混ぜないこと。Haskell の型システムを活かして、失敗するかもしれない結果は <span class="fixed">Either</span> や <span class="fixed">Maybe</span> で表すべきです。</p>
+<p>だからここでは I/O 例外の使い方だけを見ます。I/O 例外は、<span class="fixed">main</span> 配下の I/O アクションで外界とやり取りするときに起きるエラー。たとえばファイルを開こうとしたが削除されていた、など。コマンドライン引数のファイル名を開いて行数を表示するプログラム：</p>
 <pre name="code" class="haskell:hs">import System.Environment
 import System.IO
 
@@ -1658,16 +1039,11 @@ main = do (fileName:_) &lt;- getArgs
           contents &lt;- readFile fileName
           putStrLn $ "The file has " ++ show (length (lines contents)) ++ " lines!"
 </pre>
-<p>A very simple program. We perform the <span class="fixed">getArgs</span> I/O action and bind the first string in the list that it yields to <span class="fixed">fileName</span>. Then we call the contents of the file with that name <span class="fixed">contents</span>. Lastly, we apply <span class="fixed">lines</span> to those contents to get a list of lines and then we get the length of that list and give it to <span class="fixed">show</span>
- to get a string representation of that number. It works as expected, 
-but what happens when we give it the name of a file that doesn't exist?</p>
+<p>シンプルなプログラム。<span class="fixed">getArgs</span> を実行してリストの最初の文字列を <span class="fixed">fileName</span> に束縛、その名前のファイルの内容を <span class="fixed">contents</span> に。<span class="fixed">lines</span> で行リストにして長さを取り、<span class="fixed">show</span> で文字列化。期待通り動きますが、存在しないファイル名を渡したら？</p>
 <pre name="code" class="plain">$ runhaskell linecount.hs i_dont_exist.txt
 linecount.hs: i_dont_exist.txt: openFile: does not exist (No such file or directory)
 </pre>
-<p>Aha, we get an error from GHC, telling us that the file does not 
-exist. Our program crashes. What if we wanted to print out a nicer 
-message if the file doesn't exist? One way to do that is to check if the
- file exists before trying to open it by using the <span class="label function">doesFileExist</span> function from <span class="fixed">System.Directory</span>.</p>
+<p>GHC のエラーメッセージで「ファイルが存在しない」と言われ、プログラムが落ちます。ファイルが無いときに親切なメッセージを出したいときは？　1 つの方法は、開く前に <span class="fixed">System.Directory</span> の <span class="label function">doesFileExist</span> でファイルの存在を確認すること。</p>
 <pre name="code" class="haskell:hs">import System.Environment
 import System.IO
 import System.Directory
@@ -1679,29 +1055,13 @@ main = do (fileName:_) &lt;- getArgs
                       putStrLn $ "The file has " ++ show (length (lines contents)) ++ " lines!"
               else do putStrLn "The file doesn't exist!"
 </pre>
-<p>We did <span class="fixed">fileExists &lt;- doesFileExist fileName</span> because <span class="fixed">doesFileExist</span> has a type of <span class="fixed">doesFileExist :: FilePath -&gt; IO Bool</span>,
- which means that it returns an I/O action that has as its result a 
-boolean value which tells us if the file exists. We can't just use <span class="fixed">doesFileExist</span> in an <i>if</i> expression directly.</p>
-<p>Another solution here would be to use exceptions. It's perfectly 
-acceptable to use them in this context. A file not existing is an 
-exception that arises from I/O, so catching it in I/O is fine and dandy.</p>
-<p>To deal with this by using exceptions, we're going to take advantage of the <span class="label function">catch</span> function from <span class="fixed">System.IO.Error</span>. Its type is <span class="fixed">catch :: IO a -&gt; (IOError -&gt; IO a) -&gt; IO a</span>.
- It takes two parameters. The first one is an I/O action. For instance, 
-it could be an I/O action that tries to open a file. The second one is 
-the so-called handler. If the first I/O action passed to <span class="fixed">catch</span>
- throws an I/O exception, that exception gets passed to the handler, 
-which then decides what to do. So the final result is an I/O action that
- will either act the same as the first parameter or it will do what the 
-handler tells it if the first I/O action throws an exception.</p>
+<p><span class="fixed">doesFileExist</span> の型は <span class="fixed">doesFileExist :: FilePath -&gt; IO Bool</span>。「ファイル存在の真偽値」を結果に持つ IOアクションを返します。<i>if</i> 式に直接使えないので <span class="fixed">fileExists &lt;- doesFileExist fileName</span> としています。</p>
+<p>もう 1 つの解は例外を使うこと。この文脈では問題ありません。「ファイルが無い」は I/O 由来の例外なので、I/O で捕まえれば OK。</p>
+<p>例外で対処するには <span class="fixed">System.IO.Error</span> の <span class="label function">catch</span> 関数を使います。型は <span class="fixed">catch :: IO a -&gt; (IOError -&gt; IO a) -&gt; IO a</span>。引数は 2 つ。1 つ目は IOアクション（例：ファイルを開こうとする IOアクション）。2 つ目はハンドラ。1 つ目が I/O 例外を投げたらそれがハンドラに渡され、ハンドラが処理を決めます。最終的な IOアクションは、例外がなければ 1 つ目と同じ、例外があればハンドラの動作になります。</p>
 
-<p>If you're familiar with <i>try-catch</i> blocks in languages like Java or Python, the <span class="fixed">catch</span> function is similar to them. The first parameter is the thing to try, kind of like the stuff in the <i>try</i> block in other, imperative languages. The second parameter is the handler that takes an exception, just like most <i>catch</i> blocks take exceptions that you can then examine to see what happened. The handler is invoked if an exception is thrown.</p>
-<p>The handler takes a value of type <span class="fixed">IOError</span>,
- which is a value that signifies that an I/O exception occurred. It also
- carries information regarding the type of the exception that was 
-thrown. How this type is implemented depends on the implementation of 
-the language itself, which means that we can't inspect values of the 
-type <span class="fixed">IOError</span> by pattern matching against them, just like we can't pattern match against values of type <span class="fixed">IO <i>something</i></span>. We can use a bunch of useful predicates to find out stuff about values of type <span class="fixed">IOError</span> as we'll learn in a second.</p>
-<p>So let's put our new friend <span class="fixed">catch</span> to use!</p>
+<p>Java や Python の <i>try-catch</i> に馴染みがあれば、<span class="fixed">catch</span> 関数は似ています。1 つ目は試すこと（<i>try</i> ブロックの中身）、2 つ目は例外を受け取るハンドラ（<i>catch</i> ブロック相当）。例外が投げられたときにハンドラが呼ばれます。</p>
+<p>ハンドラは <span class="fixed">IOError</span> 型の値を取ります。これは I/O 例外が起きたことを示し、例外の種類情報も持ちます。実装は言語実装に依存し、<span class="fixed">IO <i>何か</i></span> 型と同じくパターンマッチで中身を覗けません。代わりに、後で学ぶ便利な述語群で値を調べます。</p>
+<p>では <span class="fixed">catch</span> を使ってみましょう！</p>
 <pre name="code" class="haskell:hs">import System.Environment
 import System.IO
 import System.IO.Error
@@ -1716,26 +1076,15 @@ toTry = do (fileName:_) &lt;- getArgs
 handler :: IOError -&gt; IO ()
 handler e = putStrLn "Whoops, had some trouble!"
 </pre>
-<p>First of all, you'll see that put backticks around it so that we can 
-use it as an infix function, because it takes two parameters. Using it 
-as an infix function makes it more readable. So <span class="fixed">toTry `catch` handler</span> is the same as <span class="fixed">catch toTry handler</span>, which fits well with its type. <span class="fixed">toTry</span> is the I/O action that we try to carry out and <span class="fixed">handler</span> is the function that takes an <span class="fixed">IOError</span> and returns an action to be carried out in case of an exception.</p>
-<p>Let's give this a go:</p>
+<p>引数が 2 つなので、バッククォートで囲んで中置関数として使うとより読みやすくなります。<span class="fixed">toTry `catch` handler</span> は <span class="fixed">catch toTry handler</span> と同じ。<span class="fixed">toTry</span> は試したい IOアクション、<span class="fixed">handler</span> は例外時に呼ばれる「<span class="fixed">IOError</span> を取って IOアクションを返す関数」。</p>
+<p>動かしてみます：</p>
 <pre name="code" class="plain">$ runhaskell count_lines.hs i_exist.txt
 The file has 3 lines!
 
 $ runhaskell count_lines.hs i_dont_exist.txt
 Whoops, had some trouble!
 </pre>
-<p>In the handler, we didn't check to see what kind of <span class="fixed">IOError</span> we got. We just say <span class="fixed">"Whoops, had some trouble!"</span>
- for any kind of error. Just catching all types of exceptions in one 
-handler is bad practice in Haskell just like it is in most other 
-languages. What if some other exception happens that we don't want to 
-catch, like us interrupting the program or something? That's why we're 
-going to do the same thing that's usually done in other languages as 
-well: we'll check to see what kind of exception we got. If it's the kind
- of exception we're waiting to catch, we do our stuff. If it's not, we 
-throw that exception back into the wild. Let's modify our program to 
-catch only the exceptions caused by a file not existing.</p>
+<p>ハンドラで <span class="fixed">IOError</span> の種類を確認していません。どんなエラーでも <span class="fixed">"Whoops, had some trouble!"</span>。1 つのハンドラで全種類の例外を捕まえるのは Haskell でも他言語でも悪い習慣。プログラム中断など、捕まえたくない例外もあります。だから他言語と同じく、例外の種類を確認し、想定したものなら処理し、そうでなければ再 throw するようにします。ファイル不在の例外だけ捕まえるよう書き換え：</p>
 <pre name="code" class="haskell:hs">import System.Environment
 import System.IO
 import System.IO.Error
@@ -1752,11 +1101,9 @@ handler e
     | isDoesNotExistError e = putStrLn "The file doesn't exist!"
     | otherwise = ioError e
 </pre>
-<p>Everything stays the same except the handler, which we modified to 
-only catch a certain group of I/O exceptions. Here we used two new 
-functions from <span class="fixed">System.IO.Error</span> — <span class="label function">isDoesNotExistError</span> and <span class="label function">ioError</span>. <span class="fixed">isDoesNotExistError</span> is a predicate over <span class="fixed">IOError</span>s, which means that it's a function that takes an <span class="fixed">IOError</span> and returns a <span class="fixed">True</span> or <span class="fixed">False</span>, meaning it has a type of <span class="fixed">isDoesNotExistError :: IOError -&gt; Bool</span>. We use it on the exception that gets passed to our handler to see if it's an error caused by a file not existing. We use <a href="syntax-in-functions.html#guards-guards">guard</a> syntax here, but we could have also used an <i>if else</i>. If it's not caused by a file not existing, we re-throw the exception that was passed by the handler with the <span class="fixed">ioError</span> function. It has a type of <span class="fixed">ioError :: IOException -&gt; IO a</span>, so it takes an <span class="fixed">IOError</span> and produces an I/O action that will throw it. The I/O action has a type of <span class="fixed">IO a</span>, because it never actually yields a result, so it can act as <span class="fixed">IO <i>anything</i></span>.</p>
-<p>So the exception thrown in the <span class="fixed">toTry</span> I/O action that we glued together with a <i>do</i> block isn't caused by a file existing, <span class="fixed">toTry `catch` handler</span> will catch that and then re-throw it. Pretty cool, huh?</p>
-<p>There are several predicates that act on <span class="fixed">IOError</span> and if a guard doesn't evaluate to <span class="fixed">True</span>, evaluation falls through to the next guard. The predicates that act on <span class="fixed">IOError</span> are:</p>
+<p>ハンドラ以外は同じ。特定の I/O 例外だけを捕まえるよう変えました。<span class="fixed">System.IO.Error</span> から 2 つの関数 — <span class="label function">isDoesNotExistError</span> と <span class="label function">ioError</span> を使います。<span class="fixed">isDoesNotExistError</span> は <span class="fixed">IOError</span> 上の述語（型 <span class="fixed">isDoesNotExistError :: IOError -&gt; Bool</span>）。ハンドラに渡された例外がファイル不在由来かを判定。ここでは <a href="syntax-in-functions.html#guards-guards">ガード</a> を使いましたが <i>if else</i> でも OK。違うなら <span class="fixed">ioError</span>（型 <span class="fixed">ioError :: IOException -&gt; IO a</span>）で例外を再 throw。結果を返さないので <span class="fixed">IO a</span> 型、何にでもなれます。</p>
+<p>つまり <i>do</i> ブロックで糊付けした <span class="fixed">toTry</span> 内で投げられた例外がファイル不在以外なら、<span class="fixed">toTry `catch` handler</span> が捕まえて再 throw します。クール！</p>
+<p><span class="fixed">IOError</span> 用の述語はいろいろあり、ガードが真でなければ次のガードへ落ちていきます。一覧：</p>
 <ul>
     <li><span class="function label">isAlreadyExistsError</span></li>
     <li><span class="function label">isDoesNotExistError</span></li>
@@ -1767,10 +1114,8 @@ functions from <span class="fixed">System.IO.Error</span> — <span class="label
     <li><span class="function label">isPermissionError</span></li>
     <li><span class="function label">isUserError</span></li>
 </ul>
-<p>Most of these are pretty self-explanatory. <span class="fixed">isUserError</span> evaluates to <span class="fixed">True</span> when we use the function <span class="label function">userError</span>
- to make the exception, which is used for making exceptions from our 
-code and equipping them with a string. For instance, you can do <span class="fixed">ioError $ userError "remote computer unplugged!"</span>, although It's prefered you use types like <span class="fixed">Either</span> and <span class="fixed">Maybe</span> to express possible failure instead of throwing exceptions yourself with <span class="fixed">userError</span>.</p>
-<p>So you could have a handler that looks something like this:</p>
+<p>大半は名前から自明。<span class="fixed">isUserError</span> は、<span class="label function">userError</span> 関数で作った例外で真を返します。<span class="fixed">userError</span> はコードから文字列付きの例外を作るのに使いますが、<span class="fixed">userError</span> で自分から投げるより <span class="fixed">Either</span> や <span class="fixed">Maybe</span> で失敗を表現するほうが好まれます。たとえば <span class="fixed">ioError $ userError "remote computer unplugged!"</span> のように使えます。</p>
+<p>ハンドラはこんな感じになり得ます：</p>
 <pre name="code" class="haskell:hs">handler :: IOError -&gt; IO ()
 handler e
     | isDoesNotExistError e = putStrLn "The file doesn't exist!"
@@ -1778,17 +1123,8 @@ handler e
     | isIllegalOperation e = notifyCops
     | otherwise = ioError e
 </pre>
-<p>Where <span class="fixed">notifyCops</span> and <span class="fixed">freeSomeSpace</span>
- are some I/O actions that you define. Be sure to re-throw exceptions if
- they don't match any of your criteria, otherwise you're causing your 
-program to fail silently in some cases where it shouldn't.</p>
-<p><span class="fixed">System.IO.Error</span> also exports functions 
-that enable us to ask our exceptions for some attributes, like what the 
-handle of the file that caused the error is, or what the filename is. 
-These start with <span class="fixed">ioe</span> and you can see a <a href="http://www.haskell.org/ghc/docs/6.10.1/html/libraries/base/System-IO-Error.html#3">full list of them</a> in the documentation. Say we want to print the filename that caused our error. We can't print the <span class="fixed">fileName</span> that we got from <span class="fixed">getArgs</span>, because only the <span class="fixed">IOError</span>
- is passed to the handler and the handler doesn't know about anything 
-else. A function depends only on the parameters it was called with. 
-That's why we can use the <span class="label function">ioeGetFileName</span> function, which has a type of <span class="fixed">ioeGetFileName :: IOError -&gt; Maybe FilePath</span>. It takes an <span class="fixed">IOError</span> as a parameter and maybe returns a <span class="fixed">FilePath</span> (which is just a type synonym for <span class="fixed">String</span>, remember, so it's kind of the same thing). Basically, what it does is it extracts the file path from the <span class="fixed">IOError</span>, if it can. Let's modify our program to print out the file path that's responsible for the exception occurring.
+<p><span class="fixed">notifyCops</span> や <span class="fixed">freeSomeSpace</span> は自分で定義した IOアクション。基準に合わない例外は必ず再 throw すること。さもないとプログラムが本来失敗すべき場面で静かに失敗します。</p>
+<p><span class="fixed">System.IO.Error</span> は例外の属性（エラー原因のハンドルやファイル名など）を取り出す関数もエクスポートします。名前は <span class="fixed">ioe</span> 始まりで、<a href="http://www.haskell.org/ghc/docs/6.10.1/html/libraries/base/System-IO-Error.html#3">完全な一覧</a> はドキュメントにあります。エラーの原因ファイル名を出したいとき。<span class="fixed">getArgs</span> で得た <span class="fixed">fileName</span> は使えません。ハンドラに渡されるのは <span class="fixed">IOError</span> だけ、関数は呼ばれたときの引数しか知らないからです。代わりに <span class="label function">ioeGetFileName</span>（型 <span class="fixed">ioeGetFileName :: IOError -&gt; Maybe FilePath</span>）が使えます。<span class="fixed">IOError</span> から可能なら <span class="fixed">FilePath</span>（<span class="fixed">String</span> のシノニム）を取り出します。プログラムを書き換えて例外原因のファイルパスを表示します。
 </p><pre name="code" class="haskell:hs">import System.Environment   
 import System.IO   
 import System.IO.Error   
@@ -1807,22 +1143,14 @@ handler e
                                  Nothing -&gt; putStrLn "Whoops! File does not exist at unknown location!"
     | otherwise = ioError e   
 </pre>
-<p>In the guard where <span class="fixed">isDoesNotExistError</span> is <span class="fixed">True</span>, we used a <i>case</i> expression to call <span class="fixed">ioeGetFileName</span> with <span class="fixed">e</span> and then pattern match against the <span class="fixed">Maybe</span> value that it returned. Using <i>case</i> expressions is commonly used when you want to pattern match against something without bringing in a new function.</p>
-<p>You don't have to use one handler to <span class="fixed">catch</span> exceptions in your whole I/O part. You can just cover certain parts of your I/O code with <span class="fixed">catch</span> or you can cover several of them with <span class="fixed">catch</span> and use different handlers for them, like so:</p>
+<p><span class="fixed">isDoesNotExistError</span> が真のガードで <i>case</i> 式を使い、<span class="fixed">ioeGetFileName</span> に <span class="fixed">e</span> を渡して、返ってきた <span class="fixed">Maybe</span> をパターンマッチ。新しい関数を導入せずパターンマッチしたいときに <i>case</i> 式が便利。</p>
+<p>I/O 部分全体で 1 つのハンドラを使う必要はありません。I/O コードの一部だけを <span class="fixed">catch</span> で囲むことも、複数の場所をそれぞれ違うハンドラで囲むこともできます：</p>
 <pre name="code" class="haskell:hs">main = do toTry `catch` handler1
           thenTryThis `catch` handler2
           launchRockets
 </pre>
-<p>Here, <span class="fixed">toTry</span> uses <span class="fixed">handler1</span> as the handler and <span class="fixed">thenTryThis</span> uses <span class="fixed">handler2</span>. <span class="fixed">launchRockets</span> isn't a parameter to <span class="fixed">catch</span>, so whichever exceptions it might throw will likely crash our program, unless <span class="fixed">launchRockets</span> uses <span class="fixed">catch</span> internally to handle its own exceptions. Of course <span class="fixed">toTry</span>, <span class="fixed">thenTryThis</span> and <span class="fixed">launchRockets</span> are I/O actions that have been glued together using <i>do</i> syntax and hypothetically defined somewhere else. This is kind of similar to <i>try-catch</i> blocks of other languages, where you can surround your whole program in a single <i>try-catch</i>
- or you can use a more fine-grained approach and use different ones in 
-different parts of your code to control what kind of error handling 
-happens where.</p>
-<p>Now you know how to deal with I/O exceptions! Throwing exceptions 
-from pure code and dealing with them hasn't been covered here, mainly 
-because, like we said, Haskell offers much better ways to indicate 
-errors than reverting to I/O to catch them. Even when glueing together 
-I/O actions that might fail, I prefer to have their type be something 
-like <span class="fixed">IO (Either a b)</span>, meaning that they're normal I/O actions but the result that they yield when performed is of type <span class="fixed">Either a b</span>, meaning it's either <span class="fixed">Left a</span> or <span class="fixed">Right b</span>.</p>
+<p><span class="fixed">toTry</span> は <span class="fixed">handler1</span> を、<span class="fixed">thenTryThis</span> は <span class="fixed">handler2</span> を使います。<span class="fixed">launchRockets</span> は <span class="fixed">catch</span> の引数になっていないので、内部で自前 <span class="fixed">catch</span> していなければ、投げられた例外でプログラムは落ちます。<span class="fixed">toTry</span>、<span class="fixed">thenTryThis</span>、<span class="fixed">launchRockets</span> はもちろん <i>do</i> 記法で糊付けされた IOアクションで、別の場所で定義されている前提。他言語の <i>try-catch</i> に似ていて、プログラム全体を 1 つの <i>try-catch</i> で囲むことも、場所ごとに細かく分けて違うエラー処理を行うこともできます。</p>
+<p>これで I/O 例外の扱いが分かりました！　純粋コードからの例外発生・処理は省略しました。Haskell は I/O に頼らずエラーを表現する優れた手段（<span class="fixed">Either</span>・<span class="fixed">Maybe</span>）を提供するからです。失敗する可能性がある IOアクションを糊付けするときも、私は型を <span class="fixed">IO (Either a b)</span> にするのが好みです。普通の IOアクションだが、実行時の結果は <span class="fixed">Either a b</span>（<span class="fixed">Left a</span> か <span class="fixed">Right b</span>）、という意味です。</p>
 
 </body>
 </html>

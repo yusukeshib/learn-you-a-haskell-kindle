@@ -3,101 +3,48 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Learn You a Haskell for Great Good!</title>
+<title>すごいHaskellたのしく学ぼう！</title>
 <link rel="stylesheet" href="../css/main.css" type="text/css" charset="utf-8">
 <body>
 
-<h1>Recursion</h1>
-<a name="hello-recursion"></a><h2>Hello recursion!</h2>
+<h1>再帰</h1>
+<a name="hello-recursion"></a><h2>こんにちは再帰！</h2>
 
-<p>We mention recursion briefly in the previous chapter. In this 
-chapter, we'll take a closer look at recursion, why it's important to 
-Haskell and how we can work out very concise and elegant solutions to 
-problems by thinking recursively. </p>
-<p>If you still don't know what recursion is, read this sentence. Haha! 
-Just kidding! Recursion is actually a way of defining functions in which
- the function is applied inside its own definition. Definitions in 
-mathematics are often given recursively. For instance, the fibonacci 
-sequence is defined recursively. First, we define the first two 
-fibonacci numbers non-recursively. We say that <i>F(0) = 0</i> and <i>F(1) = 1</i>,
- meaning that the 0th and 1st fibonacci numbers are 0 and 1, 
-respectively. Then we say that for any other natural number, that 
-fibonacci number is the sum of the previous two fibonacci numbers. So <i>F(n) = F(n-1) + F(n-2)</i>. That way, <i>F(3)</i> is <i>F(2) + F(1)</i>, which is <i>(F(1) + F(0)) + F(1)</i>. Because we've now come down to only non-recursively defined fibonacci numbers, we can safely say that <i>F(3)</i> is 2. Having an element or two in a recursion definition defined non-recursively (like <i>F(0)</i> and <i>F(1)</i> here) is also called the <em>edge condition</em> and is important if you want your recursive function to terminate. If we hadn't defined <i>F(0)</i> and <i>F(1)</i>
- non recursively, you'd never get a solution any number because you'd 
-reach 0 and then you'd go into negative numbers. All of a sudden, you'd 
-be saying that <i>F(-2000)</i> is <i>F(-2001) + F(-2002)</i> and there still wouldn't be an end in sight!</p>
-<p>Recursion is important to Haskell because unlike imperative 
-languages, you do computations in Haskell by declaring what something <i>is</i> instead of declaring <i>how</i>
- you get it. That's why there are no while loops or for loops in Haskell
- and instead we many times have to use recursion to declare what 
-something is.</p>
-<a name="maximum-awesome"></a><h2>Maximum awesome</h2>
-<p>The <span class="fixed">maximum</span> function takes a list of things that can be ordered (e.g. instances of the <span class="fixed">Ord</span>
- typeclass) and returns the biggest of them. Think about how you'd 
-implement that in an imperative fashion. You'd probably set up a 
-variable to hold the maximum value so far and then you'd loop through 
-the elements of a list and if an element is bigger than then the current
- maximum value, you'd replace it with that element. The maximum value 
-that remains at the end is the result. Whew! That's quite a lot of words
- to describe such a simple algorithm!</p>
-<p>Now let's see how we'd define it recursively. We could first set up 
-an edge condition and say that the maximum of a singleton list is equal 
-to the only element in it. Then we can say that the maximum of a longer 
-list is the head if the head is bigger than the maximum of the tail. If 
-the maximum of the tail is bigger, well, then it's the maximum of the 
-tail. That's it! Now let's implement that in Haskell.</p>
+<p>前章で再帰について少し触れました。この章では再帰を詳しく見ていき、なぜ Haskell にとって重要なのか、再帰的に考えることでどのように簡潔でエレガントな解にたどり着けるのかを見ていきます。</p>
+<p>再帰がまだ何か分からないなら、この文を読んでください。はは！　冗談です。再帰とは、関数の定義の中でその関数自身を適用する形で関数を定義する手法のことです。数学の定義は再帰的に与えられることがよくあります。たとえばフィボナッチ数列は再帰的に定義されます。まず、最初の2つのフィボナッチ数を非再帰的に定義します。<i>F(0) = 0</i> および <i>F(1) = 1</i>、つまり 0 番目と 1 番目のフィボナッチ数はそれぞれ 0 と 1 です。次に、それ以外の自然数については、フィボナッチ数を「直前2つのフィボナッチ数の和」と決めます。すなわち <i>F(n) = F(n-1) + F(n-2)</i>。こうすると <i>F(3)</i> は <i>F(2) + F(1)</i>、これは <i>(F(1) + F(0)) + F(1)</i> となります。ここまで来れば、もはや非再帰的に定義されたフィボナッチ数だけになっているので、安心して <i>F(3)</i> は 2 だと言えます。再帰定義の中で、ここでの <i>F(0)</i> と <i>F(1)</i> のように非再帰的に定義された要素を1つ2つ持っておくことを <em>エッジ条件</em> と呼びます。再帰関数を停止させたいなら、これは大切です。<i>F(0)</i> と <i>F(1)</i> を非再帰的に定義していなければ、いつまで経っても答えにたどり着けません。0 を超えると負の数に突入し、いつしか「<i>F(-2000)</i> は <i>F(-2001) + F(-2002)</i>」と言い続けることになって、終わりが見えなくなってしまいます！</p>
+<p>再帰は Haskell にとって重要です。命令型言語と違って Haskell では、計算は「<i>どうやって</i> 何かを得るか」を宣言するのではなく、「何かが <i>何で</i> あるか」を宣言する形で行うからです。だから Haskell には while ループや for ループがなく、代わりに再帰を使って物事の正体を宣言することが多いのです。</p>
+<a name="maximum-awesome"></a><h2>最大限にすごい</h2>
+<p><span class="fixed">maximum</span> 関数は、順序のあるもの（つまり <span class="fixed">Ord</span> 型クラスのインスタンス）のリストを取り、その中で一番大きい要素を返します。これを命令型のスタイルで実装することを考えてみてください。たぶん、これまでの最大値を保持する変数を用意し、リストの要素をループで回り、もし要素が現在の最大値より大きければ最大値を更新する。最後に残った最大値が結果。ふー！　こんなに簡単なアルゴリズムを説明するのに言葉を費やしてしまった！</p>
+<p>では再帰的に定義してみましょう。まずエッジ条件として、要素1つのリスト（シングルトンリスト）の最大値はその唯一の要素そのもの、と決めます。次に、長いリストの最大値は「先頭が残りの最大値より大きければ先頭、そうでなければ残りの最大値」だと決めます。それだけ！　Haskell で実装してみます。</p>
 <pre name="code" class="haskell:hs">maximum' :: (Ord a) =&gt; [a] -&gt; a
 maximum' [] = error "maximum of empty list"
 maximum' [x] = x
-maximum' (x:xs) 
+maximum' (x:xs)
     | x &gt; maxTail = x
     | otherwise = maxTail
     where maxTail = maximum' xs
 </pre>
-<p>As you can see, pattern matching goes great with recursion! Most 
-imperative languages don't have pattern matching so you have to make a 
-lot of if else statements to test for edge conditions. Here, we simply 
-put them out as patterns. So the first edge condition says that if the 
-list is empty, crash! Makes sense because what's the maximum of an empty
- list? I don't know. The second pattern also lays out an edge condition.
- It says that if it's the singleton list, just give back the only 
-element.</p>
-<p>Now the third pattern is where the action happens. We use pattern 
-matching to split a list into a head and a tail. This is a very common 
-idiom when doing recursion with lists, so get used to it. We use a <i>where</i> binding to define <span class="fixed">maxTail</span>
- as the maximum of the rest of the list. Then we check if the head is 
-greater than the maximum of the rest of the list. If it is, we return 
-the head. Otherwise, we return the maximum of the rest of the list.</p>
-<p>Let's take an example list of numbers and check out how this would work on them: <span class="fixed">[2,5,1]</span>. If we call <span class="fixed">maximum'</span> on that, the first two patterns won't match. The third one will and the list is split into <span class="fixed">2</span> and <span class="fixed">[5,1]</span>. The <i>where</i> clause wants to know the maximum of <span class="fixed">[5,1]</span>, so we follow that route. It matches the third pattern again and <span class="fixed">[5,1]</span> is split into <span class="fixed">5</span> and <span class="fixed">[1]</span>. Again, the <span class="fixed">where</span> clause wants to know the maximum of <span class="fixed">[1]</span>. Because that's the edge condition, it returns <span class="fixed">1</span>. Finally! So going up one step, comparing <span class="fixed">5</span> to the maximum of <span class="fixed">[1]</span> (which is <span class="fixed">1</span>), we obviously get back <span class="fixed">5</span>. So now we know that the maximum of <span class="fixed">[5,1]</span> is <span class="fixed">5</span>. We go up one step again where we had <span class="fixed">2</span> and <span class="fixed">[5,1]</span>. Comparing <span class="fixed">2</span> with the maximum of <span class="fixed">[5,1]</span>, which is <span class="fixed">5</span>, we choose <span class="fixed">5</span>.</p>
-<p>An even clearer way to write this function is to use <span class="fixed">max</span>. If you remember, <span class="fixed">max</span> is a function that takes two numbers and returns the bigger of them. Here's how we could rewrite <span class="fixed">maximum'</span> by using <span class="fixed">max</span>:</p>
+<p>見ての通り、パターンマッチは再帰と相性抜群！　多くの命令型言語にはパターンマッチがないので、エッジ条件をテストするのに if-else 文を山ほど書く必要があります。Haskell ではパターンとして並べるだけ。最初のエッジ条件は「リストが空ならクラッシュ」。空リストの最大値って何でしょう？　知りません。2つ目のパターンも別のエッジ条件で、「シングルトンリストならその唯一の要素を返す」というものです。</p>
+<p>3つ目のパターンが本番です。パターンマッチでリストを先頭と残りに分けます。リストでの再帰でとてもよく使われるイディオムなので、慣れておきましょう。<i>where</i> 束縛で <span class="fixed">maxTail</span> を「残りのリストの最大値」と定義します。そして先頭が残りの最大値より大きいかをチェックし、大きければ先頭を、そうでなければ残りの最大値を返します。</p>
+<p>例として数値のリスト <span class="fixed">[2,5,1]</span> を取り、これに対する動きを見てみます。<span class="fixed">maximum'</span> を呼ぶと、最初の2つのパターンには合致せず、3つ目のパターンに合致してリストは <span class="fixed">2</span> と <span class="fixed">[5,1]</span> に分けられます。<i>where</i> 節は <span class="fixed">[5,1]</span> の最大値を求めようとするので、その経路を辿ります。再び3つ目のパターンに合致して <span class="fixed">[5,1]</span> は <span class="fixed">5</span> と <span class="fixed">[1]</span> に分けられます。今度は <span class="fixed">where</span> 節が <span class="fixed">[1]</span> の最大値を求めようとし、これはエッジ条件に合致するので <span class="fixed">1</span> を返します。やっと！　1 段戻って、<span class="fixed">5</span> と <span class="fixed">[1]</span> の最大値（<span class="fixed">1</span>）を比較し、結果は当然 <span class="fixed">5</span>。これで <span class="fixed">[5,1]</span> の最大値は <span class="fixed">5</span> と分かりました。さらに 1 段戻って <span class="fixed">2</span> と <span class="fixed">[5,1]</span> の比較。<span class="fixed">[5,1]</span> の最大値 <span class="fixed">5</span> と <span class="fixed">2</span> を比べて <span class="fixed">5</span> を選びます。</p>
+<p>もっと分かりやすい書き方として、<span class="fixed">max</span> を使う方法があります。<span class="fixed">max</span> は2つの数を取って大きいほうを返す関数でしたね。<span class="fixed">max</span> を使って <span class="fixed">maximum'</span> を書き直すとこうなります：</p>
 <pre name="code" class="haskell:hs">maximum' :: (Ord a) =&gt; [a] -&gt; a
 maximum' [] = error "maximum of empty list"
 maximum' [x] = x
 maximum' (x:xs) = max x (maximum' xs)
 </pre>
-<p>How's that for elegant! In essence, the maximum of a list is the max of the first element and the maximum of the tail.</p>
+<p>なんてエレガント！　要するに、リストの最大値とは「先頭の要素」と「残りの最大値」の max なのです。</p>
 <img src="../images/maxs.png" alt="max" class="center" width="651" height="267"/>
-<a name="a-few-more-recursive-functions"></a><h2>A few more recursive functions</h2>
-<p>Now that we know how to generally think recursively, let's implement a
- few functions using recursion. First off, we'll implement <span class="fixed">replicate</span>. <span class="fixed">replicate</span> takes an <span class="fixed">Int</span> and some element and returns a list that has several repetitions of the same element. For instance, <span class="fixed">replicate 3 5</span> returns <span class="fixed">[5,5,5]</span>.
- Let's think about the edge condition. My guess is that the edge 
-condition is 0 or less. If we try to replicate something zero times, it 
-should return an empty list. Also for negative numbers, because it 
-doesn't really make sense.</p>
+<a name="a-few-more-recursive-functions"></a><h2>もう少し再帰関数</h2>
+<p>再帰的な考え方の一般像が掴めたところで、いくつか関数を再帰で実装してみましょう。まずは <span class="fixed">replicate</span> の実装。<span class="fixed">replicate</span> は <span class="fixed">Int</span> と要素を取り、その要素を何個か繰り返したリストを返します。たとえば <span class="fixed">replicate 3 5</span> は <span class="fixed">[5,5,5]</span> を返します。エッジ条件を考えてみましょう。私の予想は「0 以下」。何かを 0 回複製しようとしたら、空リストを返すべきです。負の数も同様で、そもそも意味をなしません。</p>
 <pre name="code" class="haskell:hs">replicate' :: (Num i, Ord i) =&gt; i -&gt; a -&gt; [a]
 replicate' n x
     | n &lt;= 0    = []
     | otherwise = x:replicate' (n-1) x
 </pre>
-<p>We used guards here instead of patterns because we're testing for a boolean condition. If <span class="fixed">n</span> is less than or equal to 0, return an empty list. Otherwise return a list that has <span class="fixed">x</span> as the first element and then <span class="fixed">x</span> replicated n-1 times as the tail. Eventually, the <span class="fixed">(n-1)</span> part will cause our function to reach the edge condition.</p>
-<div class="hintbox"><em>Note:</em> <span class="fixed">Num</span> is not a subclass of <span class="fixed">Ord</span>.
- That means that what constitutes for a number doesn't really have to 
-adhere to an ordering. So that's why we have to specify both the <span class="fixed">Num</span> and <span class="fixed">Ord</span> class constraints when doing addition or subtraction and also comparison.</div>
-<p>Next up, we'll implement <span class="fixed">take</span>. It takes a certain number of elements from a list. For instance, <span class="fixed">take 3 [5,4,3,2,1]</span> will return <span class="fixed">[5,4,3]</span>.
- If we try to take 0 or less elements from a list, we get an empty list.
- Also if we try to take anything from an empty list, we get an empty 
-list. Notice that those are two edge conditions right there. So let's 
-write that out:</p>
+<p>真偽条件をテストするので、ここではパターンではなくガードを使いました。<span class="fixed">n</span> が 0 以下なら空リストを返す。そうでなければ <span class="fixed">x</span> を先頭にし、その後ろに <span class="fixed">x</span> を n-1 回繰り返したリストを尾としたリストを返す。<span class="fixed">(n-1)</span> の部分が、いずれエッジ条件に到達させてくれます。</p>
+<div class="hintbox"><em>Note:</em> <span class="fixed">Num</span> は <span class="fixed">Ord</span> のサブクラスではありません。つまり数を構成するものが必ずしも順序を持つとは限りません。だから加減算と比較の両方をするときは、<span class="fixed">Num</span> と <span class="fixed">Ord</span> 両方のクラス制約を指定する必要があります。</div>
+<p>次に <span class="fixed">take</span> を実装します。リストから決まった数の要素を取ります。たとえば <span class="fixed">take 3 [5,4,3,2,1]</span> は <span class="fixed">[5,4,3]</span> を返します。0 以下の数を取ろうとすれば空リスト、空リストから何かを取ろうとしても空リスト。エッジ条件が2つあります。書き起こすと：</p>
 <pre name="code" class="haskell:hs">take' :: (Num i, Ord i) =&gt; i -&gt; [a] -&gt; [a]
 take' n _
     | n &lt;= 0   = []
@@ -105,143 +52,59 @@ take' _ []     = []
 take' n (x:xs) = x : take' (n-1) xs
 </pre>
 
-<p>The first pattern specifies that if we try to take a 0 or negative 
-number of elements, we get an empty list. Notice that we're using <span class="fixed">_</span> to match the list because we don't really care what it is in this case. Also notice that we use a guard, but without an <span class="fixed">otherwise</span> part. That means that if <span class="fixed">n</span>
- turns out to be more than 0, the matching will fall through to the next
- pattern. The second pattern indicates that if we try to take anything 
-from an empty list, we get an empty list. The third pattern breaks the 
-list into a head and a tail. And then we state that taking <span class="fixed">n</span> elements from a list equals a list that has <span class="fixed">x</span> as the head and then a list that takes <span class="fixed">n-1</span>
- elements from the tail as a tail. Try using a piece of paper to write 
-down how the evaluation would look like if we try to take, say, 3 from <span class="fixed">[4,3,2,1]</span>.</p>
-<p><span class="fixed">reverse</span> simply reverses a list. Think 
-about the edge condition. What is it? Come on ... it's the empty list! 
-An empty list reversed equals the empty list itself. O-kay. What about 
-the rest of it? Well, you could say that if we split a list to a head 
-and a tail, the reversed list is equal to the reversed tail and then the
- head at the end.</p>
+<p>最初のパターンは「0 以下の個数を取ろうとすれば空リスト」を表します。リストの中身は気にしないので <span class="fixed">_</span> でマッチさせています。ガードを使っていますが <span class="fixed">otherwise</span> が無いことに注目。これは「<span class="fixed">n</span> が 0 を超える場合はマッチが次のパターンに落ちる」ことを意味します。2つ目のパターンは「空リストから何かを取ろうとすれば空リスト」。3つ目のパターンはリストを先頭と残りに分けます。そして「リストから <span class="fixed">n</span> 個取る」とは「<span class="fixed">x</span> を先頭にして、残りから <span class="fixed">n-1</span> 個取ったリストを尾にしたリスト」だと宣言しています。たとえば <span class="fixed">[4,3,2,1]</span> から 3 つ取るとき、評価がどう進むか紙に書いてみてください。</p>
+<p><span class="fixed">reverse</span> はリストを反転するだけ。エッジ条件は何でしょう？　ええっと……空リストです！　空リストを反転したら空リストそのもの。OK。残りはどうしましょう？　リストを先頭と残りに分ければ、反転リストは「残りの反転 ++ 先頭」と書けます。</p>
 <pre name="code" class="haskell:hs">reverse' :: [a] -&gt; [a]
 reverse' [] = []
 reverse' (x:xs) = reverse' xs ++ [x]
 </pre>
-<p>There we go!</p>
-<p>Because Haskell supports infinite lists, our recursion doesn't really
- have to have an edge condition. But if it doesn't have it, it will 
-either keep churning at something infinitely or produce an infinite data
- structure, like an infinite list. The good thing about infinite lists 
-though is that we can cut them where we want. <span class="fixed">repeat</span>
- takes an element and returns an infinite list that just has that 
-element. A recursive implementation of that is really easy, watch.</p>
+<p>はい、できあがり！</p>
+<p>Haskell は無限リストをサポートしているので、再帰には必ずしもエッジ条件が要りません。ただしエッジ条件がないと、永遠に何かを擦り続けるか、無限リストのような無限のデータ構造を生成し続けることになります。とはいえ無限リストの良いところは、好きな場所で切り取れることです。<span class="fixed">repeat</span> は要素を1つ取り、その要素だけからなる無限リストを返します。再帰的な実装はとっても簡単。</p>
 <pre name="code" class="haskell:hs">repeat' :: a -&gt; [a]
 repeat' x = x:repeat' x
 </pre>
-<p>Calling <span class="fixed">repeat 3</span> will give us a list that starts with <span class="fixed">3</span> and then has an infinite amount of 3's as a tail. So calling <span class="fixed">repeat 3</span> would evaluate like <span class="fixed">3:repeat 3</span>, which is <span class="fixed">3:(3:repeat 3)</span>, which is <span class="fixed">3:(3:(3:repeat 3))</span>, etc. <span class="fixed">repeat 3</span> will never finish evaluating, whereas <span class="fixed">take 5 (repeat 3)</span> will give us a list of five 3's. So essentially it's like doing <span class="fixed">replicate 5 3</span>.</p>
-<p><span class="fixed">zip</span> takes two lists and zips them together. <span class="fixed">zip [1,2,3] [2,3]</span> returns <span class="fixed">[(1,2),(2,3)]</span>,
- because it truncates the longer list to match the length of the shorter
- one. How about if we zip something with an empty list? Well, we get an 
-empty list back then. So there's our edge condition. However, <span class="fixed">zip</span> takes two lists as parameters, so there are actually two edge conditions.</p>
+<p><span class="fixed">repeat 3</span> を呼ぶと、<span class="fixed">3</span> から始まり 3 が無限に並ぶリストを得ます。<span class="fixed">repeat 3</span> は <span class="fixed">3:repeat 3</span>、それは <span class="fixed">3:(3:repeat 3)</span>、さらに <span class="fixed">3:(3:(3:repeat 3))</span>……と評価されていきます。<span class="fixed">repeat 3</span> の評価は決して終わりませんが、<span class="fixed">take 5 (repeat 3)</span> なら 3 が 5 つ並んだリストを返します。要するに <span class="fixed">replicate 5 3</span> と同じです。</p>
+<p><span class="fixed">zip</span> は2つのリストを取って zip します。<span class="fixed">zip [1,2,3] [2,3]</span> は <span class="fixed">[(1,2),(2,3)]</span> を返します。長いほうのリストが短いほうの長さに切り詰められるからです。空リストと何かを zip したら？　空リストが返ります。これがエッジ条件。<span class="fixed">zip</span> はリストを2つ取るので、エッジ条件も2つあります。</p>
 <pre name="code" class="haskell:hs">zip' :: [a] -&gt; [b] -&gt; [(a,b)]
 zip' _ [] = []
 zip' [] _ = []
 zip' (x:xs) (y:ys) = (x,y):zip' xs ys
 </pre>
-<p>First two patterns say that if the first list or second list is 
-empty, we get an empty list. The third one says that two lists zipped 
-are equal to pairing up their heads and then tacking on the zipped 
-tails. Zipping <span class="fixed">[1,2,3]</span> and <span class="fixed">['a','b']</span> will eventually try to zip <span class="fixed">[3]</span> with <span class="fixed">[]</span>. The edge condition patterns kick in and so the result is <span class="fixed">(1,'a'):(2,'b'):[]</span>, which is exactly the same as <span class="fixed">[(1,'a'),(2,'b')]</span>.</p>
-<p>Let's implement one more standard library function — <span class="fixed">elem</span>.
- It takes an element and a list and sees if that element is in the list.
- The edge condition, as is most of the times with lists, is the empty 
-list. We know that an empty list contains no elements, so it certainly 
-doesn't have the droids we're looking for.</p>
+<p>最初の2つのパターンは「最初か2つ目のリストが空なら結果も空」。3つ目は「2つのリストを zip するとは、両方の先頭をペアにして、残り同士を zip した結果に前置する」。<span class="fixed">[1,2,3]</span> と <span class="fixed">['a','b']</span> を zip すると、最終的に <span class="fixed">[3]</span> と <span class="fixed">[]</span> を zip しようとします。エッジ条件のパターンが効いて、結果は <span class="fixed">(1,'a'):(2,'b'):[]</span> つまり <span class="fixed">[(1,'a'),(2,'b')]</span> となります。</p>
+<p>もう1つ標準ライブラリの関数を実装します — <span class="fixed">elem</span>。要素とリストを取って、その要素がリストに含まれるかを返します。リストを扱うときの定番、エッジ条件は空リスト。空リストには要素がないので、探しているドロイドはここにはいない、ですね。</p>
 <pre name="code" class="haskell:hs">elem' :: (Eq a) =&gt; a -&gt; [a] -&gt; Bool
 elem' a [] = False
 elem' a (x:xs)
     | a == x    = True
-    | otherwise = a `elem'` xs 
+    | otherwise = a `elem'` xs
 </pre>
-<p>Pretty simple and expected. If the head isn't the element then we check the tail. If we reach an empty list, the result is <span class="fixed">False</span>.</p>
-<a name="quick-sort"></a><h2>Quick, sort!</h2>
-<p>We have a list of items that can be sorted. Their type is an instance of the <span class="fixed">Ord</span>
- typeclass. And now, we want to sort them! There's a very cool algoritm 
-for sorting called quicksort. It's a very clever way of sorting items. 
-While it takes upwards of 10 lines to implement quicksort in imperative 
-languages, the implementation is much shorter and elegant in Haskell. 
-Quicksort has become a sort of poster child for Haskell. Therefore, 
-let's implement it here, even though implementing quicksort in Haskell 
-is considered really cheesy because everyone does it to showcase how 
-elegant Haskell is.</p>
+<p>シンプルで予想通り。先頭が探している要素でなければ、残りで再帰的にチェックします。空リストに到達すれば結果は <span class="fixed">False</span>。</p>
+<a name="quick-sort"></a><h2>急げ、ソートだ！</h2>
+<p>ソートできる項目のリストがあるとします。型は <span class="fixed">Ord</span> 型クラスのインスタンスです。さあ、これをソートしましょう！　ソートにはクイックソートというとてもクールなアルゴリズムがあります。命令型言語では実装に 10 行以上かかりますが、Haskell ならずっと短くてエレガントです。クイックソートは Haskell の看板みたいになっています。だからここでも実装してみます。Haskell のエレガントさを誇示するためにみんながやっているので、もはや陳腐ですが、それでも。</p>
 
-<p>So, the type signature is going to be <span class="fixed">quicksort :: (Ord a) =&gt; [a] -&gt; [a]</span>.
- No surprises there. The edge condition? Empty list, as is expected. A 
-sorted empty list is an empty list. Now here comes the main algorithm: <em>a
- sorted list is a list that has all the values smaller than (or equal 
-to) the head of the list in front (and those values are sorted), then 
-comes the head of the list in the middle and then come all the values 
-that are bigger than the head (they're also sorted).</em> Notice that we said <i>sorted</i>
- two times in this definition, so we'll probably have to make the 
-recursive call twice! Also notice that we defined it using the verb <i>is</i> to define the algorithm instead of saying <i>do this, do that, then do that ...</i>.
- That's the beauty of functional programming! How are we going to filter
- the list so that we get only the elements smaller than the head of our 
-list and only elements that are bigger? List comprehensions. So, let's 
-dive in and define this function.</p>
+<p>型シグネチャは <span class="fixed">quicksort :: (Ord a) =&gt; [a] -&gt; [a]</span>。意外性なし。エッジ条件は？　空リスト、お決まりです。空リストをソートしたら空リスト。さて主アルゴリズム：<em>ソート済みリストとは「リストの先頭以下のすべての値（これらもソート済み）を前に置き、真ん中に先頭、そして先頭より大きいすべての値（これらもソート済み）を後ろに置いたリスト」である。</em>　定義の中で <i>ソート済み</i> が2回出てくるので、再帰呼び出しを2回することになりそうです！　また、「これをやって、あれをやって、それからあれをやって……」ではなく <i>である</i> という動詞でアルゴリズムを定義していることに注目してください。これが関数型プログラミングの美しさ！　リストの先頭より小さい要素と大きい要素にどう分けるかというと、リスト内包表記を使います。さあこの関数を定義してみましょう。</p>
 <pre name="code" class="haskell:hs">quicksort :: (Ord a) =&gt; [a] -&gt; [a]
 quicksort [] = []
-quicksort (x:xs) = 
+quicksort (x:xs) =
     let smallerSorted = quicksort [a | a &lt;- xs, a &lt;= x]
         biggerSorted = quicksort [a | a &lt;- xs, a &gt; x]
     in  smallerSorted ++ [x] ++ biggerSorted
 </pre>
-<p>Let's give it a small test run to see if it appears to behave correctly.</p>
+<p>ちゃんと動くか軽く試してみましょう。</p>
 <pre name="code" class="haskell:ghci">ghci&gt; quicksort [10,2,5,3,1,6,7,4,2,3,4,8,9]
 [1,2,2,3,3,4,4,5,6,7,8,9,10]
 ghci&gt; quicksort "the quick brown fox jumps over the lazy dog"
 "        abcdeeefghhijklmnoooopqrrsttuuvwxyz"
 </pre>
-<p>Booyah! That's what I'm talking about! So if we have, say <span class="fixed">[5,1,9,4,6,7,3]</span> and we want to sort it, this algorithm will first take the head, which is <span class="fixed">5</span> and then put it in the middle of two lists that are smaller and bigger than it. So at one point, you'll have <span class="fixed">[1,4,3] ++ [5] ++ [9,6,7]</span>. We know that once the list is sorted completely, the number <span class="fixed">5</span> will stay in the fourth place since there are 3 numbers lower than it and 3 numbers higher than it. Now, if we sort <span class="fixed">[1,4,3]</span> and <span class="fixed">[9,6,7]</span>,
- we have a sorted list! We sort the two lists using the same function. 
-Eventually, we'll break it up so much that we reach empty lists and an 
-empty list is already sorted in a way, by virtue of being empty. Here's 
-an illustration:</p>
+<p>これだよこれ！　たとえば <span class="fixed">[5,1,9,4,6,7,3]</span> をソートしたい場合、このアルゴリズムはまず先頭 <span class="fixed">5</span> を取り、それより小さいリストと大きいリストの間に置きます。一時点で <span class="fixed">[1,4,3] ++ [5] ++ [9,6,7]</span> となります。完全にソートされたとき、<span class="fixed">5</span> は 4 番目の位置に居続けることが分かります（5 より小さい数が 3 つ、大きい数が 3 つ）。あとは <span class="fixed">[1,4,3]</span> と <span class="fixed">[9,6,7]</span> をソートすれば、ソート済みリストの完成！　この2つのリストも同じ関数でソートします。最終的に分割が進むと空リストにたどり着き、空リストはそもそも空であるという理由でソート済みです。図示するとこんな感じ：</p>
 <img src="../images/quicksort.png" alt="quicksort" class="center" width="799" height="332"/>
-<p>An element that is in place and won't move anymore is represented in <span style="color:#FF6600;font-weight:bold;">orange</span>.
- If you read them from left to right, you'll see the sorted list. 
-Although we chose to compare all the elements to the heads, we could 
-have used any element to compare against. In quicksort, an element that 
-you compare against is called a pivot. They're in <span style="color:#009900;font-weight:bold">green</span> here. We chose the head because it's easy to get by pattern matching. The elements that are smaller than the pivot are <span style="color:#0f0;font-weight:bold">light green</span> and elements larger than the pivot are <span style="color:#030;font-weight:bold">dark green</span>. The yellowish gradient thing represents an application of quicksort.</p>
-<a name="thinking-recursively"></a><h2>Thinking recursively</h2>
-<p>We did quite a bit of recursion so far and as you've probably 
-noticed, there's a pattern here. Usually you define an edge case and 
-then you define a function that does something between some element and 
-the function applied to the rest. It doesn't matter if it's a list, a 
-tree or any other data structure. A sum is the first element of a list 
-plus the sum of the rest of the list. A product of a list is the first 
-element of the list times the product of the rest of the list. The 
-length of a list is one plus the length of the tail of the list. 
-Ekcetera, ekcetera ...</p><p>
+<p>すでに正しい位置にあって動かない要素は <span style="color:#FF6600;font-weight:bold;">オレンジ</span> で表しています。左から右に読めば、ソート済みリストになります。比較対象として先頭を選びましたが、実はどの要素を選んでも構いません。クイックソートで比較対象に選ぶ要素を「ピボット」と呼びます。図では <span style="color:#009900;font-weight:bold">緑</span> で示しています。先頭を選んだのはパターンマッチで取り出しやすいからです。ピボットより小さい要素は <span style="color:#0f0;font-weight:bold">明るい緑</span>、ピボットより大きい要素は <span style="color:#030;font-weight:bold">濃い緑</span> です。黄色っぽいグラデーションは quicksort の適用を表しています。</p>
+<a name="thinking-recursively"></a><h2>再帰的に考える</h2>
+<p>これまでかなり再帰をやりました。気づいた人もいると思いますが、ここにはパターンがあります。普通はまずエッジケースを定義し、次に「ある要素」と「残りに対する関数の適用結果」の間で何かを行う関数を定義する、という形です。それがリストでも、木でも、その他のデータ構造でも変わりません。リストの合計とは「先頭 + 残りの合計」、リストの積とは「先頭 × 残りの積」、リストの長さとは「1 + 残りの長さ」。等々、等々……</p><p>
 
-</p><p>Of course, these also have edge cases. Usually the edge case is 
-some scenario where a recursive application doesn't make sense. When 
-dealing with lists, the edge case is most often the empty list. If 
-you're dealing with trees, the edge case is usually a node that doesn't 
-have any children.</p>
-<p>It's similar when you're dealing with numbers recursively. Usually it
- has to do with some number and the function applied to that number 
-modified. We did the factorial function earlier and it's the product of a
- number and the factorial of that number minus one. Such a recursive 
-application doesn't make sense with zero, because factorials are defined
- only for positive integers. Often the edge case value turns out to be 
-an identity. The identity for multiplication is 1 because if you 
-multiply something by 1, you get that something back. Also when doing 
-sums of lists, we define the sum of an empty list as 0 and 0 is the 
-identity for addition. In quicksort, the edge case is the empty list and
- the identity is also the empty list, because if you add an empty list 
-to a list, you just get the original list back.</p>
-<p>So when trying to think of a recursive way to solve a problem, try to
- think of when a recursive solution doesn't apply and see if you can use
- that as an edge case, think about identities and think about whether 
-you'll break apart the parameters of the function (for instance, lists 
-are usually broken into a head and a tail via pattern matching) and on 
-which part you'll use the recursive call.</p>
+</p><p>もちろんエッジケースもあります。普通エッジケースは、再帰的な適用が意味をなさないシナリオです。リストを扱うときのエッジケースは大抵空リスト。木を扱うときは、子を持たないノードがエッジケースになることが多いです。</p>
+<p>数を再帰的に扱うときも似ています。たいてい、ある数と、その数を変形した数に対する関数の適用が関わります。先ほど書いた階乗関数は「ある数 × その数 - 1 の階乗」でした。0 ではこの再帰的適用が意味をなしません。階乗は正の整数だけに定義されているからです。多くの場合、エッジケースの値は単位元 (identity) になります。乗算の単位元は 1 です。何かに 1 をかけても元のままだからです。リストの合計でも、空リストの合計を 0 と定義しました。0 は加算の単位元です。クイックソートでは、エッジケースは空リストで、これも単位元です。空リストをリストに連結しても元のリストが返るだけだからです。</p>
+<p>だから問題を再帰的に解こうとするときは、再帰的な解が当てはまらない場面を考えてエッジケースに使えるか試し、単位元を考え、関数の引数を分解できるか（リストならパターンマッチで先頭と残りに分けるのが普通です）考え、どの部分で再帰呼び出しを使うかを考えてみましょう。</p>
 
 </body>
 </html>

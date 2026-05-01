@@ -3,65 +3,44 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Learn You a Haskell for Great Good!</title>
+<title>すごいHaskellたのしく学ぼう！</title>
 <link rel="stylesheet" href="../css/main.css" type="text/css" charset="utf-8">
 <body>
 
-<h1>Zippers</h1>
+<h1>Zipper</h1>
 
 <p>
-While Haskell's purity comes with a whole bunch of benefits, it makes us tackle 
-some problems differently than we would in impure languages. Because of 
-referential transparency, one value is as good as another in Haskell if it 
-represents the same thing. 
+Haskell の純粋性は多くの利点をもたらしますが、純粋でない言語とは違うアプローチが必要な問題もあります。参照透過性により、ある値はそれが表すものが同じなら他の値と同等です。
 </p>
 
 <p>
-So if we have a tree full of fives (high-fives, maybe?) and we want to change 
-one of them into a six, we have to have some way of knowing exactly which five 
-in our tree we want to change. We have to know where it is in our tree. In 
-impure languages, we could just note where in our memory the five is located and 
-change that. But in Haskell, one five is as good as another, so we can't 
-discriminate based on where in our memory they are. We also can't really
-<i>change</i> anything; when we say that we change a tree, we actually 
-mean that we take a tree and return a new one that's similar to the original 
-tree, but slightly different.
+たとえば 5 ばかりの木があり、そのうち 1 つを 6 に変えたいとします。木のどの 5 を変えたいかを正確に知る必要があります。木の中のどこにあるか知らないといけない。純粋でない言語ならメモリ上の場所を覚えて変更できますが、Haskell ではある 5 と別の 5 は同等なのでメモリ上の場所で区別できません。<i>変更</i> もできません。木を変更すると言うとき、実際には元と似ているが少し違う新しい木を返すということ。
 </p>
 
 <p>
-One thing we can do is to remember a path from the root of the tree to the element 
-that we want to change. We could say, take this tree, go left, go right and then 
-left again and change the element that's there. While this works, it can be 
-inefficient. If we want to later change an element that's near the element that 
-we previously changed, we have to walk all the way from the root of the tree to 
-our element again!
+1 つの方法は、ルートから変更したい要素までの経路を覚えること。「木を取って、左、右、左、と進んでそこの要素を変える」と言える。これでも動きますが非効率なことも。先ほど変更した要素の近くを変えたいとき、また毎回ルートから歩いていく必要が！
 </p>
 
 <p>
-In this chapter, we'll see how we can take some data structure and focus on a 
-part of it in a way that makes changing its elements easy and walking around it 
-efficient. Nice!
+この章では、データ構造の一部に「焦点を当て」、要素変更や歩き回りを効率化する方法を見ます。
 </p>
 
 <a name="taking-a-walk"></a>
-<h2>Taking a walk</h2>
+<h2>散歩に出かけよう</h2>
 
 <p>
-Like we've learned in biology class, there are many different kinds of trees, so 
-let's pick a seed that we will use to plant ours. Here it is:
+生物の授業で学んだようにいろいろな種類の木がありますが、植える種を選びましょう：
 </p>
 
 <pre name="code" class="haskell:hs">data Tree a = Empty | Node a (Tree a) (Tree a) deriving (Show)
 </pre>
 
 <p>
-So our tree is either empty or it's a node that has an element and two 
-sub-trees. Here's a fine example of such a tree, which I give to you, the 
-reader, for free!
+木は空か、要素と 2 つの部分木を持つノード。サンプル：
 </p>
 
 <pre name="code" class="haskell:hs">freeTree :: Tree Char
-freeTree = 
+freeTree =
     Node 'P'
         (Node 'O'
             (Node 'L'
@@ -86,17 +65,13 @@ freeTree =
 </pre>
 
 <p>
-And here's this tree represented graphically:
+図にすると：
 </p>
 
 <img src="../images/pollywantsa.png" alt="polly says her back hurts" class="center" width="780" height="504"/>
 
 <p>
-Notice that <span class="fixed">W</span> in the tree there? Say we want to 
-change it into a <span class="fixed">P</span>. How would we go about doing that? 
-Well, one way would be to pattern match on our tree until we find the element 
-that's located by first going right and then left and changing said element. 
-Here's the code for this:
+木の中の <span class="fixed">W</span> を <span class="fixed">P</span> に変えたい。どうする？　パターンマッチで右、左と辿って変える方法：
 </p>
 
 <pre name="code" class="haskell:hs">changeToP :: Tree Char -&gt; Tree Char
@@ -104,21 +79,11 @@ changeToP (Node x l (Node y (Node _ m n) r)) = Node x l (Node y (Node 'P' m n) r
 </pre>
 
 <p>
-Yuck! Not only is this rather ugly, it's also kind of confusing. What happens 
-here? Well, we pattern match on our tree and name its root element 
-<span class="fixed">x</span> (that's becomes the <span class="fixed">'P'</span> in the 
-root) and its left sub-tree <span class="fixed">l</span>. Instead of giving a 
-name to its right sub-tree, we further pattern match on it. We continue this 
-pattern matching until we reach the sub-tree whose root is our <span class="fixed">'W'</span>. Once we've done this, we rebuild the tree, only the 
-sub-tree that contained the <span class="fixed">'W'</span> at its root now 
-has a <span class="fixed">'P'</span>.
+うわ！　醜いし分かりにくい。ルートを <span class="fixed">x</span>、左部分木を <span class="fixed">l</span>、右部分木はさらにパターンマッチ。<span class="fixed">'W'</span> ノードに到達したら、その <span class="fixed">'W'</span> を <span class="fixed">'P'</span> に変えて木を再構築。
 </p>
 
 <p>
-Is there a better way of doing this? How about we make our function take a tree 
-along with a list of directions. The directions will be either <span class="fixed">L</span> or <span class="fixed">R</span>, representing left and 
-right respectively, and we'll change 
-the element that we arrive at if we follow the supplied directions. Here it is:
+もっと良い方法は？　木と方向のリストを取る関数にしましょう。方向は <span class="fixed">L</span>（左）か <span class="fixed">R</span>（右）：
 </p>
 
 <pre name="code" class="haskell:hs">data Direction = L | R deriving (Show)
@@ -131,19 +96,11 @@ changeToP [] (Node _ l r) = Node 'P' l r
 </pre>
 
 <p>
-If the first element in the our list of directions is <span class="fixed">L</span>, we construct a new tree that's like the old tree, only
-its left sub-tree has an element changed to <span class="fixed">'P'</span>. When 
-we recursively call <span class="fixed">changeToP</span>, we give it only the 
-tail of the list of directions, because we already took a left. We do the same 
-thing in the case of an <span class="fixed">R</span>. If the list of directions is 
-empty, that means that we're at our destination, so we return a tree that's like 
-the one supplied, only it has <span class="fixed">'P'</span> as its root 
-element.
+方向リストの先頭が <span class="fixed">L</span> なら左部分木を変更した新しい木を作る。残りの方向リストで再帰。<span class="fixed">R</span> も同様。空なら目的地、ルートを <span class="fixed">'P'</span> にした木を返す。
 </p>
 
 <p>
-To avoid printing out the whole tree, let's make a function that takes a list of 
-directions and tells us what the element at the destination is:
+木全体を表示せずに目的地の要素を返す関数：
 </p>
 
 <pre name="code" class="haskell:hs">elemAt :: Directions -&gt; Tree a -&gt; a
@@ -153,10 +110,7 @@ elemAt [] (Node x _ _) = x
 </pre>
 
 <p>
-This function is actually quite similar to <span class="fixed">changeToP</span>, 
-only instead of remembering stuff along the way and reconstructing the tree, it 
-ignores everything except its destination. Here we change the <span class="fixed">'W'</span> to a <span class="fixed">'P'</span> and see if the 
-change in our new tree sticks:
+<span class="fixed">changeToP</span> に似ていますが、木の再構築なし。<span class="fixed">'W'</span> を <span class="fixed">'P'</span> に変えて確認：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newTree = changeToP [R,L] freeTree
@@ -165,57 +119,35 @@ ghci&gt; elemAt [R,L] newTree
 </pre>
 
 <p>
-Nice, this seems to work. In these functions, the list of directions acts as a 
-sort of <i>focus</i>, because it pinpoints one exact sub-tree from our tree. 
-A direction list of <span class="fixed">[R]</span> focuses on the sub-tree 
-that's right of the root, for example. An empty direction list focuses on the 
-main tree itself.
+動きました。方向リストは <i>焦点 (focus)</i> として、木の特定の部分木を指します。<span class="fixed">[R]</span> ならルートの右の部分木、空なら木全体。
 </p>
 
 <p>
-While this technique may seem cool, it can be rather inefficient, especially if 
-we want to repeatedly change elements. Say we have a really huge tree and a long 
-direction list that points to some element all the way at the bottom of the 
-tree. We use the direction list to take a walk along the tree and change an 
-element at the bottom. If we want to change another element that's close to the 
-element that we've just changed, we have to start from the root of the tree and 
-walk all the way to the bottom again! What a drag. 
+ただし、要素を繰り返し変更するときは非効率。巨大な木で深い場所の要素を 1 つ変えた後、近くの別要素を変えるのにルートから歩き直す！
 </p>
 
 <p>
-In the next section, we'll find a better way of focusing on a sub-tree, one that 
-allows us to efficiently switch focus to sub-trees that are nearby.
+次セクションで近くの部分木に効率的に焦点を移せる方法を見ます。
 </p>
 
 <a name="a-trail-of-breadcrumbs"></a>
-<h2>A trail of breadcrumbs</h2>
+<h2>パンくずの跡</h2>
 
 
 
 <p>
-Okay, so for focusing on a sub-tree, we want something better than just a list 
-of directions that we always follow from the root of our tree. Would it help if 
-we start at the root of the tree and move either left or right one step at a 
-time and sort of leave breadcrumbs? That is, when we go left, we remember that 
-we went left and when we go right, we remember that we went right. Sure, we can 
-try that.
+ルートから毎回辿るのではなく、ルートから一歩ずつ左右に動きながらパンくずを残してはどうでしょう？　左に行ったら左に行ったと覚え、右に行ったら右と覚える。
 </p>
 
 <p>
-To represent our breadcrumbs, we'll also use a list of <span class="fixed">Direction</span> (which is either <span class="fixed">L</span>
-or <span class="fixed">R</span>), only instead of calling it 
-<span class="fixed">Directions</span>, we'll call it <span class="fixed">Breadcrumbs</span>
-, because our directions will now be reversed since we're leaving them as 
-we go down our tree:
+パンくずも <span class="fixed">Direction</span> のリストですが、名前を <span class="fixed">Breadcrumbs</span> に：
 </p>
 
 <pre name="code" class="haskell:hs">type Breadcrumbs = [Direction]
 </pre>
 
 <p>
-Here's a function that takes a tree and some breadcrumbs and moves to the left 
-sub-tree while adding <span class="fixed">L</span> to the head of the list that 
-represents our breadcrumbs:
+木とパンくずを取って、左の部分木に移動しつつ <span class="fixed">L</span> を先頭に追加：
 </p>
 
 <pre name="code" class="haskell:hs">goLeft :: (Tree a, Breadcrumbs) -&gt; (Tree a, Breadcrumbs)
@@ -223,9 +155,7 @@ goLeft (Node _ l _, bs) = (l, L:bs)
 </pre>
 
 <p>
-We ignore the element at the root and the right sub-tree and just return the 
-left sub-tree along with the old breadcrumbs with <span class="fixed">L</span> 
-as the head. Here's a function to go right:
+ルートと右部分木を無視、左部分木とパンくずを返す。右版：
 </p>
 
 <pre name="code" class="haskell:hs">goRight :: (Tree a, Breadcrumbs) -&gt; (Tree a, Breadcrumbs)
@@ -233,8 +163,7 @@ goRight (Node _ _ r, bs) = (r, R:bs)
 </pre>
 
 <p>
-It works the same way. Let's use these functions to take our 
-<span class="fixed">freeTree</span> and go right and then left:
+<span class="fixed">freeTree</span> を右、左と歩く：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; goLeft (goRight (freeTree, []))
@@ -244,98 +173,62 @@ It works the same way. Let's use these functions to take our
 <img src="../images/almostzipper.png" alt="almostthere" class="left" width="399" height="224"/>
 
 <p>
-Okay, so now we have a tree that has <span class="fixed">'W'</span>
-in its root and <span class="fixed">'C'</span> in the root of its left sub-tree 
-and <span class="fixed">'R'</span> in the root of its right sub-tree. The 
-breadcrumbs are <span class="fixed">[L,R]</span>, because we first went right 
-and then left.
+ルートが <span class="fixed">'W'</span>、左の部分木のルートが <span class="fixed">'C'</span>、右が <span class="fixed">'R'</span>。パンくずは <span class="fixed">[L,R]</span>（右、左の順で歩いた）。
 </p>
 
 <p>
-To make walking along our tree clearer, we can use the <span class="fixed">-:</span> function that we defined like so:
+<span class="fixed">-:</span> 関数で読みやすく：
 </p>
 
 <pre name="code" class="haskell:hs">x -: f = f x
 </pre>
 
 <p>
-Which allows us to apply functions to values by first writing the value, then 
-writing a <span class="fixed">-:</span> and then the function. So instead of 
-<span class="fixed">goRight (freeTree, [])</span>, we can write
-<span class="fixed">(freeTree, []) -: goRight</span>. Using this, we can rewrite 
-the above so that it's more apparent that we're first going right and then left:
+値を先に書いて関数を後ろに書ける：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; (freeTree, []) -: goRight -: goLeft
 (Node 'W' (Node 'C' Empty Empty) (Node 'R' Empty Empty),[L,R])
 </pre>
 
-<h3>Going back up</h3>
+<h3>戻る</h3>
 
 <p>
-What if we now want to go back up in our tree? From our breadcrumbs we know 
-that the current tree is the left sub-tree of its parent and that it is the 
-right sub-tree of its parent, but that's it. They don't tell us enough about the 
-parent of the current sub-tree for us to be able to
-go up in the tree. It would seem that apart from the direction that we took, a 
-single breadcrumb should also contain all other data that we need to go back up.  
-In this case, that's the element in the parent tree along with its right 
-sub-tree.
+木を上に戻りたいときは？　パンくずから「現木は親の左部分木か右部分木」と分かりますが、それだけ。親ノードの情報（要素、もう一方の部分木）も必要。
 </p>
 
 <p>
-In general, a single breadcrumb should contain all the data needed to 
-reconstruct the parent node. So it should have the information from all the paths 
-that we didn't take and it should also know the direction that we did take, but 
-it must not contain the sub-tree that we're currently focusing on. That's because 
-we already have that sub-tree in the first component of the tuple, so if we also 
-had it in the breadcrumbs, we'd have duplicate information.
+パンくずは「親ノードを再構築できるすべての情報」を持つべき：取った道、取らなかった道のサブツリー、そしてどの方向に行ったか。今焦点を当てている部分木は除く（タプル第 1 にあるので二重持ちになる）。
 </p>
 
 <p>
-Let's modify our breadcrumbs so that they also contain information about everything 
-that we previously ignored when moving left and right. Instead of <span class="fixed">Direction</span>, we'll make a new data type:
+<span class="fixed">Direction</span> を新データ型に：
 </p>
 
 <pre name="code" class="haskell:hs">data Crumb a = LeftCrumb a (Tree a) | RightCrumb a (Tree a) deriving (Show)
 </pre>
 
 <p>
-Now, instead of just <span class="fixed">L</span>, we have a <span class="fixed">LeftCrumb</span> that also contains the element in the node that we 
-moved from and the right tree that we didn't visit. Instead of <span class="fixed">R</span>, we have <span class="fixed">RightCrumb</span>, which 
-contains the element in the node that we moved from and the left tree that we 
-didn't visit.
+<span class="fixed">L</span> の代わりに <span class="fixed">LeftCrumb</span> はそのノードの要素と、訪れなかった右部分木を持つ。<span class="fixed">R</span> は <span class="fixed">RightCrumb</span> で要素と訪れなかった左部分木。
 </p>
 
 <p>
-These breadcrumbs now contain all the data needed to recreate the tree that we 
-walked through. So instead of just being normal bread crumbs, they're now more 
-like floppy disks that we leave as we go along, because they contain a lot more 
-information than just the direction that we took.
+これでパンくずから木全体を再構築できます。フロッピーディスクのように情報を持ったパンくず。
 </p>
 
 <p>
-In essence, every breadcrumb is now like a tree node with a hole in it. When we 
-move deeper into a tree, the breadcrumb carries all the information that the 
-node that we moved away from carried <i>except</i> the sub-tree that we chose to 
-focus on. It also has to note where the hole is. In the case of a 
-<span class="fixed">LeftCrumb</span>, we know that we moved left, so the 
-sub-tree that's missing is the left one.
+要するに各パンくずは「穴のあいたノード」。深く進むとき、自分が選ばなかった部分木以外の情報を持ちます。<span class="fixed">LeftCrumb</span> なら穴は左側です。
 </p>
 
 <p>
-Let's also change our <span class="fixed">Breadcrumbs</span> type synonym to 
-reflect this:
+<span class="fixed">Breadcrumbs</span> 型シノニムも更新：
 </p>
 
 <pre name="code" class="haskell:hs">type Breadcrumbs a = [Crumb a]
 </pre>
 
 <p>
-Next up, we have to modify the <span class="fixed">goLeft</span> and
-<span class="fixed">goRight</span> functions to store information about the 
-paths that we didn't take in our breadcrumbs, instead of ignoring that 
-information like they did before. Here's <span class="fixed">goLeft</span>:
+<span class="fixed">goLeft</span>・<span class="fixed">goRight</span> も「取らなかった道」を保持するように：
 </p>
 
 <pre name="code" class="haskell:hs">goLeft :: (Tree a, Breadcrumbs a) -&gt; (Tree a, Breadcrumbs a)
@@ -343,24 +236,15 @@ goLeft (Node x l r, bs) = (l, LeftCrumb x r:bs)
 </pre>
 
 <p>
-You can see that it's very similar to our previous <span class="fixed">goLeft</span>,
-only instead of just adding a <span class="fixed">L</span> to the head of our 
-list of breadcrumbs, we add a <span class="fixed">LeftCrumb</span> to signify 
-that we went left and we equip our <span class="fixed">LeftCrumb</span> with the 
-element in the node that we moved from (that's the <span class="fixed">x</span>) 
-and the right sub-tree that we chose not to visit.
+前の <span class="fixed">goLeft</span> と似ていますが、<span class="fixed">L</span> の代わりに <span class="fixed">LeftCrumb x r</span>（移動元の要素 <span class="fixed">x</span> と訪れなかった右部分木 <span class="fixed">r</span>）を追加。
 </p>
 
 <p>
-Note that this function assumes that the current tree that's under focus isn't
-<span class="fixed">Empty</span>. An empty tree doesn't have any sub-trees, so 
-if we try to go left from an empty tree, an error will occur because the pattern 
-match on <span class="fixed">Node</span> won't succeed and there's no pattern 
-that takes care of <span class="fixed">Empty</span>.
+現在の焦点が <span class="fixed">Empty</span> でないことを仮定。空木に <span class="fixed">goLeft</span> しようとするとパターンマッチ失敗でエラー。
 </p>
 
 <p>
-<span class="fixed">goRight</span> is similar:
+<span class="fixed">goRight</span> も同様：
 </p>
 
 <pre name="code" class="haskell:hs">goRight :: (Tree a, Breadcrumbs a) -&gt; (Tree a, Breadcrumbs a)
@@ -368,10 +252,7 @@ goRight (Node x l r, bs) = (r, RightCrumb x l:bs)
 </pre>
 
 <p>
-We were previously able to go left and right. What we've gotten now is the 
-ability to actualy go back up by remembering stuff about the parent nodes and 
-the paths that we didn't visit. Here's the <span class="fixed">goUp</span> 
-function:
+親ノードと取らなかった道の情報があれば、上に戻れます。<span class="fixed">goUp</span>：
 </p>
 
 <pre name="code" class="haskell:hs">goUp :: (Tree a, Breadcrumbs a) -&gt; (Tree a, Breadcrumbs a)
@@ -382,46 +263,28 @@ goUp (t, RightCrumb x l:bs) = (Node x l t, bs)
 
 
 <p>
-We're focusing on the tree <span class="fixed">t</span> and we check what the 
-latest <span class="fixed">Crumb</span> is. If it's a <span class="fixed">LeftCrumb</span>,
-then we construct a new tree where our tree <span class="fixed">t</span> is the left 
-sub-tree and we use the information about the right sub-tree that we didn't 
-visit and the element to fill out the rest of the <span class="fixed">Node</span>.
-Because we moved back so to speak and picked up the last breadcrumb to recreate 
-with it the parent tree, the new list of breadcrumbs doesn't contain it.
+木 <span class="fixed">t</span> に焦点を当て、最新の <span class="fixed">Crumb</span> を確認。<span class="fixed">LeftCrumb</span> なら、<span class="fixed">t</span> を左部分木として、訪れなかった右部分木と要素で <span class="fixed">Node</span> を再構築。最新パンくずを使うので新パンくずリストにはそれを含めません。
 </p>
 
 <p>
-Note that this function causes an error if we're already at the top of a tree 
-and we want to move up. Later on, we'll use the <span class="fixed">Maybe</span> 
-monad to represent possible failure when moving focus.
+木のトップで上に行こうとするとエラー。後で <span class="fixed">Maybe</span> モナドで失敗を表現します。
 </p>
 
 <p>
-With a pair of <span class="fixed">Tree a</span> and <span class="fixed">Breadcrumbs a</span>,
-we have all the information to rebuild the whole tree and we also have a focus 
-on a sub-tree. This scheme also enables us to easily move up, left and right. 
-Such a pair that contains a focused part of a data structure and its surroundings is 
-called a zipper, because moving our focus up and down the data structure resembles the 
-operation of a zipper on a regular pair of pants. So it's cool to make a type 
-synonym as such:
+<span class="fixed">Tree a</span> と <span class="fixed">Breadcrumbs a</span> のペアで木全体の再構築と部分木への焦点を持てます。上下左右に動けます。データ構造の焦点と周辺を含むこのペアを「Zipper」と呼びます（ズボンのファスナーのように上下するから）：
 </p>
 
 <pre name="code" class="haskell:hs">type Zipper a = (Tree a, Breadcrumbs a)
 </pre>
 
 <p>
-I'd prefer naming the type synonym <span class="fixed">Focus</span> because that 
-makes it clearer that we're focusing on a part of a data structure, but the term 
-zipper is more widely used to describe such a setup, so we'll stick with 
-<span class="fixed">Zipper</span>.
+私としては <span class="fixed">Focus</span> と呼びたいですが、<span class="fixed">Zipper</span> という用語が広く使われています。
 </p>
 
-<h3>Manipulating trees under focus</h3>
+<h3>焦点下の木を操作する</h3>
 
 <p>
-Now that we can move up and down, let's make a function that
-modifies the element in the root of the sub-tree that the zipper is focusing on:
+焦点が当たっている部分木のルート要素を変更する関数：
 </p>
 
 <pre name="code" class="haskell:hs">modify :: (a -&gt; a) -&gt; Zipper a -&gt; Zipper a
@@ -430,52 +293,39 @@ modify f (Empty, bs) = (Empty, bs)
 </pre>
 
 <p>
-If we're focusing on a node, we modify its root element with the function
-<span class="fixed">f</span>. If we're focusing on an empty tree, we leave it as 
-it is.  Now we can start off with a tree, move to anywhere we want and modify an 
-element, all while keeping focus on that element so that we can easily move 
-further up or down. An example:
+ノードならルート要素に <span class="fixed">f</span> を適用、空木ならそのまま。木をどこへでも移動して要素を変更でき、移動後も焦点を保てます：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newFocus = modify (\_ -&gt; 'P') (goRight (goLeft (freeTree,[])))
 </pre>
 
 <p>
-We go left, then right and then modify the root element by replacing it with a
-<span class="fixed">'P'</span>. This reads even better if we use <span class="fixed">-:</span>:
+左、右、ルート要素を <span class="fixed">'P'</span> に。<span class="fixed">-:</span> で：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newFocus = (freeTree,[]) -: goLeft -: goRight -: modify (\_ -&gt; 'P')
 </pre>
 
 <p>
-We can then move up if we want and replace an 
-element with a mysterious <span class="fixed">'X'</span>:
+上に戻って別の要素を <span class="fixed">'X'</span> に：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newFocus2 = modify (\_ -&gt; 'X') (goUp newFocus)
 </pre>
 
 <p>
-Or if we wrote it with <span class="fixed">-:</span>:
+<span class="fixed">-:</span> で：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newFocus2 = newFocus -: goUp -: modify (\_ -&gt; 'X')
 </pre>
 
 <p>
-Moving up is easy because the breadcrumbs that we leave form the part of the 
-data structure that we're not focusing on, but it's inverted, sort of like turning a 
-sock inside out. That's why when we want to move up, we don't have to start from 
-the root and make our way down, but we just take the top of our inverted tree, 
-thereby uninverting a part of it and adding it to our focus.
+上に戻るのが速いのは、パンくずが「焦点を当てていない部分」を裏返した形で持っているから。靴下を裏返すような感じ。上に戻るときルートから降りるのではなく、裏返した部分の頂点を取って表に戻し焦点に追加するだけ。
 </p>
 
 <p>
-Each node has two sub-trees, even if those sub-trees are empty trees. So if 
-we're focusing on an empty sub-tree, one thing we can do is to replace it with a 
-non-empty subtree, thus attaching a tree to a leaf node. The code for this is 
-simple:
+各ノードは（空でも）2 つの部分木を持つ。空部分木に焦点を当てているとき、空でない部分木に置き換えると、葉ノードに木を貼り付けられます：
 </p>
 
 <pre name="code" class="haskell:hs">attach :: Tree a -&gt; Zipper a -&gt; Zipper a
@@ -483,10 +333,7 @@ attach t (_, bs) = (t, bs)
 </pre>
 
 <p>
-We take a tree and a zipper and return a new zipper that has its focus replaced 
-with the supplied tree. Not only can we extend trees this way by replacing empty 
-sub-trees with new trees, we can also replace whole existing sub-trees. Let's 
-attach a tree to the far left of our <span class="fixed">freeTree</span>:
+木と Zipper を取って、焦点を新しい木に置き換えた Zipper を返す。空部分木を新木に置き換えるだけでなく、既存部分木も置換可能：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let farLeft = (freeTree,[]) -: goLeft -: goLeft -: goLeft -: goLeft
@@ -494,18 +341,13 @@ ghci&gt; let newFocus = farLeft -: attach (Node 'Z' Empty Empty)
 </pre>
 
 <p>
-<span class="fixed">newFocus</span> is now focused on the tree that we just 
-attached and the rest of the tree lies inverted in the breadcrumbs. If we were 
-to use <span class="fixed">goUp</span> to walk all the way to the top of the 
-tree, it would be the same tree as <span class="fixed">freeTree</span> but with 
-an additional <span class="fixed">'Z'</span> on its far left.
+<span class="fixed">newFocus</span> は新木に焦点。<span class="fixed">goUp</span> でルートに戻ると <span class="fixed">freeTree</span> の左端に <span class="fixed">'Z'</span> が追加された木になる。
 </p>
 
-<h3>I'm going straight to the top, oh yeah, up where the air is fresh and clean!</h3>
+<h3>てっぺんへ一直線、空気がきれいなところへ！</h3>
 
 <p>
-Making a function that walks all the way to the top of the tree, regardless of 
-what we're focusing on, is really easy. Here it is:
+木のトップまで歩く関数：
 </p>
 
 <pre name="code" class="haskell:hs">topMost :: Zipper a -&gt; Zipper a
@@ -514,25 +356,14 @@ topMost z = topMost (goUp z)
 </pre>
 
 <p>
-If our trail of beefed up breadcrumbs is empty, this means that we're already at 
-the root of our tree, so we just return the current focus. Otherwise, we go up 
-to get the focus of the parent node and then recursively apply <span class="fixed">topMost</span> to that. So now we can walk around our tree, going 
-left and right and up, applying <span class="fixed">modify</span> and 
-<span class="fixed">attach</span> as we go along and then when we're done with 
-our modifications, we use <span class="fixed">topMost</span> to focus on the 
-root of our tree and see the changes that we've done in proper perspective.
+パンくずが空ならルート、そうでなければ <span class="fixed">goUp</span> して再帰。<span class="fixed">modify</span>・<span class="fixed">attach</span> で変更を加え、<span class="fixed">topMost</span> でルートに焦点を当てて全体像を確認。
 </p>
 
 <a name="focusing-on-lists"></a>
-<h2>Focusing on lists</h2>
+<h2>リストに注目する</h2>
 
 <p>
-Zippers can be used with pretty much any data structure, so it's no surprise 
-that they can be used to focus on sub-lists of lists. After all, lists are 
-pretty much like trees, only where a node in a tree has an element (or not) and 
-several sub-trees, a node in a list has an element and only a single sub-list. 
-When we <a href="making-our-own-types-and-typeclasses.html#recursive-data-structures">implemented 
-our own lists</a>, we defined our data type like so:
+Zipper はほぼ任意のデータ構造で使えます。リストの部分リストにも焦点を当てられます。リストは「ノードに要素と 1 つの部分リスト」を持つ木のようなものです。<a href="making-our-own-types-and-typeclasses.html#recursive-data-structures">自前リスト</a> で：
 </p>
 
 <pre name="code" class="haskell:hs">data List a = Empty | Cons a (List a) deriving (Show, Read, Eq, Ord)
@@ -541,55 +372,26 @@ our own lists</a>, we defined our data type like so:
 
 
 <p>
-Contrast this with our definition of our binary tree and it's easy to see how 
-lists can be viewed as trees where each node has only one sub-tree.
+二分木と比べると、リストは各ノードが 1 つの部分木しか持たない木と見られます。
 </p>
 
 <p>
-A list like <span class="fixed">[1,2,3]</span> can be written as
-<span class="fixed">1:2:3:[]</span>. It consists of the head of the list, which 
-is <span class="fixed">1</span> and then the list's tail, which is 
-<span class="fixed">2:3:[]</span>. In turn, <span class="fixed">2:3:[]</span> 
-also has a head, which is <span class="fixed">2</span> and a tail, which is
-<span class="fixed">3:[]</span>. With <span class="fixed">3:[]</span>, the 
-<span class="fixed">3</span> is the head and the tail is the empty list
-<span class="fixed">[]</span>.
+<span class="fixed">[1,2,3]</span> は <span class="fixed">1:2:3:[]</span>。先頭 <span class="fixed">1</span> と末尾 <span class="fixed">2:3:[]</span>。<span class="fixed">2:3:[]</span> も同じ構造。
 </p>
 
 <p>
-Let's make a zipper for lists. To change the focus on sub-lists of a list, we move either 
-forward or back (whereas with trees we moved either up or left or right). The 
-focused part will be a sub-tree and along with that we'll leave breadcrumbs as 
-we move forward. Now what would a single breadcrumb for a list consist of? When 
-we were dealing with binary trees, we said that a breadcrumb has to hold the 
-element in the root of the parent node along with all the sub-trees that we 
-didn't choose. It also had to remember if we went left or right. So, it had to 
-have all the information that a node has except for the sub-tree that we chose 
-to focus on. 
+リスト用の Zipper を作りましょう。前進・後退で焦点を移動。パンくずは何を含めるべき？　二分木では親ノードの要素と取らなかった部分木でしたが、リストはシンプルで分岐がないので、覚えるべきは前の要素だけ。<span class="fixed">[3,4,5]</span> で前が <span class="fixed">2</span> なら、戻ると <span class="fixed">[2,3,4,5]</span>。
 </p>
 
 <p>
-Lists are simpler than trees, so we don't have to remember if we 
-went left or right, because there's only one way to go deeper into a list. 
-Because there's only one sub-tree to each node, we don't have to remember the 
-paths that we didn't take either. It seems that all we have to remember is the 
-previous element. If we have a list like <span class="fixed">[3,4,5]</span> and 
-we know that the previous element was <span class="fixed">2</span>, we can go 
-back by just putting that element at the head of our list, getting <span class="fixed">[2,3,4,5]</span>.
-</p>
-
-<p>
-Because a single breadcrumb here is just the element, we don't really have to 
-put it inside a data type, like we did when we made the <span class="fixed">Crumb</span> data type for tree zippers:
+パンくずは要素そのものなので、データ型でラップする必要なし：
 </p>
 
 <pre name="code" class="haskell:hs">type ListZipper a = ([a],[a])
 </pre>
 
 <p>
-The first list represents the list that we're focusing on and the second list 
-is the list of breadcrumbs. Let's make functions that go forward and back
-into lists:
+第 1 リストが焦点リスト、第 2 がパンくずリスト。前進・後退関数：
 </p>
 
 <pre name="code" class="haskell:hs">goForward :: ListZipper a -&gt; ListZipper a
@@ -600,13 +402,11 @@ goBack (xs, b:bs) = (b:xs, bs)
 </pre>
 
 <p>
-When we're going forward, we focus on the tail of the current list and leave the 
-head element as a breadcrumb. When we're moving backwards, we take the latest 
-breadcrumb and put it at the beginning of the list.
+前進では現リストの末尾に焦点を移し、先頭要素をパンくずに。後退では最新パンくずをリスト先頭に。
 </p>
 
 <p>
-Here are these two functions in action:
+動作：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let xs = [1,2,3,4]
@@ -621,43 +421,26 @@ ghci&gt; goBack ([4],[3,2,1])
 </pre>
 
 <p>
-We see that the breadcrumbs in the case of lists are nothing more but a reversed 
-part of our list. The element that we move away from always goes into the head 
-of the breadcrumbs, so it's easy to move back by just taking that element from 
-the head of the breadcrumbs and making it the head of our focus.
+リストではパンくずは「リストの逆順部分」。離れた要素は常にパンくずの先頭に行くので、戻るのも簡単。
 </p>
 
 <p>
-This also makes it easier to see why we call this a zipper, because this really 
-looks like the slider of a zipper moving up and down.
+ファスナーのスライダーが上下するように見えるので Zipper と呼ばれるのが分かります。
 </p>
 
 <p>
-If you were making a text editor, you could use a list of strings to represent 
-the lines of text that are currently opened and you could then use a zipper so 
-that you know which line the cursor is currently focused on. By using a zipper, 
-it would also make it easier to insert new lines anywhere in the text or delete 
-existing ones.
+テキストエディタを作るなら、文字列リストで開いている行を表し、Zipper でカーソルがどの行にあるかを追えます。挿入・削除も簡単に。
 </p>
 
 <a name="a-very-simple-file-system"></a>
-<h2>A very simple file system</h2>
+<h2>ごく簡単なファイルシステム</h2>
 
 <p>
-Now that we know how zippers work, let's use trees to represent a very simple 
-file system and then make a zipper for that file system, which will allow us to 
-move between folders, just like we usually do when jumping around our file 
-system.
+Zipper の動きが分かったので、木でごく簡単なファイルシステムを表し、Zipper でフォルダ間を移動できるようにします。
 </p>
 
 <p>
-If we take a simplistic view of the average hierarchical file system, we see 
-that it's mostly made up of files and folders. Files are units of data and come 
-with a name, whereas folders are used to organize those files and can contain 
-files or other folders. So let's say that an item in a file system is either a 
-file, which comes with a name and some data, or a folder, which has a name and 
-then a bunch of items that are either files or folders themselves. Here's a data 
-type for this and some type synonyms so we know what's what:
+階層型ファイルシステムは主にファイルとフォルダから成ります。ファイルはデータの単位で名前付き、フォルダはファイルや別フォルダを含む名前付きコレクション。データ型：
 </p>
 
 <pre name="code" class="haskell:hs">type Name = String
@@ -666,18 +449,16 @@ data FSItem = File Name Data | Folder Name [FSItem] deriving (Show)
 </pre>
 
 <p>
-A file comes with two strings, which represent its name and the data it holds. A 
-folder comes with a string that is its name and a list of items. If that list is 
-empty, then we have an empty folder.
+ファイルは名前とデータの 2 文字列、フォルダは名前と項目リスト。リストが空なら空フォルダ。
 </p>
 
 <p>
-Here's a folder with some files and sub-folders:
+ファイルとサブフォルダを含むフォルダ：
 </p>
 
 <pre name="code" class="haskell:hs">myDisk :: FSItem
 myDisk =
-    Folder "root" 
+    Folder "root"
         [ File "goat_yelling_like_man.wmv" "baaaaaa"
         , File "pope_time.avi" "god bless"
         , Folder "pics"
@@ -699,60 +480,41 @@ myDisk =
 </pre>
 
 <p>
-That's actually what my disk contains right now. 
+私のディスクは実際こうなっています。
 </p>
 
-<h3>A zipper for our file system</h3>
+<h3>ファイルシステム用 Zipper</h3>
 
 
 
 <p>
-Now that we have a file system, all we need is a zipper so we can zip and zoom 
-around it and add, modify and remove files as well as folders. Like with binary 
-trees and lists, we're going to be leaving breadcrumbs that contain info about 
-all the stuff that we chose not to visit. Like we said, a single breadcrumb 
-should be kind of like a node, only it should contain everything except the 
-sub-tree that we're currently focusing on. It should also note where the hole 
-is so that once we move back up, we can plug our previous focus into the hole.
+ファイルシステムができたので、移動・追加・変更・削除のための Zipper を作ります。二分木やリストと同じく、訪れなかったものの情報を持つパンくずを残します。パンくずは「現焦点の部分木以外を含むノード」と、穴の場所を示すもの。
 </p>
 
 <p>
-In this case, a breadcrumb should be like a folder, only it should be missing 
-the folder that we currently chose. Why not like a file, you ask? Well, because 
-once we're focusing on a file, we can't move deeper into the file system, so it 
-doesn't make sense to leave a breadcrumb that says that we came from a file. A 
-file is sort of like an empty tree.
+今回、パンくずは「フォルダから現在選んだ項目を除いたもの」のようなもの。ファイルではなくフォルダから。ファイルに焦点を当てるとそれ以上深く進めないので、ファイルから来たというパンくずは意味なし。
 </p>
 
 <p>
-If we're focusing on the folder <span class="fixed">"root"</span> and we then 
-focus on the file <span class="fixed">"dijon_poupon.doc"</span>, what should the 
-breadcrumb that we leave look like? Well, it should contain the name of its 
-parent folder along with the items that come before the file that we're focusing 
-on and the items that come after it. So all we need is a <span class="fixed">Name</span> and two lists of items. By keeping separate lists for 
-the items that come before the item that we're focusing and for the items that 
-come after it, we know exactly where to place it once we move back up. So this 
-way, we know where the hole is.
+<span class="fixed">"root"</span> から <span class="fixed">"dijon_poupon.doc"</span> に焦点を当てたとき、パンくずは「親フォルダ名 + そのファイルより前の項目 + 後の項目」。<span class="fixed">Name</span> と項目の 2 リスト。
 </p>
 
 <p>
-Here's our breadcrumb type for the file system:
+パンくず型：
 </p>
 
 <pre name="code" class="haskell:hs">data FSCrumb = FSCrumb Name [FSItem] [FSItem] deriving (Show)
 </pre>
 
 <p>
-And here's a type synonym for our zipper:
+Zipper：
 </p>
 
 <pre name="code" class="haskell:hs">type FSZipper = (FSItem, [FSCrumb])
 </pre>
 
 <p>
-Going back up in the hierarchy is very simple. We just take the latest 
-breadcrumb and assemble a new focus from the current focus and breadcrumb. 
-Like so:
+階層を上に戻るのは簡単。最新パンくずから親フォルダを再構築：
 </p>
 
 <pre name="code" class="haskell:hs">fsUp :: FSZipper -&gt; FSZipper
@@ -760,28 +522,21 @@ fsUp (item, FSCrumb name ls rs:bs) = (Folder name (ls ++ [item] ++ rs), bs)
 </pre>
 
 <p>
-Because our breadcrumb knew what the parent folder's name was, as well as the 
-items that came before our focused item in the folder (that's <span class="fixed">ls</span>) and the ones that came after (that's <span class="fixed">rs</span>), moving up was easy.
+パンくずに親フォルダ名と前後の項目があるので、再構築は簡単。
 </p>
 
 <p>
-How about going deeper into the file system? If we're in the 
-<span class="fixed">"root"</span> and we want to focus on 
-<span class="fixed">"dijon_poupon.doc"</span>, the breadcrumb that we leave is going to 
-include the name <span class="fixed">"root"</span> along with the items that 
-precede <span class="fixed">"dijon_poupon.doc"</span> and the ones that come 
-after it.
+深く進むには？　<span class="fixed">"root"</span> から <span class="fixed">"dijon_poupon.doc"</span> に行くなら、パンくずに <span class="fixed">"root"</span> と前後の項目を入れる。
 </p>
 
 <p>
-Here's a function that, given a name, focuses on a file of folder that's located 
-in the current focused folder:
+名前を取って現フォルダ内のファイル/フォルダに焦点を当てる関数：
 </p>
 
 <pre name="code" class="haskell:hs">import Data.List (break)
 
 fsTo :: Name -&gt; FSZipper -&gt; FSZipper
-fsTo name (Folder folderName items, bs) = 
+fsTo name (Folder folderName items, bs) =
     let (ls, item:rs) = break (nameIs name) items
     in  (item, FSCrumb folderName ls rs:bs)
 
@@ -791,56 +546,32 @@ nameIs name (File fileName _) = name == fileName
 </pre>
 
 <p>
-<span class="fixed">fsTo</span> takes a <span class="fixed">Name</span> and a 
-<span class="fixed">FSZipper</span>
-and returns a new <span class="fixed">FSZipper</span> that focuses on the file 
-with the given name. That file has to be in the current focused folder. This 
-function doesn't search all over the place, it just looks at the current folder.
+<span class="fixed">fsTo</span> は名前と Zipper を取って、その名前のファイル/フォルダに焦点を当てた新 Zipper を返す。現フォルダだけ探します。
 </p>
 
 
 
 <p>
-First we use <span class="fixed">break</span> to break the list of items in a 
-folder into those that precede the file that we're searching for and those that 
-come after it. If you remember, <span class="fixed">break</span> takes a 
-predicate and a list and returns a pair of lists. The first list in the pair 
-holds items for which the predicate returns <span class="fixed">False</span>. 
-Then, once the predicate returns <span class="fixed">True</span> for an item, it 
-places that item and the rest of the list in the second item of the pair. We 
-made an auxilliary function called <span class="fixed">nameIs</span> that takes 
-a name and a file system item and returns <span class="fixed">True</span> if 
-the names match.
+<span class="fixed">break</span> でリストを「探しているもの以前」「以降（先頭が探しているもの）」に分割。<span class="fixed">break</span> は述語とリストを取ってペアを返し、述語が <span class="fixed">False</span> の間は第 1 リスト、<span class="fixed">True</span> になったらそれ以降を第 2 リストへ。<span class="fixed">nameIs</span> 補助関数で名前一致を判定。
 </p>
 
 <p>
-So now, <span class="fixed">ls</span> is a list that contains the items that 
-precede the item that we're searching for, <span class="fixed">item</span> is 
-that very item and <span class="fixed">rs</span> is the list of items that come 
-after it in its folder. Now that we have this, we just present the item that we 
-got from <span class="fixed">break</span> as the focus and build a breadcrumb 
-that has all the data it needs.
+<span class="fixed">ls</span> は前の項目、<span class="fixed">item</span> は対象、<span class="fixed">rs</span> は後の項目。これらでパンくずを構築。
 </p>
 
 <p>
-Note that if the name we're looking for isn't in the folder, the pattern
-<span class="fixed">item:rs</span> will try to match on an empty list and we'll 
-get an error. Also, if our current focus isn't a folder at all but a file, we 
-get an error as well and the program crashes.
+名前がフォルダにないと <span class="fixed">item:rs</span> パターンが失敗してエラー。現焦点がフォルダでなければエラーでクラッシュ。
 </p>
 
 <p>
-Now we can move up and down our file system. Let's start at the root and walk to 
-the file <span class="fixed">"skull_man(scary).bmp"</span>:
+ファイルシステムを上下に移動できます。ルートから <span class="fixed">"skull_man(scary).bmp"</span> に：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newFocus = (myDisk,[]) -: fsTo "pics" -: fsTo "skull_man(scary).bmp"
 </pre>
 
 <p>
-<span class="fixed">newFocus</span> is now a zipper that's focused on the
-<span class="fixed">"skull_man(scary).bmp"</span> file. Let's get the first 
-component of the zipper (the focus itself) and see if that's really true:
+焦点を確認：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; fst newFocus
@@ -848,8 +579,7 @@ File "skull_man(scary).bmp" "Yikes!"
 </pre>
 
 <p>
-Let's move up and then focus on its neighboring file 
-<span class="fixed">"watermelon_smash.gif"</span>:
+上に戻って隣のファイル <span class="fixed">"watermelon_smash.gif"</span> へ：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newFocus2 = newFocus -: fsUp -: fsTo "watermelon_smash.gif"
@@ -857,11 +587,10 @@ ghci&gt; fst newFocus2
 File "watermelon_smash.gif" "smash!!"
 </pre>
 
-<h3>Manipulating our file system</h3>
+<h3>ファイルシステムの操作</h3>
 
 <p>
-Now that we know how to navigate our file system, manipulating it is easy. 
-Here's a function that renames the currently focused file or folder:
+移動できるので操作は簡単。現在の焦点をリネーム：
 </p>
 
 <pre name="code" class="haskell:hs">fsRename :: Name -&gt; FSZipper -&gt; FSZipper
@@ -870,61 +599,45 @@ fsRename newName (File name dat, bs) = (File newName dat, bs)
 </pre>
 
 <p>
-Now we can rename our <span class="fixed">"pics"</span> folder to
-<span class="fixed">"cspi"</span>:
+<span class="fixed">"pics"</span> を <span class="fixed">"cspi"</span> に：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newFocus = (myDisk,[]) -: fsTo "pics" -: fsRename "cspi" -: fsUp
 </pre>
 
 <p>
-We descended to the <span class="fixed">"pics"</span> folder, renamed it and 
-then moved back up.
+<span class="fixed">"pics"</span> に下りてリネームし、上に戻る。
 </p>
 
 <p>
-How about a function that makes a new item in the current folder? Behold:
+現フォルダに新項目を追加：
 </p>
 
 <pre name="code" class="haskell:hs">fsNewFile :: FSItem -&gt; FSZipper -&gt; FSZipper
-fsNewFile item (Folder folderName items, bs) = 
+fsNewFile item (Folder folderName items, bs) =
     (Folder folderName (item:items), bs)
 </pre>
 
 <p>
-Easy as pie. Note that this would crash if we tried to add an item but weren't 
-focusing on a folder, but were focusing on a file instead.
+簡単。フォルダ以外（ファイル）に焦点があるとクラッシュ。
 </p>
 
 <p>
-Let's add a file to our <span class="fixed">"pics"</span> folder and then move 
-back up to the root:
+<span class="fixed">"pics"</span> にファイルを追加してルートに戻る：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let newFocus = (myDisk,[]) -: fsTo "pics" -: fsNewFile (File "heh.jpg" "lol") -: fsUp
 </pre>
 
 <p>
-What's really cool about all this is that when we modify our file system, it 
-doesn't actually modify it in place but it returns a whole new file system. That way, we 
-have access to our old file system (in this case, <span class="fixed">myDisk</span>)
-as well as the new one (the first component of <span class="fixed">newFocus</span>).
-So by using zippers, we get versioning for free, meaning that we can always 
-refer to older versions of data structures even after we've changed them, so to 
-speak. This isn't unique to zippers, but is a property of Haskell because its 
-data structures are immutable. With zippers however, we get the ability to 
-easily and efficiently walk around our data structures, so the persistence of 
-Haskell's data structures really begins to shine.
+クールなのは、ファイルシステムを変更しても元を破壊せず新しいファイルシステムが返ること。元（<span class="fixed">myDisk</span>）と新（<span class="fixed">newFocus</span> の第 1 要素）両方にアクセスできる。Zipper でバージョニングが無料で得られる、と。Zipper 固有ではなく Haskell のデータ構造が不変だから。Zipper のおかげでデータ構造を効率良く歩き回れ、不変性が活きてきます。
 </p>
 
 <a name="watch-your-step"></a>
-<h2>Watch your step</h2>
+<h2>足元に気をつけて</h2>
 
 <p>
-So far, while walking through our data structures, whether they were binary 
-trees, lists or file systems, we didn't really care if we took a step too far 
-and fell off. For instance, our <span class="fixed">goLeft</span> function takes 
-a zipper of a binary tree and moves the focus to its left sub-tree:
+これまでデータ構造を歩くとき、踏み外すことを気にしませんでした。<span class="fixed">goLeft</span>：
 </p>
 
 <pre name="code" class="haskell:hs">goLeft :: Zipper a -&gt; Zipper a
@@ -934,35 +647,15 @@ goLeft (Node x l r, bs) = (l, LeftCrumb x r:bs)
 
 
 <p>
-But what if the tree we're stepping off from is an empty tree? That is, what if 
-it's not a <span class="fixed">Node</span>, but an <span class="fixed">Empty</span>? 
-In this case, we'd get a runtime error because the pattern match would fail and 
-we have made no pattern to handle an empty tree, which doesn't have any 
-sub-trees at all. So far, we just assumed that we'd never try to focus on the 
-left sub-tree of an empty tree as its left sub-tree doesn't exist at all. But 
-going to the left sub-tree of an empty tree doesn't make much sense, and so far 
-we've just conveniently ignored this.
+踏み出した先が空木だったら？　<span class="fixed">Node</span> ではなく <span class="fixed">Empty</span>？　パターンマッチ失敗で実行時エラー。空木の左部分木は存在しないので意味をなさない、と無視してきました。
 </p>
 
 <p>
-Or what if we were already at the root of some tree and didn't have any 
-breadcrumbs but still tried to move up? The same thing would happen. It seems 
-that when using zippers, any step could be our last (cue ominous music). In 
-other words, any move can result in a success, but it can also result in a 
-failure. Does that remind you of something? Of course, monads! More 
-specifically, the <span class="fixed">Maybe</span> monad which adds a context of 
-possible failure to normal values.
+ルートでパンくずがないのに上に行こうとしても同じ。Zipper ではどの一歩も最後になりうる（暗い音楽）。成功も失敗もある、何かを思い出させる？　モナド！　特に <span class="fixed">Maybe</span> モナド（失敗の文脈）。
 </p>
 
 <p>
-So let's use the <span class="fixed">Maybe</span> monad to add a context of 
-possible failure to our movements. We're going to take the functions that work 
-on our binary tree zipper and we're going to make them into monadic functions. 
-First, let's take care of possible failure in <span class="fixed">goLeft</span> 
-and <span class="fixed">goRight</span>. So far, the failure of functions that 
-could fail was always reflected in their result, and this time is no 
-different. So here are <span class="fixed">goLeft</span> and 
-<span class="fixed">goRight</span> with an added possibility of failure:
+<span class="fixed">Maybe</span> で動きに失敗の文脈を加えます。<span class="fixed">goLeft</span>・<span class="fixed">goRight</span>：
 </p>
 
 <pre name="code" class="haskell:hs">goLeft :: Zipper a -&gt; Maybe (Zipper a)
@@ -975,8 +668,7 @@ goRight (Empty, _) = Nothing
 </pre>
 
 <p>
-Cool, now if we try to take a step to the left of an empty tree, we get a 
-<span class="fixed">Nothing</span>!
+空木に左へ行こうとすると <span class="fixed">Nothing</span>：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; goLeft (Empty, [])
@@ -986,10 +678,7 @@ Just (Empty,[LeftCrumb 'A' Empty])
 </pre>
 
 <p>
-Looks good! How about going up? The problem before happened if we tried to go up but 
-we didn't have any more breadcrumbs, which meant that we were already in the 
-root of the tree. This is the <span class="fixed">goUp</span> function that 
-throws an error if we don't keep within the bounds of our tree:
+<span class="fixed">goUp</span> はパンくずがないと木のルートを越えてエラー。エラー版：
 </p>
 
 <pre name="code" class="haskell:hs">goUp :: Zipper a -&gt; Zipper a
@@ -998,7 +687,7 @@ goUp (t, RightCrumb x l:bs) = (Node x l t, bs)
 </pre>
 
 <p>
-Now let's modify it to fail gracefully:
+失敗対応版：
 </p>
 
 <pre name="code" class="haskell:hs">goUp :: Zipper a -&gt; Maybe (Zipper a)
@@ -1008,40 +697,18 @@ goUp (_, []) = Nothing
 </pre>
 
 <p>
-If we have breadcrumbs, everything is okay and we return a successful new focus, 
-but if we don't, then we return a failure.
+パンくずがあれば成功、なければ失敗。
 </p>
 
 <p>
-Before, these functions took zippers and returned zippers, which meant that we 
-could chain them like this to walk around:
+以前は Zipper を取って Zipper を返したので連鎖できました：
 </p>
 
 <pre name="code" class="haskell:hs">gchi&gt; let newFocus = (freeTree,[]) -: goLeft -: goRight
 </pre>
 
 <p>
-But now, instead of returning <span class="fixed">Zipper a</span>, they return
-<span class="fixed">Maybe (Zipper a)</span>, so chaining functions like this 
-won't work. We had a similar problem when we 
-were <a href="a-fistful-of-monads.html#walk-the-line">dealing with our tightrope 
-walker</a> in the chapter about monads. He also walked one step at a time and 
-each of his steps could result in failure because a bunch of birds could land on 
-one side of his balancing pole and make him fall. 
-</p>
-
-<p>
-Now, the joke's on us because 
-we're the ones doing the walking, and we're traversing a labyrinth of our own 
-devising. Luckily, we can learn from the tightrope walker and just do what he 
-did, which is to exchange normal 
-function application for using <span class="fixed">&gt;&gt;=</span>, which takes 
-a value with a context (in our case, the <span class="fixed">Maybe (Zipper a)</span>,
-which has a context of possible failure) and feeds it into a function while 
-making sure that the context is taken care of. So just like our tightrope walker, we're
-going to trade in all our <span class="fixed">-:</span> operators for 
-<span class="fixed">&gt;&gt;=</span>. Alright, we can chain our functions again! 
-Watch:
+今は <span class="fixed">Maybe (Zipper a)</span> なのでこの連鎖は動きません。<a href="a-fistful-of-monads.html#walk-the-line">綱渡り</a> と同じ問題。各ステップで失敗の可能性。綱渡りでやったように、通常関数適用の代わりに <span class="fixed">&gt;&gt;=</span> を使えば連鎖できます：
 </p>
 
 <pre name="code" class="haskell:hs">ghci&gt; let coolTree = Node 1 Empty (Node 3 Empty Empty)
@@ -1054,26 +721,15 @@ Nothing
 </pre>
 
 <p>
-We used <span class="fixed">return</span> to put a zipper in a <span class="fixed">Just</span> and then used <span class="fixed">&gt;&gt;=</span> to 
-feed that to our <span class="fixed">goRight</span> function. First, we made a 
-tree that has on its left an empty sub-tree and on its right a node that has two 
-empty sub-trees. When we try to go right once, the result is a success, because 
-the operation makes sense. Going right twice is okay too; we end up with the 
-focus on an empty sub-tree. But going right three times wouldn't make sense, 
-because we can't go to the right of an empty sub-tree, which is why the
-result is a <span class="fixed">Nothing</span>.
+<span class="fixed">return</span> で Zipper を <span class="fixed">Just</span> に。<span class="fixed">&gt;&gt;=</span> で連鎖。最初の右移動は成功、2 回目も成功（空部分木に焦点）、3 回目は空部分木の右に行こうとして <span class="fixed">Nothing</span>。
 </p>
 
 <p>
-Now we've equipped our trees with a safety-net that will catch us should 
-we fall off. Wow, I nailed this metaphor.
+木に「踏み外したら受け止める安全網」を装備しました。
 </p>
 
 <p>
-Our file system also has a lot of cases where an operation could fail, such as 
-trying to focus on a file or folder that doesn't exist. As an exercise, you can 
-equip our file system with functions that fail gracefully by using the
-<span class="fixed">Maybe</span> monad.
+ファイルシステムも失敗の可能性が多い操作（存在しないファイル/フォルダに焦点を当てるなど）があります。練習として、<span class="fixed">Maybe</span> モナドで失敗対応版にしてみてください。
 </p>
 
 </body>

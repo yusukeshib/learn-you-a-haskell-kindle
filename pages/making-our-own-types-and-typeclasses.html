@@ -3,133 +3,83 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Learn You a Haskell for Great Good!</title>
+<title>すごいHaskellたのしく学ぼう！</title>
 <link rel="stylesheet" href="../css/main.css" type="text/css" charset="utf-8">
 <body>
 
-<h1>Making Our Own Types and Typeclasses</h1>
-<p>In the previous chapters, we covered some existing Haskell types and 
-typeclasses. In this chapter, we'll learn how to make our own and how to
- put them to work!</p>
-<a name="algebraic-data-types"></a><h2>Algebraic data types intro</h2>
-<p>So far, we've run into a lot of data types. <span class="fixed">Bool</span>, <span class="fixed">Int</span>, <span class="fixed">Char</span>, <span class="fixed">Maybe</span>, etc. But how do we make our own? Well, one way is to use the <em>data</em> keyword to define a type. Let's see how the <span class="fixed">Bool</span> type is defined in the standard library.</p>
+<h1>独自の型と型クラスを作る</h1>
+<p>これまで Haskell の既存の型と型クラスをいくつか扱ってきました。この章では、自分で型と型クラスを作って働かせる方法を学びます！</p>
+<a name="algebraic-data-types"></a><h2>代数的データ型入門</h2>
+<p>これまでに <span class="fixed">Bool</span>、<span class="fixed">Int</span>、<span class="fixed">Char</span>、<span class="fixed">Maybe</span> などたくさんのデータ型に出会ってきました。では自前のデータ型はどう作るのでしょう？　1 つの方法は <em>data</em> キーワードで型を定義することです。標準ライブラリでの <span class="fixed">Bool</span> 型の定義を見てみましょう。</p>
 <pre name="code" class="haskell:hs">data Bool = False | True
 </pre>
-<p><span class="fixed">data</span> means that we're defining a new data type. The part before the <span class="fixed">=</span> denotes the type, which is <span class="fixed">Bool</span>. The parts after the <span class="fixed">=</span> are <em>value constructors</em>. They specify the different values that this type can have. The <span class="fixed">|</span> is read as <i>or</i>. So we can read this as: the <span class="fixed">Bool</span> type can have a value of <span class="fixed">True</span> or <span class="fixed">False</span>. Both the type name and the value constructors have to be capital cased.</p>
-<p>In a similar fashion, we can think of the <span class="fixed">Int</span> type as being defined like this:</p>
+<p><span class="fixed">data</span> は新しいデータ型を定義することを意味します。<span class="fixed">=</span> の前の部分が型で、ここでは <span class="fixed">Bool</span>。後の部分は <em>値コンストラクタ</em> です。これらが、この型が取りうる値を指定します。<span class="fixed">|</span> は <i>または</i> と読みます。「<span class="fixed">Bool</span> 型は <span class="fixed">True</span> または <span class="fixed">False</span> という値を持ちうる」と読めます。型名と値コンストラクタはどちらも大文字で始まる必要があります。</p>
+<p>同じように <span class="fixed">Int</span> 型は次のように定義されている、と考えられます：</p>
 <pre name="code" class="haskell:hs">data Int = -2147483648 | -2147483647 | ... | -1 | 0 | 1 | 2 | ... | 2147483647
 </pre>
 
-<p>The first and last value constructors are the minimum and maximum possible values of <span class="fixed">Int</span>.
- It's not actually defined like this, the ellipses are here because we 
-omitted a heapload of numbers, so this is just for illustrative 
-purposes.</p>
-<p>Now, let's think about how we would represent a shape in Haskell. One way would be to use tuples. A circle could be denoted as <span class="fixed">(43.1, 55.0, 10.4)</span>
- where the first and second fields are the coordinates of the circle's 
-center and the third field is the radius. Sounds OK, but those could 
-also represent a 3D vector or anything else. A better solution would be 
-to make our own type to represent a shape. Let's say that a shape can be
- a circle or a rectangle. Here it is:</p>
-<pre name="code" class="haskell:hs">data Shape = Circle Float Float Float | Rectangle Float Float Float Float 
+<p>最初と最後の値コンストラクタが <span class="fixed">Int</span> の最小値と最大値です。実際にはこう定義されているわけではなく、間の数を山ほど省略しているのは説明のためです。</p>
+<p>図形を Haskell でどう表すか考えましょう。1 つの方法はタプルです。円は <span class="fixed">(43.1, 55.0, 10.4)</span> のように、最初の2要素が中心の座標、3つ目が半径と表せます。それでも一応動きますが、3D ベクトルにも見えるし、何にでも見えてしまいます。図形を表す独自の型を作るほうが良い解です。図形は円か長方形のどちらかとしましょう：</p>
+<pre name="code" class="haskell:hs">data Shape = Circle Float Float Float | Rectangle Float Float Float Float
 </pre>
 <p>
-Now what's this? Think of it like this. The <span class="fixed">Circle</span>
- value constructor has three fields, which take floats. So when we write
- a value constructor, we can optionally add some types after it and 
-those types define the values it will contain. Here, the first two 
-fields are the coordinates of its center, the third one its radius. The <span class="fixed">Rectangle</span>
- value constructor has four fields which accept floats. The first two 
-are the coordinates to its upper left corner and the second two are 
-coordinates to its lower right one.
+さて、これは何でしょう？　こう考えてください。<span class="fixed">Circle</span> 値コンストラクタは Float を取る3つのフィールドを持ちます。値コンストラクタを書くとき、後ろに型を続けて、それが「保持する値」を定義できるのです。ここでは最初の2つが中心の座標、3つ目が半径。<span class="fixed">Rectangle</span> 値コンストラクタは Float を取る4つのフィールド。最初の2つが左上の座標、後の2つが右下の座標です。
 </p>
-<p>Now when I say fields, I actually mean parameters. Value constructors
- are actually functions that ultimately return a value of a data type. 
-Let's take a look at the type signatures for these two value 
-constructors.</p>
+<p>「フィールド」と言いましたが、要するに引数のことです。値コンストラクタは、最終的にデータ型の値を返す関数なのです。これら2つの値コンストラクタの型シグネチャを見てみましょう。</p>
 <pre name="code" class="haskell:hs">ghci&gt; :t Circle
 Circle :: Float -&gt; Float -&gt; Float -&gt; Shape
 ghci&gt; :t Rectangle
 Rectangle :: Float -&gt; Float -&gt; Float -&gt; Float -&gt; Shape
 </pre>
-<p>Cool, so value constructors are functions like everything else. Who 
-would have thought? Let's make a function that takes a shape and returns
- its surface.</p>
+<p>クール、値コンストラクタは普通の関数なんですね。誰が想像したでしょう？　図形を取って表面積を返す関数を作ってみます。</p>
 <pre name="code" class="haskell:hs">surface :: Shape -&gt; Float
 surface (Circle _ _ r) = pi * r ^ 2
 surface (Rectangle x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
 </pre>
-<p>The first notable thing here is the type declaration. It says that 
-the function takes a shape and returns a float. We couldn't write a type
- declaration of <span class="fixed">Circle -&gt; Float</span> because <span class="fixed">Circle</span> is not a type, <span class="fixed">Shape</span> is. Just like we can't write a function with a type declaration of <span class="fixed">True -&gt; Int</span>.
- The next thing we notice here is that we can pattern match against 
-constructors. We pattern matched against constructors before (all the 
-time actually) when we pattern matched against values like <span class="fixed">[]</span> or <span class="fixed">False</span> or <span class="fixed">5</span>,
- only those values didn't have any fields. We just write a constructor 
-and then bind its fields to names. Because we're interested in the 
-radius, we don't actually care about the first two fields, which tell us
- where the circle is.</p>
+<p>まず注目すべきは型宣言。「図形を取って Float を返す」と言っています。<span class="fixed">Circle -&gt; Float</span> とは書けません。<span class="fixed">Circle</span> は型ではなく、<span class="fixed">Shape</span> が型だからです。<span class="fixed">True -&gt; Int</span> という型宣言の関数が書けないのと同じです。次に注目すべきは、コンストラクタに対してパターンマッチできることです。これまでもパターンマッチの相手はコンストラクタでしたが（<span class="fixed">[]</span>、<span class="fixed">False</span>、<span class="fixed">5</span> など）、それらにはフィールドがありませんでした。コンストラクタを書いてフィールドを名前に束縛するだけ。半径だけが欲しいので、円の位置を表す最初の2つのフィールドは気にしません。</p>
 <pre name="code" class="haskell:hs">ghci&gt; surface $ Circle 10 20 10
 314.15927
 ghci&gt; surface $ Rectangle 0 0 100 100
 10000.0
 </pre>
-<p>Yay, it works! But if we try to just print out <span class="fixed">Circle 10 20 5</span>
- in the prompt, we'll get an error. That's because Haskell doesn't know 
-how to display our data type as a string (yet). Remember, when we try to
- print a value out in the prompt, Haskell first runs the <span class="fixed">show</span> function to get the string representation of our value and then it prints that out to the terminal. To make our <span class="fixed">Shape</span> type part of the <span class="fixed">Show</span> typeclass, we modify it like this: </p>
+<p>動きました！　でもプロンプトでただ <span class="fixed">Circle 10 20 5</span> と打つとエラーになります。Haskell はまだ私たちのデータ型を文字列にして表示する方法を知らないからです。プロンプトで値を表示するとき、Haskell はまず <span class="fixed">show</span> 関数で値の文字列表現を取得し、それを端末に出力します。<span class="fixed">Shape</span> 型を <span class="fixed">Show</span> 型クラスのメンバーにするには、こう書きます：</p>
 <pre name="code" class="haskell:hs">data Shape = Circle Float Float Float | Rectangle Float Float Float Float deriving (Show)
 </pre>
-<p>We won't concern ourselves with deriving too much for now. Let's just say that if we add <span class="fixed">deriving (Show)</span> at the end of a <i>data</i> declaration, Haskell automagically makes that type part of the <span class="fixed">Show</span> typeclass. So now, we can do this:</p>
+<p>deriving についてはまだ深く立ち入りません。今のところは、<i>data</i> 宣言の最後に <span class="fixed">deriving (Show)</span> を加えると、Haskell が自動でその型を <span class="fixed">Show</span> 型クラスの一員にしてくれる、と思っておけば十分。これでこうできます：</p>
 <pre name="code" class="haskell:hs">ghci&gt; Circle 10 20 5
 Circle 10.0 20.0 5.0
 ghci&gt; Rectangle 50 230 60 90
 Rectangle 50.0 230.0 60.0 90.0
 </pre>
-<p>Value constructors are functions, so we can map them and partially 
-apply them and everything. If we want a list of concentric circles with 
-different radii, we can do this.</p>
+<p>値コンストラクタは関数なので、map したり部分適用したりできます。半径違いの同心円のリストが欲しいなら：</p>
 <pre name="code" class="haskell:hs">ghci&gt; map (Circle 10 20) [4,5,6,6]
 [Circle 10.0 20.0 4.0,Circle 10.0 20.0 5.0,Circle 10.0 20.0 6.0,Circle 10.0 20.0 6.0]
 </pre>
-<p>Our data type is good, although it could be better. Let's make an 
-intermediate data type that defines a point in two-dimensional space. 
-Then we can use that to make our shapes more understandable.</p>
+<p>悪くないですが、もっと良くできます。2 次元の点を定義する中間データ型を作って、図形をもっと分かりやすくしましょう。</p>
 <pre name="code" class="haskell:hs">data Point = Point Float Float deriving (Show)
 data Shape = Circle Point Float | Rectangle Point Point deriving (Show)
 </pre>
-<p>Notice that when defining a point, we used the same name for the data
- type and the value constructor. This has no special meaning, although 
-it's common to use the same name as the type if there's only one value 
-constructor. So now the <span class="fixed">Circle</span> has two fields, one is of type <span class="fixed">Point</span> and the other of type <span class="fixed">Float</span>. This makes it easier to understand what's what. Same goes for the rectangle. We have to adjust our <span class="fixed">surface</span> function to reflect these changes.</p>
+<p>点を定義するとき、データ型と値コンストラクタに同じ名前を使ったことに注目。特別な意味はありませんが、値コンストラクタが1つしかないときは型名と同じにするのが慣習です。<span class="fixed">Circle</span> は <span class="fixed">Point</span> 型と <span class="fixed">Float</span> 型のフィールドを持ち、何が何だか分かりやすくなりました。長方形も同様。<span class="fixed">surface</span> 関数も合わせて変えます：</p>
 <pre name="code" class="haskell:hs">surface :: Shape -&gt; Float
 surface (Circle _ r) = pi * r ^ 2
 surface (Rectangle (Point x1 y1) (Point x2 y2)) = (abs $ x2 - x1) * (abs $ y2 - y1)
 </pre>
-<p>The only thing we had to change were the patterns. We disregarded the
- whole point in the circle pattern. In the rectangle pattern, we just 
-used a nested pattern matching to get the fields of the points. If we 
-wanted to reference the points themselves for some reason, we could have
- used as-patterns.</p>
+<p>変えたのはパターンだけ。円のパターンでは点全体を無視。長方形のパターンではネストしたパターンマッチで点のフィールドを取り出しています。点そのものを参照したければ as パターンが使えます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; surface (Rectangle (Point 0 0) (Point 100 100))
 10000.0
 ghci&gt; surface (Circle (Point 0 0) 24)
 1809.5574
 </pre>
-<p>How about a function that nudges a shape? It takes a shape, the 
-amount to move it on the x axis and the amount to move it on the y axis 
-and then returns a new shape that has the same dimensions, only it's 
-located somewhere else.</p>
+<p>図形を「ぐっと押す」関数はどうでしょう？　図形と x 軸方向の移動量、y 軸方向の移動量を取り、寸法はそのまま、位置だけ動いた新しい図形を返します。</p>
 <pre name="code" class="haskell:hs">nudge :: Shape -&gt; Float -&gt; Float -&gt; Shape
 nudge (Circle (Point x y) r) a b = Circle (Point (x+a) (y+b)) r
 nudge (Rectangle (Point x1 y1) (Point x2 y2)) a b = Rectangle (Point (x1+a) (y1+b)) (Point (x2+a) (y2+b))
 </pre>
-<p>Pretty straightforward. We add the nudge amounts to the points that denote the position of the shape.</p>
+<p>シンプル。図形の位置を表す点に nudge 量を足しているだけです。</p>
 <pre name="code" class="haskell:hs">ghci&gt; nudge (Circle (Point 34 34) 10) 5 10
 Circle (Point 39.0 44.0) 10.0
 </pre>
-<p>If we don't want to deal directly with points, we can make some 
-auxilliary functions that create shapes of some size at the zero 
-coordinates and then nudge those.</p>
+<p>点を直接扱いたくなければ、原点で図形を作る補助関数を作って、それを nudge できます。</p>
 <pre name="code" class="haskell:hs">baseCircle :: Float -&gt; Shape
 baseCircle r = Circle (Point 0 0) r
 
@@ -139,13 +89,9 @@ baseRect width height = Rectangle (Point 0 0) (Point width height)
 <pre name="code" class="haskell:hs">ghci&gt; nudge (baseRect 40 100) 60 23
 Rectangle (Point 60.0 23.0) (Point 100.0 123.0)
 </pre>
-<p>You can, of course, export your data types in your modules. To do 
-that, just write your type along with the functions you are exporting 
-and then add some parentheses and in them specify the value constructors
- that you want to export for it, separated by commas. If you want to 
-export all the value constructors for a given type, just write <span class="fixed">..</span>.</p>
-<p>If we wanted to export the functions and types that we defined here in a module, we could start it off like this:</p>
-<pre name="code" class="haskell:hs">module Shapes 
+<p>もちろんモジュールでデータ型をエクスポートできます。エクスポートする関数と一緒に型名を書き、その後ろに括弧で値コンストラクタをカンマ区切りで指定します。すべての値コンストラクタをエクスポートしたいなら <span class="fixed">..</span> と書きます。</p>
+<p>ここで定義した型と関数をモジュールでエクスポートするなら、こんな感じで始まります：</p>
+<pre name="code" class="haskell:hs">module Shapes
 ( Point(..)
 , Shape(..)
 , surface
@@ -154,35 +100,20 @@ export all the value constructors for a given type, just write <span class="fixe
 , baseRect
 ) where
 </pre>
-<p>By doing <span class="fixed">Shape(..)</span>, we exported all the value constructors for <span class="fixed">Shape</span>, so that means that whoever imports our module can make shapes by using the <span class="fixed">Rectangle</span> and <span class="fixed">Circle</span> value constructors. It's the same as writing <span class="fixed">Shape (Rectangle, Circle)</span>.</p>
-<p>We could also opt not to export any value constructors for <span class="fixed">Shape</span> by just writing <span class="fixed">Shape</span> in the export statement. That way, someone importing our module could only make shapes by using the auxilliary functions <span class="fixed">baseCircle</span> and <span class="fixed">baseRect</span>. <span class="fixed">Data.Map</span> uses that approach. You can't create a map by doing <span class="fixed">Map.Map [(1,2),(3,4)]</span>
- because it doesn't export that value constructor. However, you can make
- a mapping by using one of the auxilliary functions like <span class="fixed">Map.fromList</span>. Remember, value constructors are just functions that take the fields as parameters and return a value of some type (like <span class="fixed">Shape</span>)
- as a result. So when we choose not to export them, we just prevent the 
-person importing our module from using those functions, but if some 
-other functions that are exported return a type, we can use them to make
- values of our custom data types.</p>
-<p>Not exporting the value constructors of a data types makes them more 
-abstract in such a way that we hide their implementation. Also, whoever 
-uses our module can't pattern match against the value constructors.</p>
-<a name="record-syntax"></a><h2>Record syntax</h2>
+<p><span class="fixed">Shape(..)</span> で <span class="fixed">Shape</span> のすべての値コンストラクタをエクスポートしたので、import 側は <span class="fixed">Rectangle</span>・<span class="fixed">Circle</span> 値コンストラクタで図形を作れます。<span class="fixed">Shape (Rectangle, Circle)</span> と書くのと同じです。</p>
+<p><span class="fixed">Shape</span> の値コンストラクタを一切エクスポートしないなら、エクスポート文に単に <span class="fixed">Shape</span> と書きます。すると import 側は <span class="fixed">baseCircle</span>・<span class="fixed">baseRect</span> といった補助関数経由でしか図形を作れません。<span class="fixed">Data.Map</span> はこの方式です。<span class="fixed">Map.Map [(1,2),(3,4)]</span> ではマップを作れず、<span class="fixed">Map.fromList</span> のような補助関数経由で作ります。値コンストラクタはフィールドを引数に取って何らかの型（<span class="fixed">Shape</span> など）の値を返す関数なので、エクスポートしないことで利用者がそれらの関数を使うのを防げます。ただし、その型を返す他のエクスポート関数があれば、それで型の値を作れます。</p>
+<p>値コンストラクタをエクスポートしないと、データ型はある意味抽象的になり実装が隠れます。利用者は値コンストラクタにパターンマッチもできません。</p>
+<a name="record-syntax"></a><h2>レコード構文</h2>
 
-<p>OK, we've been tasked with creating a data type that describes a 
-person. The info that we want to store about that person is: first name,
- last name, age, height, phone number, and favorite ice-cream flavor. I 
-don't know about you, but that's all I ever want to know about a person.
- Let's give it a go!</p>
+<p>OK、人物を表すデータ型を作るタスクに取り組むことにします。保持したい情報は：名、姓、年齢、身長、電話番号、好きなアイスのフレーバー。私はそれくらいしか他人について知りたくありません。やってみましょう！</p>
 <pre name="code" class="haskell:hs">data Person = Person String String Int Float String String deriving (Show)
 </pre>
-<p>O-kay. The first field is the first name, the second is the last name, the third is the age and so on. Let's make a person.</p>
+<p>OK。1 つ目が名、2 つ目が姓、3 つ目が年齢、と続きます。人を作ってみます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; let guy = Person "Buddy" "Finklestein" 43 184.2 "526-2928" "Chocolate"
 ghci&gt; guy
 Person "Buddy" "Finklestein" 43 184.2 "526-2928" "Chocolate"
 </pre>
-<p>That's kind of cool, although slightly unreadable. What if we want to
- create a function to get seperate info from a person? A function that 
-gets some person's first name, a function that gets some person's last 
-name, etc. Well, we'd have to define them kind of like this.</p>
+<p>悪くないですが、ちょっと読みにくいですね。人物から個別の情報を取り出す関数を作りたいときは？　名前を取り出す関数、姓を取り出す関数、と個別に。こんな感じになるでしょう。</p>
 <pre name="code" class="haskell:hs">firstName :: Person -&gt; String
 firstName (Person firstname _ _ _ _ _) = firstname
 
@@ -201,7 +132,7 @@ phoneNumber (Person _ _ _ _ number _) = number
 flavor :: Person -&gt; String
 flavor (Person _ _ _ _ _ flavor) = flavor
 </pre>
-<p>Whew! I certainly did not enjoy writing that! Despite being very cumbersome and BORING to write, this method works.</p>
+<p>ふー！　書いていて全然楽しくない！　面倒で退屈ですが、一応動きます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; let guy = Person "Buddy" "Finklestein" 43 184.2 "526-2928" "Chocolate"
 ghci&gt; firstName guy
 "Buddy"
@@ -210,11 +141,8 @@ ghci&gt; height guy
 ghci&gt; flavor guy
 "Chocolate"
 </pre>
-<p>There must be a better way, you say! Well no, there isn't, sorry.</p>
-<p>Just kidding, there is. Hahaha! The makers of Haskell were very smart
- and anticipated this scenario. They included an alternative way to 
-write data types. Here's how we could achieve the above functionality 
-with record syntax.</p>
+<p>もっと良い方法があるはずだ、と思いますか？　残念ながらありません。</p>
+<p>……というのは冗談で、ちゃんとあります。Haskell の作者たちは賢く、こうしたケースを予期していました。データ型を書く別の方法を用意してくれているのです。レコード構文で同じことを実現するとこうなります。</p>
 <pre name="code" class="haskell:hs">data Person = Person { firstName :: String
                      , lastName :: String
                      , age :: Int
@@ -222,60 +150,35 @@ with record syntax.</p>
                      , phoneNumber :: String
                      , flavor :: String
                      } deriving (Show) </pre>
-<p>So instead of just naming the field types one after another and 
-separating them with spaces, we use curly brackets. First we write the 
-name of the field, for instance, <span class="fixed">firstName</span> and then we write a double colon <span class="fixed">::</span>
- (also called Paamayim Nekudotayim, haha) and then we specify the type. 
-The resulting data type is exactly the same. The main benefit of this is
- that it creates functions that lookup fields in the data type. By using
- record syntax to create this data type, Haskell automatically made 
-these functions: <span class="fixed">firstName</span>, <span class="fixed">lastName</span>, <span class="fixed">age</span>, <span class="fixed">height</span>, <span class="fixed">phoneNumber</span> and <span class="fixed">flavor</span>.</p>
+<p>フィールドの型をスペース区切りで並べる代わりに、波括弧を使います。フィールド名（たとえば <span class="fixed">firstName</span>）、ダブルコロン <span class="fixed">::</span>（Paamayim Nekudotayim とも呼ばれる、笑）、続けて型を指定します。データ型自体はまったく同じものです。主な利点は、フィールドを引くための関数が自動的に作られること。レコード構文を使うことで、Haskell が自動で <span class="fixed">firstName</span>、<span class="fixed">lastName</span>、<span class="fixed">age</span>、<span class="fixed">height</span>、<span class="fixed">phoneNumber</span>、<span class="fixed">flavor</span> 関数を作ってくれます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; :t flavor
 flavor :: Person -&gt; String
 ghci&gt; :t firstName
 firstName :: Person -&gt; String
 </pre>
-<p>There's another benefit to using record syntax. When we derive <span class="fixed">Show</span>
- for the type, it displays it differently if we use record syntax to 
-define and instantiate the type. Say we have a type that represents a 
-car. We want to keep track of the company that made it, the model name 
-and its year of production. Watch.</p>
+<p>レコード構文にはもう1つ利点があります。<span class="fixed">Show</span> を導出すると、レコード構文で定義・インスタンス化した場合は表示形式が違うのです。車を表す型が会社・モデル名・製造年を保持するとして：</p>
 <pre name="code" class="haskell:hs">data Car = Car String String Int deriving (Show)
 </pre>
 <pre name="code" class="haskell:hs">ghci&gt; Car "Ford" "Mustang" 1967
 Car "Ford" "Mustang" 1967
 </pre>
-<p>If we define it using record syntax, we can make a new car like this.</p>
+<p>レコード構文で定義すれば、新しい車をこう作れます。</p>
 <pre name="code" class="haskell:hs">data Car = Car {company :: String, model :: String, year :: Int} deriving (Show)
 </pre>
 <pre name="code" class="haskell:hs">ghci&gt; Car {company="Ford", model="Mustang", year=1967}
 Car {company = "Ford", model = "Mustang", year = 1967}
 </pre>
-<p>When making a new car, we don't have to necessarily put the fields in
- the proper order, as long as we list all of them. But if we don't use 
-record syntax, we have to specify them in order.</p>
-<p>Use record syntax when a constructor has several fields and it's not 
-obvious which field is which. If we make a 3D vector data type by doing <span class="fixed">data Vector = Vector Int Int Int</span>, it's pretty obvious that the fields are the components of a vector. However, in our <span class="fixed">Person</span> and <span class="fixed">Car</span> types, it wasn't so obvious and we greatly benefited from using record syntax.</p>
-<a name="type-parameters"></a><h2>Type parameters</h2>
-<p>A value constructor can take some values parameters and then produce a new value. For instance, the <span class="fixed">Car</span> constructor takes three values and produces a car value. In a similar manner, <em>type constructors</em>
- can take types as parameters to produce new types. This might sound a 
-bit too meta at first, but it's not that complicated. If you're familiar
- with templates in C++, you'll see some parallels. To get a clear 
-picture of what type parameters work like in action, let's take a look 
-at how a type we've already met is implemented.</p>
+<p>レコード構文なら、すべてのフィールドを列挙する限り順序を気にしなくて良いです。レコード構文を使わないなら順番通りに指定する必要があります。</p>
+<p>レコード構文は、コンストラクタが多くのフィールドを持っていてどれが何か自明でないときに使いましょう。3D ベクトルを <span class="fixed">data Vector = Vector Int Int Int</span> と定義するなら、フィールドがベクトルの成分なのは明らかですが、<span class="fixed">Person</span> や <span class="fixed">Car</span> ではそうはいかないので、レコード構文の恩恵が大きいです。</p>
+<a name="type-parameters"></a><h2>型引数</h2>
+<p>値コンストラクタは値引数を取って新しい値を生み出します。<span class="fixed">Car</span> コンストラクタは3つの値を取って車の値を生みます。同様に <em>型コンストラクタ</em> は型を引数に取って新しい型を生みます。最初は抽象的すぎに聞こえるかもしれませんが、それほど複雑ではありません。C++ のテンプレートに馴染みがあれば類似点が見えます。型引数の動きを把握するために、すでに見たことのある型の実装を見てみましょう。</p>
 <pre name="code" class="haskell:hs">data Maybe a = Nothing | Just a
 </pre>
 
-<p>The <span class="fixed">a</span> here is the type parameter. And because there's a type parameter involved, we call <span class="fixed">Maybe</span> a type constructor. Depending on what we want this data type to hold when it's not <span class="fixed">Nothing</span>, this type constructor can end up producing a type of <span class="fixed">Maybe Int</span>, <span class="fixed">Maybe Car</span>, <span class="fixed">Maybe String</span>, etc. No value can have a type of just <span class="fixed">Maybe</span>,
- because that's not a type per se, it's a type constructor. In order for
- this to be a real type that a value can be part of, it has to have all 
-its type parameters filled up.</p>
-<p>So if we pass <span class="fixed">Char</span> as the type parameter to <span class="fixed">Maybe</span>, we get a type of <span class="fixed">Maybe Char</span>. The value <span class="fixed">Just 'a'</span> has a type of <span class="fixed">Maybe Char</span>, for example.</p>
-<p>You might not know it, but we used a type that has a type parameter before we used <span class="fixed">Maybe</span>.
- That type is the list type. Although there's some syntactic sugar in 
-play, the list type takes a parameter to produce a concrete type. Values
- can have an <span class="fixed">[Int]</span> type, a <span class="fixed">[Char]</span> type, a <span class="fixed">[[String]]</span> type, but you can't have a value that just has a type of <span class="fixed">[]</span>.</p>
-<p>Let's play around with the <span class="fixed">Maybe</span> type.</p>
+<p>ここで <span class="fixed">a</span> が型引数です。型引数があるので <span class="fixed">Maybe</span> は型コンストラクタです。<span class="fixed">Nothing</span> でないときに何を保持するかによって、この型コンストラクタは <span class="fixed">Maybe Int</span>、<span class="fixed">Maybe Car</span>、<span class="fixed">Maybe String</span> といった型を生みます。値が単なる <span class="fixed">Maybe</span> 型ということはありません。<span class="fixed">Maybe</span> はそれ自体は型ではなく、型コンストラクタだからです。値が属せる本物の型になるには、型引数をすべて埋める必要があります。</p>
+<p><span class="fixed">Maybe</span> に <span class="fixed">Char</span> を型引数として渡すと、<span class="fixed">Maybe Char</span> 型が得られます。<span class="fixed">Just 'a'</span> の型は <span class="fixed">Maybe Char</span>、というように。</p>
+<p>気づいていないかもしれませんが、<span class="fixed">Maybe</span> より前にも型引数を持つ型を使っています。リスト型です。糖衣構文があるので分かりにくいですが、リスト型は引数を1つ取って具体型を生みます。値の型は <span class="fixed">[Int]</span>、<span class="fixed">[Char]</span>、<span class="fixed">[[String]]</span> などになりえますが、ただの <span class="fixed">[]</span> 型の値はありません。</p>
+<p><span class="fixed">Maybe</span> 型で遊んでみます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; Just "Haha"
 Just "Haha"
 ghci&gt; Just 84
@@ -289,26 +192,21 @@ Nothing :: Maybe a
 ghci&gt; Just 10 :: Maybe Double
 Just 10.0
 </pre>
-<p>Type parameters are useful because we can make different types with 
-them depending on what kind of types we want contained in our data type.
- When we do <span class="fixed">:t Just "Haha"</span>, the type inference engine figures it out to be of the type <span class="fixed">Maybe [Char]</span>, because if the <span class="fixed">a</span> in the <span class="fixed">Just a</span> is a string, then the <span class="fixed">a</span> in <span class="fixed">Maybe a</span> must also be a string.</p>
-<p>Notice that the type of <span class="fixed">Nothing</span> is <span class="fixed">Maybe a</span>. Its type is polymorphic. If some function requires a <span class="fixed">Maybe Int</span> as a parameter, we can give it a <span class="fixed">Nothing</span>, because a <span class="fixed">Nothing</span> doesn't contain a value anyway and so it doesn't matter. The <span class="fixed">Maybe a</span> type can act like a <span class="fixed">Maybe Int</span> if it has to, just like <span class="fixed">5</span> can act like an <span class="fixed">Int</span> or a <span class="fixed">Double</span>. Similarly, the type of the empty list is <span class="fixed">[a]</span>. An empty list can act like a list of anything. That's why we can do <span class="fixed">[1,2,3] ++ []</span> and <span class="fixed">["ha","ha","ha"] ++ []</span>.</p>
-<p>Using type parameters is very beneficial, but only when using them 
-makes sense. Usually we use them when our data type would work 
-regardless of the type of the value it then holds inside it, like with 
-our <span class="fixed">Maybe a</span> type. If our type acts as some kind of box, it's good to use them. We could change our <span class="fixed">Car</span> data type from this:</p>
+<p>型引数のおかげで、データ型に含めたい型に応じて違う型を作れます。<span class="fixed">:t Just "Haha"</span> をすると、型推論エンジンが <span class="fixed">Maybe [Char]</span> と判断します。<span class="fixed">Just a</span> の <span class="fixed">a</span> が文字列なら <span class="fixed">Maybe a</span> の <span class="fixed">a</span> も文字列だからです。</p>
+<p><span class="fixed">Nothing</span> の型が <span class="fixed">Maybe a</span> となっているのに注目。多相型です。<span class="fixed">Maybe Int</span> を引数に取る関数があれば <span class="fixed">Nothing</span> を渡せます。<span class="fixed">Nothing</span> はそもそも値を含まないので関係ないからです。<span class="fixed">Maybe a</span> 型は必要なら <span class="fixed">Maybe Int</span> として振る舞えます。<span class="fixed">5</span> が <span class="fixed">Int</span> としても <span class="fixed">Double</span> としても振る舞えるのと同じです。同様に空リストの型は <span class="fixed">[a]</span>。空リストはどんなリストとしても振る舞えます。だから <span class="fixed">[1,2,3] ++ []</span> や <span class="fixed">["ha","ha","ha"] ++ []</span> ができるのです。</p>
+<p>型引数は便利ですが、使うのが理にかなうときだけ使うべきです。普通、内部に保持する値の型に関係なくデータ型が機能する場合（<span class="fixed">Maybe a</span> など）に使います。型が「箱」のように振る舞うなら、型引数を使うのが良いです。<span class="fixed">Car</span> をこう変えることもできます：</p>
 <pre name="code" class="haskell:hs">data Car = Car { company :: String
                , model :: String
                , year :: Int
                } deriving (Show)
 </pre>
-<p>To this:</p>
+<p>こう：</p>
 <pre name="code" class="haskell:hs">data Car a b c = Car { company :: a
                      , model :: b
-                     , year :: c 
+                     , year :: c
                      } deriving (Show)
 </pre>
-<p>But would we really benefit? The answer is: probably no, because we'd just end up defining functions that only work on the <span class="fixed">Car String String Int</span> type. For instance, given our first definition of <span class="fixed">Car</span>, we could make a function that displays the car's properties in a nice little text.</p>
+<p>でも本当に得をするでしょうか？　答えはたぶん「いいえ」です。結局 <span class="fixed">Car String String Int</span> 型でしか動かない関数を定義することになるからです。たとえば最初の <span class="fixed">Car</span> 定義なら、車のプロパティを表示する小さな関数を作れます。</p>
 <pre name="code" class="haskell:hs">tellCar :: Car -&gt; String
 tellCar (Car {company = c, model = m, year = y}) = "This " ++ c ++ " " ++ m ++ " was made in " ++ show y
 </pre>
@@ -316,14 +214,11 @@ tellCar (Car {company = c, model = m, year = y}) = "This " ++ c ++ " " ++ m ++ "
 ghci&gt; tellCar stang
 "This Ford Mustang was made in 1967"
 </pre>
-<p>A cute little function! The type declaration is cute and it works nicely. Now what if <span class="fixed">Car</span> was <span class="fixed">Car a b c</span>?</p>
+<p>かわいい関数！　型宣言もすっきりで動きます。<span class="fixed">Car</span> が <span class="fixed">Car a b c</span> だったらどうでしょう？</p>
 <pre name="code" class="haskell:hs">tellCar :: (Show a) =&gt; Car String String a -&gt; String
 tellCar (Car {company = c, model = m, year = y}) = "This " ++ c ++ " " ++ m ++ " was made in " ++ show y
 </pre>
-<p>We'd have to force this function to take a <span class="fixed">Car</span> type of <span class="fixed">(Show a) =&gt; Car String String a</span>.
- You can see that the type signature is more complicated and the only 
-benefit we'd actually get would be that we can use any type that's an 
-instance of the <span class="fixed">Show</span> typeclass as the type for <span class="fixed">c</span>.</p>
+<p>関数を <span class="fixed">(Show a) =&gt; Car String String a</span> 型の <span class="fixed">Car</span> に縛らないといけません。型シグネチャは複雑になり、得るものといえば <span class="fixed">c</span> として <span class="fixed">Show</span> 型クラスのインスタンスを使えるようになるくらい。</p>
 <pre name="code" class="haskell:hs">ghci&gt; tellCar (Car "Ford" "Mustang" 1967)
 "This Ford Mustang was made in 1967"
 ghci&gt; tellCar (Car "Ford" "Mustang" "nineteen sixty seven")
@@ -334,32 +229,14 @@ ghci&gt; :t Car "Ford" "Mustang" "nineteen sixty seven"
 Car "Ford" "Mustang" "nineteen sixty seven" :: Car [Char] [Char] [Char]
 </pre>
 
-<p>In real life though, we'd end up using <span class="fixed">Car String String Int</span> most of the time and so it would seem that parameterizing the <span class="fixed">Car</span>
- type isn't really worth it. We usually use type parameters when the 
-type that's contained inside the data type's various value constructors 
-isn't really that important for the type to work. A list of stuff is a 
-list of stuff and it doesn't matter what the type of that stuff is, it 
-can still work. If we want to sum a list of numbers, we can specify 
-later in the summing function that we specifically want a list of 
-numbers. Same goes for <span class="fixed">Maybe</span>. <span class="fixed">Maybe</span> represents an option of either having nothing or having one of something. It doesn't matter what the type of that something is.</p>
+<p>実生活ではほとんどの場合 <span class="fixed">Car String String Int</span> を使うので、<span class="fixed">Car</span> をパラメータ化する価値はあまりなさそうです。型引数は、値コンストラクタの中身の型がデータ型の機能に本質的でないときに使います。何かのリストはなんであれリストですし、何の型かは関係なく動きます。数のリストの和を求めたければ、和を取る関数の側で「数のリスト」と指定すればよい。<span class="fixed">Maybe</span> も同じ。「何もないか、何かが1つあるか」を表すだけで、その何かが何の型かは関係ありません。</p>
 
-<p>Another example of a parameterized type that we've already met is <span class="fixed">Map k v</span> from <span class="fixed">Data.Map</span>. The <span class="fixed">k</span> is the type of the keys in a map and the <span class="fixed">v</span>
- is the type of the values. This is a good example of where type 
-parameters are very useful. Having maps parameterized enables us to have
- mappings from any type to any other type, as long as the type of the 
-key is part of the <span class="fixed">Ord</span> typeclass. If we were defining a mapping type, we could add a typeclass constraint in the <i>data</i> declaration:</p>
+<p>すでに出会ったパラメータ化された型のもう1つの例は <span class="fixed">Data.Map</span> の <span class="fixed">Map k v</span>。<span class="fixed">k</span> がキーの型、<span class="fixed">v</span> が値の型。型引数が役立つ良い例です。マップがパラメータ化されているおかげで、キーが <span class="fixed">Ord</span> 型クラスのメンバーである限り、任意の型から任意の型へのマップが作れます。マップ型を定義するなら <i>data</i> 宣言にクラス制約を追加できそうです：</p>
 <pre name="code" class="haskell:hs">data (Ord k) =&gt; Map k v = ...
 </pre>
-<p>However, it's a very strong convention in Haskell to <em>never add typeclass constraints in data declarations. </em>Why?
- Well, because we don't benefit a lot, but we end up writing more class 
-constraints, even when we don't need them. If we put or don't put the <span class="fixed">Ord k</span> constraint in the <i>data</i> declaration for <span class="fixed">Map k v</span>,
- we're going to have to put the constraint into functions that assume 
-the keys in a map can be ordered. But if we don't put the constraint in 
-the data declaration, we don't have to put <span class="fixed">(Ord k) =&gt;</span> in the type declarations of functions that don't care whether the keys can be ordered or not. An example of such a function is <span class="fixed">toList</span>, that just takes a mapping and converts it to an associative list. Its type signature is <span class="fixed">toList :: Map k a -&gt; [(k, a)]</span>. If <span class="fixed">Map k v</span> had a type constraint in its <i>data</i> declaration, the type for <span class="fixed">toList</span> would have to be <span class="fixed">toList :: (Ord k) =&gt; Map k a -&gt; [(k, a)]</span>, even though the function doesn't do any comparing of keys by order.</p>
-<p>So don't put type constraints into <i>data</i> declarations even if it seems to make sense, because you'll have to put them into the function type declarations either way.</p>
-<p>Let's implement a 3D vector type and add some operations for it. 
-We'll be using a parameterized type because even though it will usually 
-contain numeric types, it will still support several of them.</p>
+<p>しかし Haskell では <em>data 宣言にクラス制約を絶対に書かない</em> という強い慣習があります。なぜ？　ほとんど得がないのに、不要な場面でもクラス制約を書く羽目になるからです。<span class="fixed">Map k v</span> の <i>data</i> 宣言に <span class="fixed">Ord k</span> を入れても入れなくても、キーが順序付け可能だと仮定する関数には制約を書く必要があります。一方、<i>data</i> 宣言に制約を入れなければ、キーの順序を気にしない関数の型宣言に <span class="fixed">(Ord k) =&gt;</span> を書かなくて済みます。たとえば <span class="fixed">toList</span> はマップを連想リストに変換するだけで、型シグネチャは <span class="fixed">toList :: Map k a -&gt; [(k, a)]</span>。<span class="fixed">Map k v</span> の <i>data</i> 宣言に型制約があれば、<span class="fixed">toList</span> の型は <span class="fixed">toList :: (Ord k) =&gt; Map k a -&gt; [(k, a)]</span> にしないといけません。比較しないのに。</p>
+<p>だから理にかなって見えても <i>data</i> 宣言には型制約を書かないこと。どのみち関数の型宣言に書くハメになります。</p>
+<p>3D ベクトル型を実装し、いくつか演算を加えてみましょう。普通は数値型を使いますが、複数の数値型をサポートできるよう、パラメータ化された型を使います。</p>
 <pre name="code" class="haskell:hs">data Vector a = Vector a a a deriving (Show)
 
 vplus :: (Num t) =&gt; Vector t -&gt; Vector t -&gt; Vector t
@@ -371,14 +248,8 @@ vectMult :: (Num t) =&gt; Vector t -&gt; t -&gt; Vector t
 scalarMult :: (Num t) =&gt; Vector t -&gt; Vector t -&gt; t
 (Vector i j k) `scalarMult` (Vector l m n) = i*l + j*m + k*n
 </pre>
-<p><span class="fixed">vplus</span> is for adding two vectors together. Two vectors are added just by adding their corresponding components. <span class="fixed">scalarMult</span> is for the scalar product of two vectors and <span class="fixed">vectMult</span> is for multiplying a vector with a scalar. These functions can operate on types of <span class="fixed">Vector Int</span>, <span class="fixed">Vector Integer</span>, <span class="fixed">Vector Float</span>, whatever, as long as the <span class="fixed">a</span> from <span class="fixed">Vector a</span> is from the <span class="fixed">Num</span>
- typeclass. Also, if you examine the type declaration for these 
-functions, you'll see that they can operate only on vectors of the same 
-type and the numbers involved must also be of the type that is contained
- in the vectors. Notice that we didn't put a <span class="fixed">Num</span> class constraint in the <i>data</i> declaration, because we'd have to repeat it in the functions anyway.</p>
-<p>Once again, it's very important to distinguish between the type 
-constructor and the value constructor. When declaring a data type, the 
-part before the <span class="fixed">=</span> is the type constructor and the constructors after it (possibly separated by <span class="fixed">|</span>'s) are value constructors. Giving a function a type of <span class="fixed">Vector t t t -&gt; Vector t t t -&gt; t</span> would be wrong, because we have to put types in type declaration and the vector <em>type</em> constructor takes only one parameter, whereas the value constructor takes three. Let's play around with our vectors.</p>
+<p><span class="fixed">vplus</span> はベクトルの和、対応成分どうしを足します。<span class="fixed">scalarMult</span> はスカラー積、<span class="fixed">vectMult</span> はベクトルとスカラーの積です。<span class="fixed">Vector a</span> の <span class="fixed">a</span> が <span class="fixed">Num</span> 型クラスのメンバーであれば、<span class="fixed">Vector Int</span>、<span class="fixed">Vector Integer</span>、<span class="fixed">Vector Float</span> など何でも動きます。型宣言を見ると、同じ型のベクトル同士、関わる数もベクトルが含む型と同じである必要があります。<i>data</i> 宣言に <span class="fixed">Num</span> クラス制約は入れていません。どのみち関数で繰り返さなければならないからです。</p>
+<p>もう一度強調しますが、型コンストラクタと値コンストラクタの区別は重要です。データ型を宣言するとき、<span class="fixed">=</span> の前が型コンストラクタ、後ろのコンストラクタ（<span class="fixed">|</span> で区切られている）は値コンストラクタです。関数に <span class="fixed">Vector t t t -&gt; Vector t t t -&gt; t</span> のような型を与えるのは間違いです。型宣言には型を書かねばならず、ベクトル <em>型</em> コンストラクタは引数を1つしか取らない（値コンストラクタは3つ取る）からです。ベクトルで遊んでみましょう。</p>
 <pre name="code" class="haskell:hs">ghci&gt; Vector 3 5 8 `vplus` Vector 9 2 8
 Vector 12 7 16
 ghci&gt; Vector 3 5 8 `vplus` Vector 9 2 8 `vplus` Vector 0 2 3
@@ -390,44 +261,23 @@ ghci&gt; Vector 4 9 5 `scalarMult` Vector 9.0 2.0 4.0
 ghci&gt; Vector 2 9 3 `vectMult` (Vector 4 9 5 `scalarMult` Vector 9 2 4)
 Vector 148 666 222
 </pre>
-<a name="derived-instances"></a><h2>Derived instances</h2>
-<p>In the <a href="types-and-typeclasses.html#typeclasses-101">Typeclasses 101</a>
-section, we explained the basics of typeclasses. We explained that a 
-typeclass is a sort of an interface that defines some behavior. A type 
-can be made an <em>instance</em> of a typeclass if it supports that behavior. Example: the <span class="fixed">Int</span> type is an instance of the <span class="fixed">Eq</span> typeclass because the <span class="fixed">Eq</span> typeclass defines behavior for stuff that can be equated. And because integers can be equated, <span class="fixed">Int</span> is a part of the <span class="fixed">Eq</span> typeclass. The real usefulness comes with the functions that act as the interface for <span class="fixed">Eq</span>, namely <span class="fixed">==</span> and <span class="fixed">/=</span>. If a type is a part of the <span class="fixed">Eq</span> typeclass, we can use the <span class="fixed">==</span> functions with values of that type. That's why expressions like <span class="fixed">4 == 4</span> and <span class="fixed">"foo" /= "bar"</span> typecheck.</p>
-<p>We also mentioned that they're often confused with classes in 
-languages like Java, Python, C++ and the like, which then baffles a lot 
-of people. In those languages, classes are a blueprint from which we 
-then create objects that contain state and can do some actions. 
-Typeclasses are more like interfaces. We don't make data from 
-typeclasses. Instead, we first make our data type and then we think 
-about what it can act like. If it can act like something that can be 
-equated, we make it an instance of the <span class="fixed">Eq</span> typeclass. If it can act like something that can be ordered, we make it an instance of the <span class="fixed">Ord</span> typeclass.</p>
-<p>In the next section, we'll take a look at how we can manually make 
-our types instances of typeclasses by implementing the functions defined
- by the typeclasses. But right now, let's see how Haskell can 
-automatically make our type an instance of any of the following 
-typeclasses: <span class="fixed">Eq</span>, <span class="fixed">Ord</span>, <span class="fixed">Enum</span>, <span class="fixed">Bounded</span>, <span class="fixed">Show</span>, <span class="fixed">Read</span>. Haskell can derive the behavior of our types in these contexts if we use the <i>deriving</i> keyword when making our data type.</p>
-<p>Consider this data type:</p>
+<a name="derived-instances"></a><h2>派生インスタンス</h2>
+<p><a href="types-and-typeclasses.html#typeclasses-101">型クラス入門</a> のセクションで、型クラスの基本を説明しました。型クラスはある振る舞いを定義するインターフェースのようなもの、と。型がその振る舞いをサポートするなら、その型を <em>インスタンス</em> にできます。例：<span class="fixed">Int</span> 型は <span class="fixed">Eq</span> 型クラスのインスタンス。<span class="fixed">Eq</span> 型クラスは等価性を扱うものを定義し、整数は等価性を扱えるからです。本当の有用性は、<span class="fixed">Eq</span> のインターフェースとなる関数（<span class="fixed">==</span>、<span class="fixed">/=</span>）にあります。型が <span class="fixed">Eq</span> のメンバーなら、その型の値で <span class="fixed">==</span> を使える。だから <span class="fixed">4 == 4</span> や <span class="fixed">"foo" /= "bar"</span> が型チェックを通るのです。</p>
+<p>Java、Python、C++ などの「クラス」と混同されることがあって、多くの人を混乱させます。それらの言語では、クラスは状態を持ち動作できるオブジェクトを作るための設計図です。型クラスはむしろインターフェース。型クラスからデータを作るのではなく、まずデータ型を作って、それが何のように振る舞えるかを考えます。等価性を扱えるなら <span class="fixed">Eq</span> のインスタンスに、順序を持つなら <span class="fixed">Ord</span> のインスタンスに、というように。</p>
+<p>次のセクションでは、型クラスが定義する関数を実装して手動でインスタンスにする方法を見ます。今は、Haskell が自動で型を以下の型クラスのインスタンスにできることを見ます：<span class="fixed">Eq</span>、<span class="fixed">Ord</span>、<span class="fixed">Enum</span>、<span class="fixed">Bounded</span>、<span class="fixed">Show</span>、<span class="fixed">Read</span>。データ型を作るときに <i>deriving</i> キーワードを使えば、これらの型クラスにおける挙動を導出できます。</p>
+<p>このデータ型を考えてください：</p>
 <pre name="code" class="haskell:hs">data Person = Person { firstName :: String
                      , lastName :: String
                      , age :: Int
                      }
 </pre>
-<p>It describes a person. Let's assume that no two people have the same 
-combination of first name, last name and age. Now, if we have records 
-for two people, does it make sense to see if they represent the same 
-person? Sure it does. We can try to equate them and see if they're equal
- or not. That's why it would make sense for this type to be part of the <span class="fixed">Eq</span> typeclass. We'll derive the instance.</p>
+<p>人物を表します。同じ名・姓・年齢の人がいないと仮定すれば、2 人の人物レコードが同じ人物を表すか調べるのは意味があります。等価性のテストをしたい。それなら <span class="fixed">Eq</span> 型クラスのメンバーにするのが理にかなっています。インスタンスを派生しましょう。</p>
 <pre name="code" class="haskell:hs">data Person = Person { firstName :: String
                      , lastName :: String
                      , age :: Int
                      } deriving (Eq)
 </pre>
-<p>When we derive the <span class="fixed">Eq</span> instance for a type and then try to compare two values of that type with <span class="fixed">==</span> or <span class="fixed">/=</span>,
- Haskell will see if the value constructors match (there's only one 
-value constructor here though) and then it will check if all the data 
-contained inside matches by testing each pair of fields with <span class="fixed">==</span>. There's only one catch though, the types of all the fields also have to be part of the <span class="fixed">Eq</span> typeclass. But since both <span class="fixed">String</span> and <span class="fixed">Int</span> are, we're OK. Let's test our <span class="fixed">Eq</span> instance.</p>
+<p>型に対して <span class="fixed">Eq</span> インスタンスを派生してから 2 つの値を <span class="fixed">==</span> や <span class="fixed">/=</span> で比較すると、Haskell はまず値コンストラクタが一致するか確認し（ここは1つしかありませんが）、次に各フィールドのペアを <span class="fixed">==</span> でテストします。1 つだけ条件があります：すべてのフィールドの型も <span class="fixed">Eq</span> 型クラスのメンバーである必要があります。<span class="fixed">String</span> も <span class="fixed">Int</span> もそうなので OK。<span class="fixed">Eq</span> インスタンスを試します。</p>
 <pre name="code" class="haskell:hs">ghci&gt; let mikeD = Person {firstName = "Michael", lastName = "Diamond", age = 43}
 ghci&gt; let adRock = Person {firstName = "Adam", lastName = "Horovitz", age = 41}
 ghci&gt; let mca = Person {firstName = "Adam", lastName = "Yauch", age = 44}
@@ -440,50 +290,38 @@ True
 ghci&gt; mikeD == Person {firstName = "Michael", lastName = "Diamond", age = 43}
 True
 </pre>
-<p>Of course, since <span class="fixed">Person</span> is now in <span class="fixed">Eq</span>, we can use it as the <span class="fixed">a</span> for all functions that have a class constraint of <span class="fixed">Eq a</span> in their type signature, such as <span class="fixed">elem</span>.</p>
+<p><span class="fixed">Person</span> が <span class="fixed">Eq</span> に入ったので、<span class="fixed">elem</span> のように <span class="fixed">Eq a</span> 制約を持つ関数すべてに使えます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; let beastieBoys = [mca, adRock, mikeD]
 ghci&gt; mikeD `elem` beastieBoys
 True
 </pre>
-<p>The <span class="fixed">Show</span> and <span class="fixed">Read</span> typeclasses are for things that can be converted to or from strings, respectively. Like with <span class="fixed">Eq</span>, if a type's constructors have fields, their type has to be a part of <span class="fixed">Show</span> or <span class="fixed">Read</span> if we want to make our type an instance of them. Let's make our <span class="fixed">Person</span> data type a part of <span class="fixed">Show</span> and <span class="fixed">Read</span> as well.</p>
+<p><span class="fixed">Show</span> と <span class="fixed">Read</span> 型クラスは、それぞれ文字列に変換できるもの・文字列から変換できるもののためのものです。<span class="fixed">Eq</span> と同様、コンストラクタにフィールドがある場合、フィールドの型もそれぞれ <span class="fixed">Show</span> や <span class="fixed">Read</span> に属している必要があります。<span class="fixed">Person</span> を <span class="fixed">Show</span> と <span class="fixed">Read</span> にも入れましょう。</p>
 <pre name="code" class="haskell:hs">data Person = Person { firstName :: String
                      , lastName :: String
                      , age :: Int
                      } deriving (Eq, Show, Read)
 </pre>
-<p>Now we can print a person out to the terminal.</p>
+<p>これで人物を端末に表示できます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; let mikeD = Person {firstName = "Michael", lastName = "Diamond", age = 43}
 ghci&gt; mikeD
 Person {firstName = "Michael", lastName = "Diamond", age = 43}
 ghci&gt; "mikeD is: " ++ show mikeD
 "mikeD is: Person {firstName = \"Michael\", lastName = \"Diamond\", age = 43}"
 </pre>
-<p>Had we tried to print a person on the terminal before making the <span class="fixed">Person</span> data type part of <span class="fixed">Show</span>,
- Haskell would have complained at us, claiming it doesn't know how to 
-represent a person as a string. But now that we've derived a <span class="fixed">Show</span> instance for it, it does know.</p>
-<p><span class="fixed">Read</span> is pretty much the inverse typeclass of <span class="fixed">Show</span>. <span class="fixed">Show</span> is for converting values of our a type to a string, <span class="fixed">Read</span> is for converting strings to values of our type. Remember though, when we use the <span class="fixed">read</span>
- function, we have to use an explicit type annotation to tell Haskell 
-which type we want to get as a result. If we don't make the type we want
- as a result explicit, Haskell doesn't know which type we want.</p>
+<p><span class="fixed">Show</span> インスタンスにする前に人物を表示しようとすると、Haskell に「人物を文字列で表す方法を知らない」と怒られていたでしょう。今は知っています。</p>
+<p><span class="fixed">Read</span> はほぼ <span class="fixed">Show</span> の逆。<span class="fixed">Show</span> は値→文字列、<span class="fixed">Read</span> は文字列→値。<span class="fixed">read</span> 関数を使うときは、結果としてどの型が欲しいかを Haskell に明示的な型注釈で伝える必要があります。</p>
 <pre name="code" class="haskell:hs">ghci&gt; read "Person {firstName =\"Michael\", lastName =\"Diamond\", age = 43}" :: Person
 Person {firstName = "Michael", lastName = "Diamond", age = 43}
 </pre>
-<p>If we use the result of our <span class="fixed">read</span> later on in a way that Haskell can infer that it should read it as a person, we don't have to use type annotation.</p>
+<p><span class="fixed">read</span> の結果を後で人物として使うなら、Haskell が推論できるので型注釈は不要です。</p>
 <pre name="code" class="haskell:hs">ghci&gt; read "Person {firstName =\"Michael\", lastName =\"Diamond\", age = 43}" == mikeD
 True
 </pre>
-<p>We can also read parameterized types, but we have to fill in the type parameters. So we can't do <span class="fixed">read "Just 't'" :: Maybe a</span>, but we can do <span class="fixed">read "Just 't'" :: Maybe Char</span>.</p>
-<p>We can derive instances for the <span class="fixed">Ord</span> type class, 
-which is for types that have values that can be ordered. If we compare two 
-values of the same type that were made using different constructors, the value 
-which was made with a constructor that's defined first is considered smaller. 
-For instance, consider the <span class="fixed">Bool</span>
-type, which can have a value of either <span class="fixed">False</span> or <span class="fixed">True</span>. For the purpose of seeing how it behaves when 
-compared, we can think of it as being implemented like 
-this:</p>
+<p>パラメータ化された型も読めますが、型引数を埋める必要があります。<span class="fixed">read "Just 't'" :: Maybe a</span> はダメで、<span class="fixed">read "Just 't'" :: Maybe Char</span> なら OK。</p>
+<p><span class="fixed">Ord</span> 型クラスのインスタンスも派生できます。順序を持つ値の型のためのものです。同じ型の2つの値が異なるコンストラクタで作られている場合、先に定義されたコンストラクタの値のほうが小さいとみなされます。たとえば <span class="fixed">Bool</span> 型は <span class="fixed">False</span> または <span class="fixed">True</span> の値を取ります。比較動作を見るために、こう実装されているとイメージできます：</p>
 <pre name="code" class="haskell:hs">data Bool = False | True deriving (Ord)
 </pre>
-<p>Because the <span class="fixed">False</span> value constructor is specified first and the <span class="fixed">True</span> value constructor is specified after it, we can consider <span class="fixed">True</span> as greater than <span class="fixed">False</span>.</p>
+<p><span class="fixed">False</span> 値コンストラクタが先、<span class="fixed">True</span> が後に指定されているので、<span class="fixed">True</span> は <span class="fixed">False</span> より大きいとみなせます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; True `compare` False
 GT
 ghci&gt; True &gt; False
@@ -491,7 +329,7 @@ True
 ghci&gt; True &lt; False
 False
 </pre>
-<p>In the <span class="fixed">Maybe a</span> data type, the <span class="fixed">Nothing</span> value constructor is specified before the <span class="fixed">Just</span> value constructor, so a value of <span class="fixed">Nothing</span> is always smaller than a value of <span class="fixed">Just something</span>, even if that something is minus one billion trillion. But if we compare two <span class="fixed">Just</span> values, then it goes to compare what's inside them.</p>
+<p><span class="fixed">Maybe a</span> データ型では、<span class="fixed">Nothing</span> 値コンストラクタが <span class="fixed">Just</span> より先に指定されているので、<span class="fixed">Nothing</span> は常に <span class="fixed">Just something</span> より小さいです。たとえ something がマイナス10億兆だったとしても。<span class="fixed">Just</span> どうしを比較するときは中身の比較になります。</p>
 <pre name="code" class="haskell:hs">ghci&gt; Nothing &lt; Just 100
 True
 ghci&gt; Nothing &gt; Just (-49999)
@@ -501,19 +339,15 @@ GT
 ghci&gt; Just 100 &gt; Just 50
 True
 </pre>
-<p>But we can't do something like <span class="fixed">Just (*3) &gt; Just (*2)</span>, because <span class="fixed">(*3)</span> and <span class="fixed">(*2)</span> are functions, which aren't instances of <span class="fixed">Ord</span>.</p>
-<p>We can easily use algebraic data types to make enumerations and the <span class="fixed">Enum</span> and <span class="fixed">Bounded</span> typeclasses help us with that. Consider the following data type:</p>
+<p>ただし <span class="fixed">Just (*3) &gt; Just (*2)</span> はできません。<span class="fixed">(*3)</span> や <span class="fixed">(*2)</span> は関数で、<span class="fixed">Ord</span> のインスタンスではないからです。</p>
+<p>代数的データ型で列挙型を作りやすくするのに <span class="fixed">Enum</span>・<span class="fixed">Bounded</span> 型クラスが役立ちます。次のデータ型を考えます：</p>
 <pre name="code" class="haskell:hs">data Day = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday
 </pre>
-<p>Because all the value constructors are nullary (take no parameters, i.e. fields), we can make it part of the <span class="fixed">Enum</span> typeclass. The <span class="fixed">Enum</span> typeclass is for things that have predecessors and successors. We can also make it part of the <span class="fixed">Bounded</span>
- typeclass, which is for things that have a lowest possible value and 
-highest possible value. And while we're at it, let's also make it an 
-instance of all the other derivable typeclasses and see what we can do 
-with it.</p>
-<pre name="code" class="haskell:hs">data Day = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday 
+<p>すべての値コンストラクタが引数を取らない（フィールド0個）ので、<span class="fixed">Enum</span> 型クラスに入れられます。<span class="fixed">Enum</span> は前者・後者を持つもののためのもの。最大値・最小値を持つもののための <span class="fixed">Bounded</span> も使えます。ついでにすべての派生可能な型クラスのインスタンスにもしておきましょう。</p>
+<pre name="code" class="haskell:hs">data Day = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday
            deriving (Eq, Ord, Show, Read, Bounded, Enum)
 </pre>
-<p>Because it's part of the <span class="fixed">Show</span> and <span class="fixed">Read</span> typeclasses, we can convert values of this type to and from strings.</p>
+<p><span class="fixed">Show</span>・<span class="fixed">Read</span> のメンバーなので、文字列との相互変換が可能。</p>
 <pre name="code" class="haskell:hs">ghci&gt; Wednesday
 Wednesday
 ghci&gt; show Wednesday
@@ -521,7 +355,7 @@ ghci&gt; show Wednesday
 ghci&gt; read "Saturday" :: Day
 Saturday
 </pre>
-<p>Because it's part of the <span class="fixed">Eq</span> and <span class="fixed">Ord</span> typeclasses, we can compare or equate days.</p>
+<p><span class="fixed">Eq</span>・<span class="fixed">Ord</span> のメンバーなので比較・等価が可能。</p>
 <pre name="code" class="haskell:hs">ghci&gt; Saturday == Sunday
 False
 ghci&gt; Saturday == Saturday
@@ -531,13 +365,13 @@ True
 ghci&gt; Monday `compare` Wednesday
 LT
 </pre>
-<p>It's also part of <span class="fixed">Bounded</span>, so we can get the lowest and highest day.</p>
+<p><span class="fixed">Bounded</span> なので最小・最大の日も取れます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; minBound :: Day
 Monday
 ghci&gt; maxBound :: Day
 Sunday
 </pre>
-<p>It's also an instance of <span class="fixed">Enum</span>. We can get predecessors and successors of days and we can make list ranges from them!</p>
+<p><span class="fixed">Enum</span> でもあるので、前者・後者・レンジが使えます！</p>
 <pre name="code" class="haskell:hs">ghci&gt; succ Monday
 Tuesday
 ghci&gt; pred Saturday
@@ -547,100 +381,62 @@ ghci&gt; [Thursday .. Sunday]
 ghci&gt; [minBound .. maxBound] :: [Day]
 [Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday]
 </pre>
-<p>That's pretty awesome.</p>
-<a name="type-synonyms"></a><h2>Type synonyms</h2>
+<p>すごい。</p>
+<a name="type-synonyms"></a><h2>型シノニム</h2>
 <p>
- Previously, we mentioned that when writing types, the <span class="fixed">[Char]</span> and <span class="fixed">String </span> types are equivalent and interchangeable. That's implemented with <em>type synonyms</em>.
- Type synonyms don't really do anything per se, they're just about 
-giving some types different names so that they make more sense to 
-someone reading our code and documentation. Here's how the standard 
-library defines <span class="fixed">String</span> as a synonym for <span class="fixed">[Char]</span>.
- </p>
+前に <span class="fixed">[Char]</span> と <span class="fixed">String</span> は等価で交換可能だ、と話しました。これは <em>型シノニム</em> によるものです。型シノニムは何か新しいことをするわけではなく、ただ既存の型に別名を付けて、コードやドキュメントを読む人にとって意味が通るようにする、という働きです。標準ライブラリでの <span class="fixed">String</span> 定義：
+</p>
  <pre name="code" class="haskell:hs"> type String = [Char]
  </pre>
- 
+
  <p>
- We've introduced the <i>type</i> keyword. The keyword might be misleading to some, because we're not actually making anything new (we did that with the <i>data</i> keyword), but we're just making a synonym for an already existing type.
+新しいキーワード <i>type</i> を導入しました。<i>type</i> は紛らわしいかもしれません。<i>data</i> のように新しいものを作るわけではなく、既存の型のシノニム（別名）を作るだけだからです。
  </p>
- <p>If we make a function that converts a string to uppercase and call it <span class="fixed">toUpperString</span> or something, we can give it a type declaration of <span class="fixed">toUpperString :: [Char] -&gt; [Char]</span> or <span class="fixed">toUpperString :: String -&gt; String</span>. Both of these are essentially the same, only the latter is nicer to read.</p>
+ <p>文字列を大文字化する関数を <span class="fixed">toUpperString</span> として作ったとして、型宣言は <span class="fixed">toUpperString :: [Char] -&gt; [Char]</span> と書いても、<span class="fixed">toUpperString :: String -&gt; String</span> と書いても等価ですが、後者のほうが読みやすいです。</p>
  <p>
- When we were dealing with the <span class="fixed">Data.Map</span> 
-module, we first represented a phonebook with an association list before
- converting it into a map. As we've already found out, an association 
-list is a list of key-value pairs. Let's look at a phonebook that we 
-had.
+<span class="fixed">Data.Map</span> モジュールを扱ったとき、電話帳をまず連想リストで表してからマップに変換しました。連想リストはキー値ペアのリストでしたね。あの電話帳：
  </p>
 <pre name="code" class="haskell:hs">phoneBook :: [(String,String)]
-phoneBook =    
-    [("betty","555-2938")   
-    ,("bonnie","452-2928")   
-    ,("patsy","493-2928")   
-    ,("lucille","205-2928")   
-    ,("wendy","939-8282")   
-    ,("penny","853-2492")   
+phoneBook =
+    [("betty","555-2938")
+    ,("bonnie","452-2928")
+    ,("patsy","493-2928")
+    ,("lucille","205-2928")
+    ,("wendy","939-8282")
+    ,("penny","853-2492")
     ]</pre>
- <p>We see that the type of <span class="fixed">phoneBook</span> is <span class="fixed">[(String,String)]</span>.
- That tells us that it's an association list that maps from strings to 
-strings, but not much else. Let's make a type synonym to convey some 
-more information in the type declaration.</p>
+ <p><span class="fixed">phoneBook</span> の型は <span class="fixed">[(String,String)]</span>。文字列から文字列への連想リストだと分かりますが、それ以上は分かりません。型宣言にもう少し情報を持たせるシノニムを作ります。</p>
 <pre name="code" class="haskell:hs">type PhoneBook = [(String,String)]
 </pre>
-<p>Now the type declaration for our phonebook can be <span class="fixed">phoneBook :: PhoneBook</span>. Let's make a type synonym for <span class="fixed">String</span> as well.</p>
+<p>これで型宣言を <span class="fixed">phoneBook :: PhoneBook</span> と書けます。<span class="fixed">String</span> にもシノニムを：</p>
 <pre name="code" class="haskell:hs">type PhoneNumber = String
 type Name = String
 type PhoneBook = [(Name,PhoneNumber)]
 </pre>
-<p>Giving the <span class="fixed">String</span> type synonyms is 
-something that Haskell programmers do when they want to convey more 
-information about what strings in their functions should be used as and 
-what they represent.</p>
-<p>So now, when we implement a function that takes a name and a number 
-and sees if that name and number combination is in our phonebook, we can
- give it a very pretty and descriptive type declaration.</p>
+<p>関数内で文字列が何を表すかを伝えたいとき、Haskell プログラマは <span class="fixed">String</span> にシノニムを付けます。</p>
+<p>名前と番号を取って、その組み合わせが電話帳にあるかを調べる関数：</p>
 <pre name="code" class="haskell:hs">inPhoneBook :: Name -&gt; PhoneNumber -&gt; PhoneBook -&gt; Bool
 inPhoneBook name pnumber pbook = (name,pnumber) `elem` pbook
 </pre>
-<p>If we decided not to use type synonyms, our function would have a type of <span class="fixed">String -&gt; String -&gt; [(String,String)] -&gt; Bool</span>.
- In this case, the type declaration that took advantage of type synonyms
- is easier to understand. However, you shouldn't go overboard with them.
- We introduce type synonyms either to describe what some existing type 
-represents in our functions (and thus our type declarations become 
-better documentation) or when something has a long-ish type that's 
-repeated a lot (like <span class="fixed">[(String,String)]</span>) but represents something more specific in the context of our functions.</p>
-<p>Type synonyms can also be parameterized. If we want a type that 
-represents an association list type but still want it to be general so 
-it can use any type as the keys and values, we can do this:</p>
+<p>シノニムを使わなければ型は <span class="fixed">String -&gt; String -&gt; [(String,String)] -&gt; Bool</span>。シノニムを使うほうが分かりやすい。とはいえやりすぎは禁物です。型シノニムは「関数で使われる既存型が何を表すか」を説明したいとき、または「<span class="fixed">[(String,String)]</span> のような長めの型が繰り返し出て、関数の文脈で何かより具体的なものを表すとき」に導入します。</p>
+<p>型シノニムもパラメータ化できます。連想リストを表すけれどキー・値の型を任意にしたければ：</p>
 <pre name="code" class="haskell:hs">type AssocList k v = [(k,v)]
 </pre>
-<p>Now, a function that gets the value by a key in an association list can have a type of <span class="fixed">(Eq k) =&gt; k -&gt; AssocList k v -&gt; Maybe v</span>. <span class="fixed">AssocList</span> is a type constructor that takes two types and produces a concrete type, like <span class="fixed">AssocList Int String</span>, for instance.</p>
-<div class="hintbox"><em>Fonzie says:</em> Aaay! When I talk about <i>concrete types</i> I mean like fully applied types like <span class="fixed">Map Int String</span> or if we're dealin' with one of them polymorphic functions, <span class="fixed">[a]</span> or <span class="fixed">(Ord a) =&gt; Maybe a</span> and stuff. And like, sometimes me and the boys say that <span class="fixed">Maybe</span> is a type, but we don't mean that, cause every idiot knows <span class="fixed">Maybe</span> is a type constructor. When I apply an extra type to <span class="fixed">Maybe</span>, like <span class="fixed">Maybe String</span>,
- then I have a concrete type. You know, values can only have types that 
-are concrete types! So in conclusion, live fast, love hard and don't let
- anybody else use your comb!</div>
-<p>Just like we can partially apply functions to get new functions, we 
-can partially apply type parameters and get new type constructors from 
-them. Just like we call a function with too few parameters to get back a
- new function, we can specify a type constructor with too few type 
-parameters and get back a partially applied type constructor. If we 
-wanted a type that represents a map (from <span class="fixed">Data.Map</span>) from integers to something, we could either do this:</p>
+<p>キーで値を引く関数の型は <span class="fixed">(Eq k) =&gt; k -&gt; AssocList k v -&gt; Maybe v</span> のようになります。<span class="fixed">AssocList</span> は2つの型を取って具体型（<span class="fixed">AssocList Int String</span> など）を生む型コンストラクタです。</p>
+<div class="hintbox"><em>Fonzie 曰く：</em> いいか！　<i>具体型</i> っていうのは、<span class="fixed">Map Int String</span> みたいに完全に適用された型のことだ。多相関数を扱ってるなら <span class="fixed">[a]</span> や <span class="fixed">(Ord a) =&gt; Maybe a</span> なんかもな。仲間内では <span class="fixed">Maybe</span> を「型」と呼ぶこともあるが、それは違って、<span class="fixed">Maybe</span> は型コンストラクタだってことくらい子どもでも知ってる。<span class="fixed">Maybe</span> に追加の型を適用すると、たとえば <span class="fixed">Maybe String</span>、はじめて具体型になる。値が持てる型は具体型だけだ！　というわけで、人生は早く生き、激しく愛し、誰にも自分のクシを使わせるな！</div>
+<p>関数を部分適用して新しい関数を得るのと同じく、型引数を部分適用して新しい型コンストラクタを得られます。引数が足りない関数を呼んで関数を返すのと同じく、型引数を足りないまま指定して部分適用された型コンストラクタを得られます。<span class="fixed">Data.Map</span> の整数→何かのマップを表したければ：</p>
 <pre name="code" class="haskell:hs">type IntMap v = Map Int v
 </pre>
-<p>Or we could do it like this:</p>
+<p>あるいは：</p>
 <pre name="code" class="haskell:hs">type IntMap = Map Int
 </pre>
-<p>Either way, the <span class="fixed">IntMap</span> type constructor takes one parameter and that is the type of what the integers will point to.</p>
-<div class="hintbox"><em>Oh yeah</em>. If you're going to try and implement this, you'll probably going to do a qualified import of <span class="fixed">Data.Map</span>. When you do a qualified import, type constructors also have to be preceeded with a module name. So you'd write <span class="fixed">type IntMap = Map.Map Int</span>.</div>
-<p>Make sure that you really understand the distinction between type 
-constructors and value constructors. Just because we made a type synonym
- called <span class="fixed">IntMap</span> or <span class="fixed">AssocList</span> doesn't mean that we can do stuff like <span class="fixed">AssocList [(1,2),(4,5),(7,9)]</span>. All it means is that we can refer to its type by using different names. We can do <span class="fixed">[(1,2),(3,5),(8,9)] :: AssocList Int Int</span>, which will make the numbers inside assume a type of <span class="fixed">Int</span>,
- but we can still use that list as we would any normal list that has 
-pairs of integers inside. Type synonyms (and types generally) can only 
-be used in the type portion of Haskell. We're in Haskell's type portion 
-whenever we're defining new types (so in <i>data</i> and <i>type</i> declarations) or when we're located after a <span class="fixed">::</span>. The <span class="fixed">::</span> is in type declarations or in type annotations.</p>
-<p>Another cool data type that takes two types as its parameters is the <span class="fixed">Either a b</span> type. This is roughly how it's defined:</p>
+<p>どちらの場合も、<span class="fixed">IntMap</span> 型コンストラクタは引数を1つ取り、それは整数が指す値の型です。</p>
+<div class="hintbox"><em>そうそう</em>。これを実装するなら <span class="fixed">Data.Map</span> を qualified import するでしょう。qualified import すると型コンストラクタもモジュール名を前置する必要があります。<span class="fixed">type IntMap = Map.Map Int</span> と書きます。</div>
+<p>型コンストラクタと値コンストラクタの違いをよく理解してください。<span class="fixed">IntMap</span> や <span class="fixed">AssocList</span> といった型シノニムを作ったからといって、<span class="fixed">AssocList [(1,2),(4,5),(7,9)]</span> のようなことができるわけではありません。型を別名で参照できるだけです。<span class="fixed">[(1,2),(3,5),(8,9)] :: AssocList Int Int</span> はでき、中身の数は <span class="fixed">Int</span> 型と仮定されますが、リストとしては普通の整数ペアのリストとして使えます。型シノニム（と一般に型）は Haskell の型部分でしか使えません。新しい型を定義するとき（<i>data</i>・<i>type</i> 宣言）や <span class="fixed">::</span> の後ろが型部分です。<span class="fixed">::</span> は型宣言や型注釈で使われます。</p>
+<p>もう1つ、2 つの型を引数に取るデータ型 <span class="fixed">Either a b</span>。おおよそこう定義されています：</p>
 <pre name="code" class="haskell:hs">data Either a b = Left a | Right b deriving (Eq, Ord, Read, Show)
 </pre>
-<p>It has two value constructors. If the <span class="fixed">Left</span> is used, then its contents are of type <span class="fixed">a</span> and if <span class="fixed">Right</span> is used, then its contents are of type <span class="fixed">b</span>. So we can use this type to encapsulate a value of one type or another and then when we get a value of type <span class="fixed">Either a b</span>, we usually pattern match on both <span class="fixed">Left</span> and <span class="fixed">Right</span> and we different stuff based on which one of them it was. </p>
+<p>2つの値コンストラクタを持ちます。<span class="fixed">Left</span> なら中身は <span class="fixed">a</span> 型、<span class="fixed">Right</span> なら <span class="fixed">b</span> 型。一方の型または他方の型の値を包めるので、<span class="fixed">Either a b</span> の値を扱うときは <span class="fixed">Left</span> と <span class="fixed">Right</span> 両方にパターンマッチして、それぞれで違うことをするのが普通です。</p>
 <pre name="code" class="haskell:hs">ghci&gt; Right 20
 Right 20
 ghci&gt; Left "w00t"
@@ -650,20 +446,8 @@ Right 'a' :: Either a Char
 ghci&gt; :t Left True
 Left True :: Either Bool b
 </pre>
-<p>So far, we've seen that <span class="fixed">Maybe a</span> was mostly used to represent the results of computations that could have either failed or not. But somtimes, <span class="fixed">Maybe a</span> isn't good enough because <span class="fixed">Nothing</span>
- doesn't really convey much information other than that something has 
-failed. That's cool for functions that can fail in only one way or if 
-we're just not interested in how and why they failed. A <span class="fixed">Data.Map</span>
- lookup fails only if the key we were looking for wasn't in the map, so 
-we know exactly what happened. However, when we're interested in how 
-some function failed or why, we usually use the result type of <span class="fixed">Either a b</span>, where <span class="fixed">a</span> is some sort of type that can tell us something about the possible failure and <span class="fixed">b</span> is the type of a successful computation. Hence, errors use the <span class="fixed">Left</span> value constructor while results use <span class="fixed">Right</span>.</p>
-<p>An example: a high-school has lockers so that students have some 
-place to put their Guns'n'Roses posters. Each locker has a code 
-combination. When a student wants a new locker, they tell the locker 
-supervisor which locker number they want and he gives them the code. 
-However, if someone is already using that locker, he can't tell them the
- code for the locker and they have to pick a different one. We'll use a 
-map from <span class="fixed">Data.Map</span> to represent the lockers. It'll map from locker numbers to a pair of whether the locker is in use or not and the locker code.</p>
+<p>これまで <span class="fixed">Maybe a</span> は計算が失敗したかどうかを表すのによく使ってきました。でも <span class="fixed">Nothing</span> は「失敗した」以上の情報を持ちません。1 通りの失敗しかしない、または失敗の理由に興味がない関数ならそれで OK。<span class="fixed">Data.Map</span> の lookup は「キーがマップになかった」という1通りの失敗しかしないので何が起きたか分かります。一方、失敗の理由に興味があるときは <span class="fixed">Either a b</span> をよく使います。<span class="fixed">a</span> が失敗の情報、<span class="fixed">b</span> が成功の値の型。エラーは <span class="fixed">Left</span>、結果は <span class="fixed">Right</span>。</p>
+<p>例：高校にロッカーがあり、生徒が Guns'n'Roses のポスターを貼る場所を確保するのに使います。各ロッカーには暗証番号があります。新しいロッカーが欲しい生徒は番号を伝え、監督者がコードを教えます。誰かが既に使っていれば、コードを教えられないので別のを選んでもらいます。<span class="fixed">Data.Map</span> でロッカーを表します。ロッカー番号から「使用中かどうか」と「コード」のペアへの写像です。</p>
 <pre name="code" class="haskell:hs">import qualified Data.Map as Map
 
 data LockerState = Taken | Free deriving (Show, Eq)
@@ -672,30 +456,17 @@ type Code = String
 
 type LockerMap = Map.Map Int (LockerState, Code)
 </pre>
-<p>Simple stuff. We introduce a new data type to represent whether a 
-locker is taken or free and we make a type synonym for the locker code. 
-We also make a type synonym for the type that maps from integers to 
-pairs of locker state and code. And now, we're going to make a function 
-that searches for the code in a locker map. We're going to use an <span class="fixed">Either String Code</span>
- type to represent our result, because our lookup can fail in two ways —
- the locker can be taken, in which case we can't tell the code or the 
-locker number might not exist at all. If the lookup fails, we're just 
-going to use a <span class="fixed">String</span> to tell what's happened. </p>
+<p>シンプル。ロッカーの状態を表す新しいデータ型と、コードのシノニム、整数→（状態,コード）のシノニムを作ります。コードを検索する関数を作ります。<span class="fixed">Either String Code</span> 型で結果を表します。lookup は2 通りで失敗しうる — ロッカーが使用中、または番号が存在しない。失敗時は <span class="fixed">String</span> で何が起きたかを伝えます。</p>
 <pre name="code" class="haskell:hs">lockerLookup :: Int -&gt; LockerMap -&gt; Either String Code
-lockerLookup lockerNumber map = 
-    case Map.lookup lockerNumber map of 
+lockerLookup lockerNumber map =
+    case Map.lookup lockerNumber map of
         Nothing -&gt; Left $ "Locker number " ++ show lockerNumber ++ " doesn't exist!"
-        Just (state, code) -&gt; if state /= Taken 
+        Just (state, code) -&gt; if state /= Taken
                                 then Right code
                                 else Left $ "Locker " ++ show lockerNumber ++ " is already taken!"</pre>
-<p>We do a normal lookup in the map. If we get a <span class="fixed">Nothing</span>, we return a value of type <span class="fixed">Left String</span>,
- saying that the locker doesn't exist at all. If we do find it, then we 
-do an additional check to see if the locker is taken. If it is, return a
- <span class="fixed">Left</span> saying that it's already taken. If it isn't, then return a value of type <span class="fixed">Right Code</span>, in which we give the student the correct code for the locker. It's actually a <span class="fixed">Right String</span>,
- but we introduced that type synonym to introduce some additional 
-documentation into the type declaration. Here's an example map:</p>
+<p>普通に lookup します。<span class="fixed">Nothing</span> なら「存在しない」と <span class="fixed">Left String</span>。見つかれば、使用中チェックを追加。使用中なら <span class="fixed">Left</span> で「使用中」、空いていれば <span class="fixed">Right Code</span> でコード（実体は <span class="fixed">Right String</span> ですが、シノニムでドキュメント化）。サンプルマップ：</p>
 <pre name="code" class="haskell:hs">lockers :: LockerMap
-lockers = Map.fromList 
+lockers = Map.fromList
     [(100,(Taken,"ZD39I"))
     ,(101,(Free,"JAH3I"))
     ,(103,(Free,"IQSA9"))
@@ -704,7 +475,7 @@ lockers = Map.fromList
     ,(110,(Taken,"99292"))
     ]
 </pre>
-<p>Now let's try looking up some locker codes.</p>
+<p>ロッカーコードを引いてみましょう。</p>
 <pre name="code" class="haskell:hs">ghci&gt; lockerLookup 101 lockers
 Right "JAH3I"
 ghci&gt; lockerLookup 100 lockers
@@ -716,32 +487,19 @@ Left "Locker 110 is already taken!"
 ghci&gt; lockerLookup 105 lockers
 Right "QOTSA"
 </pre>
-<p>We could have used a <span class="fixed">Maybe a</span> to represent 
-the result but then we wouldn't know why we couldn't get the code. But 
-now, we have information about the failure in our result type.</p>
-<a name="recursive-data-structures"></a><h2>Recursive data structures</h2>
+<p><span class="fixed">Maybe a</span> でも結果は表せましたが、なぜコードが取れなかったか分かりません。今は失敗の情報が結果型に乗っています。</p>
+<a name="recursive-data-structures"></a><h2>再帰的データ構造</h2>
 
-<p>As we've seen, a constructor in an algebraic data type can have 
-several (or none at all) fields and each field must be of some concrete 
-type. With that in mind, we can make types whose constructors have 
-fields that are of the same type! Using that, we can create recursive 
-data types, where one value of some type contains values of that type, 
-which in turn contain more values of the same type and so on.</p>
-<p>Think about this list: <span class="fixed">[5]</span>. That's just syntactic sugar for <span class="fixed">5:[]</span>. On the left side of the <span class="fixed">:</span>, there's a value and on the right side, there's a list. And in this case, it's an empty list. Now how about the list <span class="fixed">[4,5]</span>? Well, that desugars to <span class="fixed">4:(5:[])</span>. Looking at the first <span class="fixed">:</span>, we see that it also has an element on its left side and a list (<span class="fixed">5:[]</span>) on its right side. Same goes for a list like <span class="fixed">3:(4:(5:6:[]))</span>, which could be written either like that or like <span class="fixed">3:4:5:6:[]</span> (because <span class="fixed">:</span> is right-associative) or <span class="fixed">[3,4,5,6]</span>.</p>
-<p>We could say that a list can be an empty list or it can be an element joined together with a <span class="fixed">:</span> with another list (that can be either the empty list or not).</p>
-<p>Let's use algebraic data types to implement our own list then!</p>
+<p>これまで見てきたように、代数的データ型のコンストラクタは複数（あるいはゼロ個）のフィールドを持ち、各フィールドの型は具体型でなければなりません。これを踏まえると、コンストラクタが同じ型のフィールドを持つような型も作れます！　これにより再帰的なデータ型が作れます。ある型の値がその型の値を含み、その値もまたその型の値を含み、という具合です。</p>
+<p>このリストを考えてみてください：<span class="fixed">[5]</span>。これは <span class="fixed">5:[]</span> の糖衣構文。<span class="fixed">:</span> の左に値、右にリスト（ここでは空リスト）。<span class="fixed">[4,5]</span> は <span class="fixed">4:(5:[])</span>。最初の <span class="fixed">:</span> の左に要素、右にリスト（<span class="fixed">5:[]</span>）。<span class="fixed">3:(4:(5:6:[]))</span> も同様で、<span class="fixed">:</span> が右結合なので <span class="fixed">3:4:5:6:[]</span> や <span class="fixed">[3,4,5,6]</span> とも書けます。</p>
+<p>つまり「リストとは空リスト、または要素を別のリスト（空または非空）と <span class="fixed">:</span> でつないだもの」です。</p>
+<p>代数的データ型で自分のリストを実装してみましょう！</p>
 <pre name="code" class="haskell:hs">data List a = Empty | Cons a (List a) deriving (Show, Read, Eq, Ord)
 </pre>
-<p>This reads just like our definition of lists from one of the previous
- paragraphs. It's either an empty list or a combination of a head with 
-some value and a list. If you're confused about this, you might find it 
-easier to understand in record syntax.</p>
+<p>先ほどの定義と同じです。空リストか、ある値（先頭）と別のリストの組み合わせ。混乱したらレコード構文版のほうが分かりやすいかも。</p>
 <pre name="code" class="haskell:hs">data List a = Empty | Cons { listHead :: a, listTail :: List a} deriving (Show, Read, Eq, Ord)
 </pre>
-<p>You might also be confused about the <span class="fixed">Cons</span> constructor here. <i>cons</i> is another word for <span class="fixed">:</span>. You see, in lists, <span class="fixed">:</span>
- is actually a constructor that takes a value and another list and 
-returns a list. We can already use our new list type! In other words, it
- has two fields. One field is of the type of <span class="fixed">a</span> and the other is of the type <span class="fixed">[a]</span>.</p>
+<p><span class="fixed">Cons</span> コンストラクタについて。<i>cons</i> は <span class="fixed">:</span> の別名です。実はリストの <span class="fixed">:</span> は値とリストを取ってリストを返すコンストラクタなのです。新しいリスト型はもう使えます！　フィールド2つ、1つは <span class="fixed">a</span>、もう1つは <span class="fixed">[a]</span> のような型。</p>
 <pre name="code" class="haskell:hs">ghci&gt; Empty
 Empty
 ghci&gt; 5 `Cons` Empty
@@ -751,130 +509,61 @@ Cons 4 (Cons 5 Empty)
 ghci&gt; 3 `Cons` (4 `Cons` (5 `Cons` Empty))
 Cons 3 (Cons 4 (Cons 5 Empty))
 </pre>
-<p>We called our <span class="fixed">Cons</span> constructor in an infix manner so you can see how it's just like <span class="fixed">:</span>. <span class="fixed">Empty</span> is like <span class="fixed">[]</span> and <span class="fixed">4 `Cons` (5 `Cons` Empty)</span> is like <span class="fixed">4:(5:[])</span>.</p>
-<p>We can define functions to be automatically infix by making them 
-comprised of only special characters. We can also do the same with 
-constructors, since they're just functions that return a data type. So 
-check this out.</p>
+<p><span class="fixed">Cons</span> を中置呼びして <span class="fixed">:</span> っぽく見せました。<span class="fixed">Empty</span> が <span class="fixed">[]</span>、<span class="fixed">4 `Cons` (5 `Cons` Empty)</span> が <span class="fixed">4:(5:[])</span> に対応。</p>
+<p>関数を特殊文字だけで構成すれば自動的に中置にできます。コンストラクタも関数なので同じことができます。</p>
 <pre name="code" class="haskell:hs">infixr 5 :-:
 data List a = Empty | a :-: (List a) deriving (Show, Read, Eq, Ord)
 </pre>
-<p>First off, we notice a new syntactic construct, the fixity 
-declarations. When we define functions as operators, we can use that to 
-give them a fixity (but we don't have to). A fixity states how tightly 
-the operator binds and whether it's left-associative or 
-right-associative. For instance, <span class="fixed">*</span>'s fixity is <span class="fixed">infixl 7 *</span> and <span class="fixed">+</span>'s fixity is <span class="fixed">infixl 6</span>. That means that they're both left-associative (<span class="fixed">4 * 3 * 2</span> is <span class="fixed">(4 * 3) * 2</span>) but <span class="fixed">*</span> binds tighter than <span class="fixed">+</span>, because it has a greater fixity, so <span class="fixed">5 * 4 + 3</span> is <span class="fixed">(5 * 4) + 3</span>.</p>
-<p>Otherwise, we just wrote <span class="fixed">a :-: (List a)</span> instead of <span class="fixed">Cons a (List a)</span>. Now, we can write out lists in our list type like so:</p>
+<p>新しい構文「fixity 宣言」が登場しました。演算子として関数を定義するときに fixity を指定できます（必須ではない）。fixity は演算子の結合の強さと結合方向を表します。<span class="fixed">*</span> の fixity は <span class="fixed">infixl 7 *</span>、<span class="fixed">+</span> の fixity は <span class="fixed">infixl 6</span>。両方とも左結合で（<span class="fixed">4 * 3 * 2</span> は <span class="fixed">(4 * 3) * 2</span>）、<span class="fixed">*</span> のほうが結合が強い（fixity が大きい）ので <span class="fixed">5 * 4 + 3</span> は <span class="fixed">(5 * 4) + 3</span>。</p>
+<p>あとは <span class="fixed">Cons a (List a)</span> を <span class="fixed">a :-: (List a)</span> と書いただけ。リストはこう書けます：</p>
 <pre name="code" class="haskell:hs">ghci&gt; 3 :-: 4 :-: 5 :-: Empty
 (:-:) 3 ((:-:) 4 ((:-:) 5 Empty))
 ghci&gt; let a = 3 :-: 4 :-: 5 :-: Empty
 ghci&gt; 100 :-: a
 (:-:) 100 ((:-:) 3 ((:-:) 4 ((:-:) 5 Empty)))
 </pre>
-<p>When deriving <span class="fixed">Show</span> for our type, Haskell 
-will still display it as if the constructor was a prefix function, hence
- the parentheses around the operator (remember, <span class="fixed">4 + 3</span> is <span class="fixed">(+) 4 3</span>).</p>
-<p>Let's make a function that adds two of our lists together. This is how <span class="fixed">++</span> is defined for normal lists:</p>
+<p>型に <span class="fixed">Show</span> を派生させると、Haskell はコンストラクタを前置関数として表示するので、演算子に括弧が付きます（<span class="fixed">4 + 3</span> は <span class="fixed">(+) 4 3</span> と同じ）。</p>
+<p>2つのリストを連結する関数を作ります。これが普通のリストの <span class="fixed">++</span> 定義：</p>
 <pre name="code" class="haskell:hs">infixr 5  ++
 (++) :: [a] -&gt; [a] -&gt; [a]
 []     ++ ys = ys
 (x:xs) ++ ys = x : (xs ++ ys)
 </pre>
-<p>So we'll just steal that for our own list. We'll name the function <span class="fixed">.++</span>.</p>
+<p>これを自分のリスト用に拝借します。<span class="fixed">.++</span> と命名。</p>
 <pre name="code" class="haskell:hs">infixr 5  .++
-(.++) :: List a -&gt; List a -&gt; List a 
+(.++) :: List a -&gt; List a -&gt; List a
 Empty .++ ys = ys
 (x :-: xs) .++ ys = x :-: (xs .++ ys)
 </pre>
-<p>And let's see if it works ...</p>
+<p>動くか確認…</p>
 <pre name="code" class="haskell:hs">ghci&gt; let a = 3 :-: 4 :-: 5 :-: Empty
 ghci&gt; let b = 6 :-: 7 :-: Empty
 ghci&gt; a .++ b
 (:-:) 3 ((:-:) 4 ((:-:) 5 ((:-:) 6 ((:-:) 7 Empty))))
 </pre>
-<p>Nice. Is nice. If we wanted, we could implement all of the functions that operate on lists on our own list type.</p>
-<p>Notice how we pattern matched on <span class="fixed">(x :-: xs)</span>. That works because pattern matching is actually about matching constructors. We can match on <span class="fixed">:-:</span> because it is a constructor for our own list type and we can also match on <span class="fixed">:</span> because it is a constructor for the built-in list type. Same goes for <span class="fixed">[]</span>.
- Because pattern matching works (only) on constructors, we can match for
- stuff like that, normal prefix constructors or stuff like <span class="fixed">8</span> or <span class="fixed">'a'</span>, which are basically constructors for the numeric and character types, respectively.</p>
+<p>いい感じ。リスト用関数全部を自前リスト型でも実装できますが、ここまで。</p>
+<p><span class="fixed">(x :-: xs)</span> でパターンマッチしているのに注目。パターンマッチは実はコンストラクタへのマッチなのです。<span class="fixed">:-:</span> は自前のリスト型のコンストラクタなのでマッチでき、<span class="fixed">:</span> は組み込みリスト型のコンストラクタなのでマッチでき、<span class="fixed">[]</span> も同様。パターンマッチはコンストラクタに対してのみ働くので、こうした構造、普通の前置コンストラクタ、<span class="fixed">8</span> や <span class="fixed">'a'</span>（数値型・文字型のコンストラクタ）にもマッチできます。</p>
 <img src="../images/binarytree.png" alt="binary search tree" class="left" width="323" height="225"/>
-<p>Now, we're going to implement a <em>binary search tree</em>. If 
-you're not familiar with binary search trees from languages like C, 
-here's what they are: an element points to two elements, one on its left
- and one on its right. The element to the left is smaller, the element 
-to the right is bigger. Each of those elements can also point to two 
-elements (or one, or none). In effect, each element has up to two 
-sub-trees. And a cool thing about binary search trees is that we know 
-that all the elements at the left sub-tree of, say, 5 are going to be 
-smaller than 5. Elements in its right sub-tree are going to be bigger. 
-So if we need to find if 8 is in our tree, we'd start at 5 and then 
-because 8 is greater than 5, we'd go right. We're now at 7 and because 8
- is greater than 7, we go right again. And we've found our element in 
-three hops! Now if this were a normal list (or a tree, but really 
-unbalanced), it would take us seven hops instead of three to see if 8 is
- in there.</p>
-<p>Sets and maps from <span class="fixed">Data.Set</span> and <span class="fixed">Data.Map</span>
- are implemented using trees, only instead of normal binary search 
-trees, they use balanced binary search trees, which are always balanced.
- But right now, we'll just be implementing normal binary search trees.</p>
-<p>Here's what we're going to say: a tree is either an empty tree or 
-it's an element that contains some value and two trees. Sounds like a 
-perfect fit for an algebraic data type!</p>
+<p>次に <em>二分探索木</em> を実装します。C のような言語の二分探索木に馴染みがなければ、こうです：要素は左右2つの要素を指し、左は小さく、右は大きい。それらの要素もまた2つ（あるいは1つ、あるいは0個）の要素を指せる。要するに各要素は最大2つの部分木を持つ。例えば 5 の左部分木の要素はすべて 5 より小さい、右はすべて 5 より大きい、という性質があるので、たとえば 8 が木にあるか調べたいとき、5 から始めて 8 は 5 より大きいので右、7 から 8 は 7 より大きいので右、と3 ホップで見つかる。普通のリスト（あるいはアンバランスな木）なら 8 を見つけるのに 7 ホップかかるかも。</p>
+<p><span class="fixed">Data.Set</span>・<span class="fixed">Data.Map</span> の集合・マップは木で実装されていますが、普通の二分探索木ではなく、常にバランスされた平衡二分探索木です。今は普通の二分探索木を実装します。</p>
+<p>これからこう言います：木は空木か、ある値と2つの木を含む要素のどちらか。代数的データ型にぴったりです！</p>
 <pre name="code" class="haskell:hs">data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
 </pre>
-<p>Okay, good, this is good. Instead of manually building a tree, we're 
-going to make a function that takes a tree and an element and inserts an
- element. We do this by comparing the value we want to insert to the 
-root node and then if it's smaller, we go left, if it's larger, we go 
-right. We do the same for every subsequent node until we reach an empty 
-tree. Once we've reached an empty tree, we just insert a node with that 
-value instead of the empty tree.</p>
-<p>In languages like C, we'd do this by modifying the pointers and 
-values inside the tree. In Haskell, we can't really modify our tree, so 
-we have to make a new sub-tree each time we decide to go left or right 
-and in the end the insertion function returns a completely new tree, 
-because Haskell doesn't really have a concept of pointer, just values. 
-Hence, the type for our insertion function is going to be something like
- <span class="fixed">a -&gt; Tree a - &gt; Tree a</span>. It takes an 
-element and a tree and returns a new tree that has that element inside. 
-This might seem like it's inefficient but laziness takes care of that 
-problem.</p>
-<p>So, here are two functions. One is a utility function for making a 
-singleton tree (a tree with just one node) and a function to insert an 
-element into a tree.</p>
+<p>OK。手で木を作る代わりに、木と要素を取って要素を挿入する関数を作ります。挿入する値とルートノードを比較し、小さければ左へ、大きければ右へ。空木に到達するまで繰り返し、空木に到達したらその空木の代わりにその値を持つノードを挿入します。</p>
+<p>C のような言語ではポインタと値を変更してこれをやります。Haskell では木を変更できないので、左右に進むたびに新しい部分木を作ります。最終的に挿入関数は完全に新しい木を返します。Haskell にポインタの概念はなく、値だけです。なので挿入関数の型は <span class="fixed">a -&gt; Tree a - &gt; Tree a</span>。要素と木を取り、その要素を含む新しい木を返す。非効率に見えますが、遅延評価が解決してくれます。</p>
+<p>2つの関数：シングルトン木（ノード1つの木）を作るユーティリティと、要素を木に挿入する関数。</p>
 <pre name="code" class="haskell:hs">singleton :: a -&gt; Tree a
 singleton x = Node x EmptyTree EmptyTree
 
 treeInsert :: (Ord a) =&gt; a -&gt; Tree a -&gt; Tree a
 treeInsert x EmptyTree = singleton x
-treeInsert x (Node a left right) 
+treeInsert x (Node a left right)
     | x == a = Node x left right
     | x &lt; a  = Node a (treeInsert x left) right
     | x &gt; a  = Node a left (treeInsert x right)
 </pre>
-<p>The <span class="fixed">singleton</span> function is just a shortcut 
-for making a node that has something and then two empty sub-trees. In 
-the insertion function, we first have the edge condition as a pattern. 
-If we've reached an empty sub-tree, that means we're where we want and 
-instead of the empty tree, we put a singleton tree with our element. If 
-we're not inserting into an empty tree, then we have to check some 
-things. First off, if the element we're inserting is equal to the root 
-element, just return a tree that's the same. If it's smaller, return a 
-tree that has the same root value, the same right sub-tree but instead 
-of its left sub-tree, put a tree that has our value inserted into it. 
-Same (but the other way around) goes if our value is bigger than the 
-root element.</p> 
-<p>Next up, we're going to make a function that checks if some element 
-is in the tree. First, let's define the edge condition. If we're looking
- for an element in an empty tree, then it's certainly not there. Okay. 
-Notice how this is the same as the edge condition when searching for 
-elements in lists. If we're looking for an element in an empty list, 
-it's not there. Anyway, if we're not looking for an element in an empty 
-tree, then we check some things. If the element in the root node is what
- we're looking for, great! If it's not, what then? Well, we can take 
-advantage of knowing that all the left elements are smaller than the 
-root node. So if the element we're looking for is smaller than the root 
-node, check to see if it's in the left sub-tree. If it's bigger, check 
-to see if it's in the right sub-tree.</p>
+<p><span class="fixed">singleton</span> は中身と空部分木2つのノードを作るショートカット。挿入関数では、まずパターンとしてエッジ条件。空部分木に到達したらシングルトン木を入れる。空でない木への挿入なら、いくつかチェック：挿入する要素がルートと等しいなら同じ木を返す、小さいなら同じルート・同じ右部分木で左部分木に値を挿入した木、大きいならその逆。</p>
+<p>次に、要素が木にあるか確認する関数。エッジ条件を定義しましょう。空木にはどんな要素もない。リストで要素を探す場合と同じです。空木でないなら、ルートが探している要素か確認、違えば左部分木はルートより小さいことを利用して、探している要素がルートより小さければ左、大きければ右を再帰的にチェック。</p>
 <pre name="code" class="haskell:hs">treeElem :: (Ord a) =&gt; a -&gt; Tree a -&gt; Bool
 treeElem x EmptyTree = False
 treeElem x (Node a left right)
@@ -882,22 +571,13 @@ treeElem x (Node a left right)
     | x &lt; a  = treeElem x left
     | x &gt; a  = treeElem x right
 </pre>
-<p>All we had to do was write up the previous paragraph in code. Let's 
-have some fun with our trees! Instead of manually building one (although
- we could), we'll use a fold to build up a tree from a list. Remember, 
-pretty much everything that traverses a list one by one and then returns
- some sort of value can be implemented with a fold! We're going to start
- with the empty tree and then approach a list from the right and just 
-insert element after element into our accumulator tree. </p>
+<p>前段落をコードに起こしただけ。木で遊んでみましょう！　手で構築する代わりに fold でリストから木を組み上げます。リストを1つずつ走査して何かを返すものはほぼすべて fold で実装できる、というのを覚えていれば！　空木から始め、リストを右からアプローチして、要素を順次アキュムレータの木に insert していくだけ。</p>
 <pre name="code" class="haskell:hs">ghci&gt; let nums = [8,6,4,1,7,3,5]
 ghci&gt; let numsTree = foldr treeInsert EmptyTree nums
 ghci&gt; numsTree
 Node 5 (Node 3 (Node 1 EmptyTree EmptyTree) (Node 4 EmptyTree EmptyTree)) (Node 7 (Node 6 EmptyTree EmptyTree) (Node 8 EmptyTree EmptyTree))</pre>
-<p>In that <span class="fixed">foldr</span>, <span class="fixed">treeInsert</span> was the folding function (it takes a tree and a list element and produces a new tree) and <span class="fixed">EmptyTree</span> was the starting accumulator. <span class="fixed">nums</span>, of course, was the list we were folding over.</p>
-<p>When we print our tree to the console, it's not very readable, but if
- we try, we can make out its structure. We see that the root node is 5 
-and then it has two sub-trees, one of which has the root node of 3 and 
-the other a 7, etc.</p>
+<p><span class="fixed">foldr</span> で <span class="fixed">treeInsert</span> が畳み込み関数（木とリスト要素を取って新しい木）、<span class="fixed">EmptyTree</span> が初期アキュムレータ、<span class="fixed">nums</span> が畳み込むリスト。</p>
+<p>木をコンソールに表示してもあまり読みやすくありませんが、頑張れば構造が分かります。ルートが 5、その左部分木のルートが 3、右が 7、と。</p>
 <pre name="code" class="haskell:hs">ghci&gt; 8 `treeElem` numsTree
 True
 ghci&gt; 100 `treeElem` numsTree
@@ -907,92 +587,50 @@ True
 ghci&gt; 10 `treeElem` numsTree
 False
 </pre>
-<p>Checking for membership also works nicely. Cool.</p>
-<p>So as you can see, algebraic data structures are a really cool and 
-powerful concept in Haskell. We can use them to make anything from 
-boolean values and weekday enumerations to binary search trees and more!</p>
-<a name="typeclasses-102"></a><h2>Typeclasses 102</h2>
+<p>メンバーシップチェックも問題なし。クール。</p>
+<p>このように、代数的データ構造は Haskell の本当にクールでパワフルな概念です。真偽値や曜日の列挙から、二分探索木やもっといろんなものまで作れます！</p>
+<a name="typeclasses-102"></a><h2>型クラス応用</h2>
 
-<p>So far, we've learned about some of the standard Haskell typeclasses 
-and we've seen which types are in them. We've also learned how to 
-automatically make our own types instances of the standard typeclasses 
-by asking Haskell to derive the instances for us. In this section, we're
- going to learn how to make our own typeclasses and how to make types 
-instances of them by hand.</p>
-<p>A quick recap on typeclasses: typeclasses are like interfaces. A 
-typeclass defines some behavior (like comparing for equality, comparing 
-for ordering, enumeration) and then types that can behave in that way 
-are made instances of that typeclass. The behavior of typeclasses is 
-achieved by defining functions or just type declarations that we then 
-implement. So when we say that a type is an instance of a typeclass, we 
-mean that we can use the functions that the typeclass defines with that 
-type.</p>
-<p>Typeclasses have pretty much nothing to do with classes in languages 
-like Java or Python. This confuses many people, so I want you to forget 
-everything you know about classes in imperative languages right now.</p>
-<p>For example, the <span class="fixed">Eq</span> typeclass is for stuff that can be equated. It defines the functions <span class="fixed">==</span> and <span class="fixed">/=</span>. If we have a type (say, <span class="fixed">Car</span>) and comparing two cars with the equality function <span class="fixed">==</span> makes sense, then it makes sense for <span class="fixed">Car</span> to be an instance of <span class="fixed">Eq</span>.</p>
-<p>This is how the <span class="fixed">Eq</span> class is defined in the standard prelude:</p>
+<p>これまで標準 Haskell の型クラスのいくつかを学び、どの型がそこに属するかを見ました。標準型クラスのインスタンスを Haskell に自動派生してもらう方法も学びました。このセクションでは、自分で型クラスを作る方法、手作業で型をインスタンスにする方法を学びます。</p>
+<p>型クラスのおさらい：型クラスはインターフェースのようなもの。何らかの振る舞い（等価性比較、順序比較、列挙など）を定義し、その振る舞いができる型がインスタンスになる。型クラスの振る舞いは関数または型宣言を定義し、それを実装することで実現される。型がある型クラスのインスタンスだ、と言うとき、その型でその型クラスの定義する関数が使える、ということです。</p>
+<p>型クラスは Java や Python のクラスとはほとんど関係ありません。混乱する人が多いので、命令型言語のクラスについて知っていることはいったん忘れてください。</p>
+<p><span class="fixed">Eq</span> 型クラスは等価性をテストできるもののためのもの。関数 <span class="fixed">==</span>・<span class="fixed">/=</span> を定義する。<span class="fixed">Car</span> 型があり 2台の車を <span class="fixed">==</span> で比較するのが理にかなうなら、<span class="fixed">Car</span> を <span class="fixed">Eq</span> のインスタンスにするのは理にかなう。</p>
+<p>標準 Prelude での <span class="fixed">Eq</span> の定義：</p>
 <pre name="code" class="haskell:hs">class Eq a where
     (==) :: a -&gt; a -&gt; Bool
     (/=) :: a -&gt; a -&gt; Bool
     x == y = not (x /= y)
     x /= y = not (x == y)
 </pre>
-<p>Woah, woah, woah! Some new strange syntax and keywords there! Don't 
-worry, this will all be clear in a second. First off, when we write <span class="fixed">class Eq a where</span>, this means that we're defining a new typeclass and that's called <span class="fixed">Eq</span>. The <span class="fixed">a</span> is the type variable and it means that <span class="fixed">a</span> will play the role of the type that we will soon be making an instance of <span class="fixed">Eq</span>. It doesn't have to be called <span class="fixed">a</span>,
- it doesn't even have to be one letter, it just has to be a lowercase 
-word. Then, we define several functions. It's not mandatory to implement
- the function bodies themselves, we just have to specify the type 
-declarations for the functions.</p>
-<div class="hintbox">Some people might understand this better if we wrote <span class="fixed">class Eq equatable where</span> and then specified the type declarations like <span class="fixed">(==) :: equatable -&gt; equatable -&gt; Bool</span>.</div>
-<p>Anyway, we <i>did</i> implement the function bodies for the functions that <span class="fixed">Eq</span> defines, only we defined them in terms of mutual recursion. We said that two instances of <span class="fixed">Eq</span>
- are equal if they are not different and they are different if they are 
-not equal. We didn't have to do this, really, but we did and we'll see 
-how this helps us soon.</p>
-<div class="hintbox">If we have say <span class="fixed">class Eq a where</span> and then define a type declaration within that class like <span class="fixed">(==) :: a -&gt; -a -&gt; Bool</span>, then when we examine the type of that function later on, it will have the type of <span class="fixed">(Eq a) =&gt; a -&gt; a -&gt; Bool</span>.</div>
-<p>So once we have a class, what can we do with it? Well, not much, 
-really. But once we start making types instances of that class, we start
- getting some nice functionality. So check out this type:</p>
+<p>うわ、新しい奇妙な構文！　すぐに明らかになるので心配無用。まず <span class="fixed">class Eq a where</span> は新しい型クラス（名前は <span class="fixed">Eq</span>）の定義です。<span class="fixed">a</span> は型変数で、これからインスタンスにする型の役を担います。<span class="fixed">a</span> でなくとも、1文字でなくとも、小文字の単語ならOK。続いて関数を定義。本体の実装は必須ではなく、関数の型宣言だけで構いません。</p>
+<div class="hintbox"><span class="fixed">class Eq equatable where</span> と書き、<span class="fixed">(==) :: equatable -&gt; equatable -&gt; Bool</span> と型宣言する、と読めば理解しやすい人もいるかも。</div>
+<p>とはいえ、ここでは関数本体を実装しています。相互再帰で。「<span class="fixed">Eq</span> の2つのインスタンスは、異ならなければ等しい、等しくなければ異なる」と。必須ではありませんが、こうすると後で役立ちます。</p>
+<div class="hintbox"><span class="fixed">class Eq a where</span> でクラスを定義し、<span class="fixed">(==) :: a -&gt; a -&gt; Bool</span> の型宣言があれば、その関数の型は <span class="fixed">(Eq a) =&gt; a -&gt; a -&gt; Bool</span> になります。</div>
+<p>クラスができたら何ができるでしょう？　あまりできることはありませんが、型をそのクラスのインスタンスにすると素敵な機能が手に入ります。この型を見てください：</p>
 <pre name="code" class="haskell:hs">data TrafficLight = Red | Yellow | Green
 </pre>
-<p>It defines the states of a traffic light. Notice how we didn't derive
- any class instances for it. That's because we're going to write up some
- instances by hand, even though we could derive them for types like <span class="fixed">Eq</span> and <span class="fixed">Show</span>. Here's how we make it an instance of <span class="fixed">Eq</span>.</p>
+<p>信号機の状態を定義します。クラスインスタンスを派生していないことに注目。<span class="fixed">Eq</span> や <span class="fixed">Show</span> なら派生できますが、ここでは手書きします。<span class="fixed">Eq</span> インスタンスにする方法：</p>
 <pre name="code" class="haskell:hs">instance Eq TrafficLight where
     Red == Red = True
     Green == Green = True
     Yellow == Yellow = True
     _ == _ = False
 </pre>
-<p>We did it by using the <i>instance</i> keyword. So <i>class</i> is for defining new typeclasses and <i>instance</i> is for making our types instances of typeclasses. When we were defining <span class="fixed">Eq</span>, we wrote <span class="fixed">class Eq a where</span> and we said that <span class="fixed">a</span>
- plays the role of whichever type will be made an instance later on. We 
-can see that clearly here, because when we're making an instance, we 
-write <span class="fixed">instance Eq TrafficLight where</span>. We replace the <span class="fixed">a</span> with the actual type.</p>
-<p>Because <span class="fixed">==</span> was defined in terms of <span class="fixed">/=</span> and vice versa in the <i>class</i>
- declaration, we only had to overwrite one of them in the instance 
-declaration. That's called the minimal complete definition for the 
-typeclass — the minimum of functions that we have to implement so that 
-our type can behave like the class advertises. To fulfill the minimal 
-complete definition for <span class="fixed">Eq</span>, we have to overwrite either one of <span class="fixed">==</span> or <span class="fixed">/=</span>. If <span class="fixed">Eq</span> was defined simply like this:</p>
+<p><i>instance</i> キーワードを使いました。<i>class</i> は新しい型クラスの定義、<i>instance</i> は型をインスタンスにするためのもの。<span class="fixed">Eq</span> 定義では <span class="fixed">class Eq a where</span> と書き、<span class="fixed">a</span> がインスタンスになる型の役を担うと言いました。インスタンス化のときは <span class="fixed">instance Eq TrafficLight where</span> と書き、<span class="fixed">a</span> が実際の型に置き換えられます。</p>
+<p><span class="fixed">==</span> が <span class="fixed">/=</span> で、<span class="fixed">/=</span> が <span class="fixed">==</span> で定義されていたので、インスタンス宣言ではどちらか一方だけ上書きすれば済みます。これを「最小完全定義」と呼びます — 型クラスのインターフェース通り振る舞うために実装すべき関数の最小集合。<span class="fixed">Eq</span> の最小完全定義は <span class="fixed">==</span> または <span class="fixed">/=</span> のどちらか。もし <span class="fixed">Eq</span> がこう定義されていたら：</p>
 <pre name="code" class="haskell:hs">class Eq a where
     (==) :: a -&gt; a -&gt; Bool
     (/=) :: a -&gt; a -&gt; Bool
 </pre>
-<p>we'd have to implement both of these functions when making a type an 
-instance of it, because Haskell wouldn't know how these two functions 
-are related. The minimal complete definition would then be: both <span class="fixed">==</span> and <span class="fixed">/=</span>.</p>
-<p>You can see that we implemented <span class="fixed">==</span> simply 
-by doing pattern matching. Since there are many more cases where two 
-lights aren't equal, we specified the ones that are equal and then just 
-did a catch-all pattern saying that if it's none of the previous 
-combinations, then two lights aren't equal.</p>
-<p>Let's make this an instance of <span class="fixed">Show</span> by hand, too. To satisfy the minimal complete definition for <span class="fixed">Show</span>, we just have to implement its <span class="fixed">show</span> function, which takes a value and turns it into a string.</p>
+<p>両方の関数を実装する必要があります。Haskell は関係を知らないので。最小完全定義は <span class="fixed">==</span> と <span class="fixed">/=</span> 両方になります。</p>
+<p><span class="fixed">==</span> はパターンマッチで実装しています。等しくないケースのほうがずっと多いので、等しいケースを並べて、それ以外は catch-all で False。</p>
+<p><span class="fixed">Show</span> インスタンスも手作業にしましょう。最小完全定義は <span class="fixed">show</span> 関数（値を取って文字列を返す）。</p>
 <pre name="code" class="haskell:hs">instance Show TrafficLight where
     show Red = "Red light"
     show Yellow = "Yellow light"
     show Green = "Green light"
 </pre>
-<p>Once again, we used pattern matching to achieve our goals. Let's see how it works in action:</p>
+<p>これもパターンマッチで実現。動かしてみます：</p>
 <pre name="code" class="haskell:hs">ghci&gt; Red == Red
 True
 ghci&gt; Red == Yellow
@@ -1002,107 +640,78 @@ True
 ghci&gt; [Red, Yellow, Green]
 [Red light,Yellow light,Green light]
 </pre>
-<p>Nice. We could have just derived <span class="fixed">Eq</span> and it would have had the same effect (but we didn't for educational purposes). However, deriving <span class="fixed">Show</span> would have just directly translated the value constructors to strings. But if we want lights to appear like <span class="fixed">"Red light"</span>, then we have to make the instance declaration by hand.</p>
-<p>You can also make typeclasses that are subclasses of other typeclasses. The <i>class</i> declaration for <span class="fixed">Num</span> is a bit long, but here's the first part:</p>
+<p>いいですね。<span class="fixed">Eq</span> は派生しても同じ効果（学習目的なのでしませんでしたが）。ただし <span class="fixed">Show</span> を派生すると値コンストラクタを直接文字列にするだけ。<span class="fixed">"Red light"</span> のように見せたいなら手書きが必要です。</p>
+<p>他の型クラスのサブクラスとなる型クラスも作れます。<span class="fixed">Num</span> の <i>class</i> 宣言の最初の部分：</p>
 <pre name="code" class="haskell:hs">class (Eq a) =&gt; Num a where
    ...  </pre>
-<p>As we mentioned previously, there are a lot of places where we can cram in class constraints. So this is just like writing <span class="fixed">class Num a where</span>, only we state that our type <span class="fixed">a</span> must be an instance of <span class="fixed">Eq</span>. We're essentially saying that we have to make a type an instance of <span class="fixed">Eq</span> before we can make it an instance of <span class="fixed">Num</span>.
- Before some type can be considered a number, it makes sense that we can
- determine whether values of that type can be equated or not. That's all
- there is to subclassing really, it's just a class constraint on a <i>class</i> declaration! When defining function bodies in the <i>class</i> declaration or when defining them in <i>instance</i> declarations, we can assume that <span class="fixed">a</span> is a part of <span class="fixed">Eq</span> and so we can use <span class="fixed">==</span> on values of that type.</p>
-<p>But how are the <span class="fixed">Maybe</span> or list types made as instances of typeclasses? What makes <span class="fixed">Maybe</span> different from, say, <span class="fixed">TrafficLight</span> is that <span class="fixed">Maybe</span> in itself isn't a concrete type, it's a type constructor that takes one type parameter (like <span class="fixed">Char</span> or something) to produce a concrete type (like <span class="fixed">Maybe Char</span>). Let's take a look at the <span class="fixed">Eq</span> typeclass again:</p>
+<p>クラス制約を入れる場所はいろいろあります。これは <span class="fixed">class Num a where</span> と書くのと似ていますが、<span class="fixed">a</span> が <span class="fixed">Eq</span> のインスタンスでなければならないと述べています。要するに、<span class="fixed">Num</span> のインスタンスにする前に <span class="fixed">Eq</span> のインスタンスにしなければなりません。数とみなせる前に等価性が判定できるべき、というのは納得です。サブクラス化はこれだけ — <i>class</i> 宣言にクラス制約があるだけ！　関数本体を <i>class</i> 宣言や <i>instance</i> 宣言で書くとき、<span class="fixed">a</span> が <span class="fixed">Eq</span> に属すと仮定でき、<span class="fixed">==</span> を使えます。</p>
+<p>ところで <span class="fixed">Maybe</span> やリスト型はどうやってインスタンスにするのでしょう？　<span class="fixed">Maybe</span> が <span class="fixed">TrafficLight</span> と違うのは、<span class="fixed">Maybe</span> 自体は具体型ではなく型コンストラクタである点です。型引数（<span class="fixed">Char</span> など）を1つ取って具体型（<span class="fixed">Maybe Char</span>）を生みます。<span class="fixed">Eq</span> の定義をもう一度見ます：</p>
 <pre name="code" class="haskell:hs">class Eq a where
     (==) :: a -&gt; a -&gt; Bool
     (/=) :: a -&gt; a -&gt; Bool
     x == y = not (x /= y)
     x /= y = not (x == y) </pre>
-<p>From the type declarations, we see that the <span class="fixed">a</span>
- is used as a concrete type because all the types in functions have to 
-be concrete (remember, you can't have a function of the type <span class="fixed">a -&gt; Maybe</span> but you can have a function of <span class="fixed">a -&gt; Maybe a</span> or <span class="fixed">Maybe Int -&gt; Maybe String</span>). That's why we can't do something like</p>
+<p>型宣言から、<span class="fixed">a</span> は具体型として使われていることが分かります（関数の型はすべて具体型でなければなりません。<span class="fixed">a -&gt; Maybe</span> はダメ、<span class="fixed">a -&gt; Maybe a</span> や <span class="fixed">Maybe Int -&gt; Maybe String</span> はOK）。だからこうは書けません：</p>
 <pre name="code" class="haskell:hs">instance Eq Maybe where
     ...  </pre>
-<p>Because like we've seen, the <span class="fixed">a</span> has to be a concrete type but <span class="fixed">Maybe</span>
- isn't a concrete type. It's a type constructor that takes one parameter
- and then produces a concrete type. It would also be tedious to write <span class="fixed">instance Eq (Maybe Int) where</span>, <span class="fixed">instance Eq (Maybe Char) where</span>, etc. for every type ever. So we could write it out like so:</p>
+<p><span class="fixed">a</span> は具体型である必要があるのに、<span class="fixed">Maybe</span> は具体型ではない（型コンストラクタ）からです。<span class="fixed">instance Eq (Maybe Int) where</span>、<span class="fixed">instance Eq (Maybe Char) where</span>、と全型ぶん書くのも面倒。なのでこう：</p>
 <pre name="code" class="haskell:hs">instance Eq (Maybe m) where
     Just x == Just y = x == y
     Nothing == Nothing = True
     _ == _ = False
       </pre>
-<p>This is like saying that we want to make all types of the form <span class="fixed">Maybe something</span> an instance of <span class="fixed">Eq</span>. We actually could have written <span class="fixed">(Maybe something)</span>, but we usually opt for single letters to be true to the Haskell style. The <span class="fixed">(Maybe m)</span> here plays the role of the <span class="fixed">a</span> from <span class="fixed">class Eq a where</span>. While <span class="fixed">Maybe</span> isn't a concrete type, <span class="fixed">Maybe m</span> is. By specifying a type parameter (<span class="fixed">m</span>, which is in lowercase), we said that we want all types that are in the form of <span class="fixed">Maybe m</span>, where <span class="fixed">m</span> is any type, to be an instance of <span class="fixed">Eq</span>.</p>
-<p>There's one problem with this though. Can you spot it? We use <span class="fixed">==</span> on the contents of the <span class="fixed">Maybe</span> but we have no assurance that what the <span class="fixed">Maybe</span> contains can be used with <span class="fixed">Eq</span>! That's why we have to modify our <i>instance</i> declaration like this:</p>
+<p>「<span class="fixed">Maybe something</span> 型をすべて <span class="fixed">Eq</span> のインスタンスにしたい」と言っています。<span class="fixed">(Maybe something)</span> でも書けますが、Haskell スタイルでは1文字を選ぶのが普通。<span class="fixed">(Maybe m)</span> が <span class="fixed">class Eq a where</span> の <span class="fixed">a</span> の役を担います。<span class="fixed">Maybe</span> は具体型ではないですが、<span class="fixed">Maybe m</span> は具体型。型引数 <span class="fixed">m</span> を指定することで、「<span class="fixed">Maybe m</span> 形式の型すべてを <span class="fixed">Eq</span> のインスタンスにしたい」と言っています。</p>
+<p>1 つだけ問題があります。気づきましたか？　<span class="fixed">Maybe</span> の中身に <span class="fixed">==</span> を使っていますが、中身が <span class="fixed">Eq</span> で使えるかは保証されていません！　なので <i>instance</i> 宣言を変えます：</p>
 <pre name="code" class="haskell:hs">instance (Eq m) =&gt; Eq (Maybe m) where
     Just x == Just y = x == y
     Nothing == Nothing = True
     _ == _ = False
       </pre>
-<p>We had to add a class constraint! With this <i>instance</i> declaration, we say this: we want all types of the form <span class="fixed">Maybe m</span> to be part of the <span class="fixed">Eq</span> typeclass, but only those types where the <span class="fixed">m</span> (so what's contained inside the <span class="fixed">Maybe</span>) is also a part of <span class="fixed">Eq</span>. This is actually how Haskell would derive the instance too.</p>
-<p>Most of the times, class constraints in <i>class</i> declarations are used for making a typeclass a subclass of another typeclass and class constraints in <i>instance</i>
- declarations are used to express requirements about the contents of 
-some type. For instance, here we required the contents of the <span class="fixed">Maybe</span> to also be part of the <span class="fixed">Eq</span> typeclass.</p>
-<p>When making instances, if you see that a type is used as a concrete type in the type declarations (like the <span class="fixed">a</span> in <span class="fixed">a -&gt; a -&gt; Bool</span>), you have to supply type parameters and add parentheses so that you end up with a concrete type.</p>
-<div class="hintbox">Take into account that the type you're trying to make an instance of will replace the parameter in the <i>class</i> declaration. The <span class="fixed">a</span> from <span class="fixed">class Eq a where</span>
- will be replaced with a real type when you make an instance, so try 
-mentally putting your type into the function type declarations as well. <span class="fixed">(==) :: Maybe -&gt; Maybe -&gt; Bool</span> doesn't make much sense but <span class="fixed">(==) :: (Eq m) =&gt; Maybe m -&gt; Maybe m -&gt; Bool</span> does. But this is just something to think about, because <span class="fixed">==</span> will always have a type of <span class="fixed">(==) :: (Eq a) =&gt; a -&gt; a -&gt; Bool</span>, no matter what instances we make.</div>
-<p>Ooh, one more thing, check this out! If you want to see what the instances of a typeclass are, just do <span class="fixed">:info YourTypeClass</span> in GHCI. So typing <span class="fixed">:info Num</span> will show which functions the typeclass defines and it will give you a list of the types in the typeclass. <span class="fixed">:info</span> works for types and type constructors too. If you do <span class="fixed">:info Maybe</span>, it will show you all the typeclasses that <span class="fixed">Maybe</span> is an instance of. Also <span class="fixed">:info</span> can show you the type declaration of a function. I think that's pretty cool.</p>
-<a name="a-yes-no-typeclass"></a><h2>A yes-no typeclass</h2>
+<p>クラス制約を加える必要がありました！　この <i>instance</i> 宣言で「<span class="fixed">Maybe m</span> 形式の型のうち、<span class="fixed">m</span>（<span class="fixed">Maybe</span> の中身）も <span class="fixed">Eq</span> 型クラスに属するものだけを <span class="fixed">Eq</span> のメンバーにする」と言えます。Haskell が派生するときも実はこうしています。</p>
+<p>多くの場合、<i>class</i> 宣言のクラス制約は型クラスをサブクラスにするために、<i>instance</i> 宣言のクラス制約は中身に対する要件を表すために使います。</p>
+<p>インスタンスを作るとき、型が型宣言で具体型として使われている（<span class="fixed">a -&gt; a -&gt; Bool</span> の <span class="fixed">a</span> など）なら、型引数を与えて括弧で囲み、具体型にする必要があります。</p>
+<div class="hintbox">インスタンスにする型は <i>class</i> 宣言の引数を置き換えるという点に注意。<span class="fixed">class Eq a where</span> の <span class="fixed">a</span> は実際の型に置き換わるので、関数の型宣言にもその型を入れて考えると良いです。<span class="fixed">(==) :: Maybe -&gt; Maybe -&gt; Bool</span> は意味をなしませんが、<span class="fixed">(==) :: (Eq m) =&gt; Maybe m -&gt; Maybe m -&gt; Bool</span> は意味が通ります。とはいえ、これは思考の補助で、<span class="fixed">==</span> は常に <span class="fixed">(==) :: (Eq a) =&gt; a -&gt; a -&gt; Bool</span> 型です。</div>
+<p>もう1つ、これを見て！　型クラスのインスタンスを見たければ、GHCi で <span class="fixed">:info YourTypeClass</span>。<span class="fixed">:info Num</span> なら型クラスが定義する関数とインスタンス型一覧が見えます。<span class="fixed">:info</span> は型・型コンストラクタにも効きます。<span class="fixed">:info Maybe</span> は <span class="fixed">Maybe</span> がインスタンスである型クラス全部を見せてくれます。<span class="fixed">:info</span> は関数の型宣言も見せられます。クールです。</p>
+<a name="a-yes-no-typeclass"></a><h2>YesNo型クラス</h2>
 
-<p>In JavaScript and some other weakly typed languages, you can put 
-almost anything inside an if expression. For example, you can do all of 
-the following: <span class="fixed">if (0) alert("YEAH!") else alert("NO!")</span>, <span class="fixed">if ("") alert ("YEAH!") else alert("NO!")</span>, <span class="fixed">if (false) alert("YEAH") else alert("NO!)</span>, etc. and all of these will throw an alert of <span class="fixed">NO!</span>. If you do <span class="fixed">if ("WHAT") alert ("YEAH") else alert("NO!")</span>, it will alert a <span class="fixed">"YEAH!"</span> because JavaScript considers non-empty strings to be a sort of true-ish value.</p>
-<p>Even though strictly using <span class="fixed">Bool</span> for 
-boolean semantics works better in Haskell, let's try and implement that 
-JavaScript-ish behavior anyway. For fun! Let's start out with a <i>class</i> declaration.</p>
+<p>JavaScript やいくつかの弱い型付け言語では、ほぼ何でも if 式に入れられます。<span class="fixed">if (0) alert("YEAH!") else alert("NO!")</span>、<span class="fixed">if ("") alert ("YEAH!") else alert("NO!")</span>、<span class="fixed">if (false) alert("YEAH") else alert("NO!)</span>、これら全部 <span class="fixed">NO!</span> のアラート。<span class="fixed">if ("WHAT") alert ("YEAH") else alert("NO!")</span> なら <span class="fixed">"YEAH!"</span>。JavaScript では空でない文字列を真っぽいとみなすからです。</p>
+<p>Haskell では真偽値に <span class="fixed">Bool</span> を厳格に使うほうが良いですが、JavaScript っぽい振る舞いをあえて実装してみます。お遊びです！　<i>class</i> 宣言から：</p>
 <pre name="code" class="haskell:hs">class YesNo a where
     yesno :: a -&gt; Bool
 </pre>
-<p>Pretty simple. The <span class="fixed">YesNo</span> typeclass defines
- one function. That function takes one value of a type that can be 
-considered to hold some concept of true-ness and tells us for sure if 
-it's true or not. Notice that from the way we use the <span class="fixed">a</span> in the function, <span class="fixed">a</span> has to be a concrete type.</p>
-<p>Next up, let's define some instances. For numbers, we'll assume that 
-(like in JavaScript) any number that isn't 0 is true-ish and 0 is 
-false-ish.</p>
+<p>シンプル。<span class="fixed">YesNo</span> は関数を1つ定義。「真っぽさ」を持つ型の値を取って、真かどうかを返す。<span class="fixed">a</span> の使い方から、<span class="fixed">a</span> は具体型である必要があります。</p>
+<p>インスタンスを定義します。数値は（JavaScript のように）0 以外は真っぽい、0 は偽っぽい。</p>
 <pre name="code" class="haskell:hs">instance YesNo Int where
     yesno 0 = False
     yesno _ = True
 </pre>
-<p>Empty lists (and by extensions, strings) are a no-ish value, while non-empty lists are a yes-ish value.</p>
+<p>空リスト（および文字列）は偽っぽい、非空は真っぽい。</p>
 <pre name="code" class="haskell:hs">instance YesNo [a] where
     yesno [] = False
     yesno _ = True
 </pre>
-<p>Notice how we just put in a type parameter <span class="fixed">a</span>
- in there to make the list a concrete type, even though we don't make 
-any assumptions about the type that's contained in the list. What else, 
-hmm ... I know, <span class="fixed">Bool</span> itself also holds true-ness and false-ness and it's pretty obvious which is which.</p>
+<p>型引数 <span class="fixed">a</span> を入れてリストを具体型にしているのに注目。中身の型は仮定しません。<span class="fixed">Bool</span> は真偽そのものなので明らか：</p>
 <pre name="code" class="haskell:hs">instance YesNo Bool where
-    yesno = id   
+    yesno = id
 </pre>
-<p>Huh? What's <span class="fixed">id</span>? It's just a standard 
-library function that takes a parameter and returns the same thing, 
-which is what we would be writing here anyway.</p>
-<p>Let's make <span class="fixed">Maybe a</span> an instance too.</p>
+<p>あれ？　<span class="fixed">id</span> って何？　標準ライブラリの関数で、引数をそのまま返すだけ。ここで書きたかったまさにその関数です。</p>
+<p><span class="fixed">Maybe a</span> もインスタンスに：</p>
 <pre name="code" class="haskell:hs">instance YesNo (Maybe a) where
     yesno (Just _) = True
     yesno Nothing = False
 </pre>
-<p>We didn't need a class constraint because we made no assumptions about the contents of the <span class="fixed">Maybe</span>. We just said that it's true-ish if it's a <span class="fixed">Just</span> value and false-ish if it's a <span class="fixed">Nothing</span>. We still had to write out <span class="fixed">(Maybe a)</span> instead of just <span class="fixed">Maybe</span> because if you think about it, a <span class="fixed">Maybe -&gt; Bool</span> function can't exist (because <span class="fixed">Maybe</span> isn't a concrete type), whereas a <span class="fixed">Maybe a -&gt; Bool</span> is fine and dandy. Still, this is really cool because now, any type of the form <span class="fixed">Maybe something</span> is part of <span class="fixed">YesNo</span> and it doesn't matter what that <span class="fixed">something</span> is.</p>
-<p>Previously, we defined a <span class="fixed">Tree a</span> type, that
- represented a binary search tree. We can say an empty tree is false-ish
- and anything that's not an empty tree is true-ish.</p>
+<p><span class="fixed">Maybe</span> の中身に何も仮定していないのでクラス制約は不要。<span class="fixed">Just</span> なら真っぽく、<span class="fixed">Nothing</span> なら偽っぽい、と。<span class="fixed">Maybe</span> ではなく <span class="fixed">(Maybe a)</span> と書く必要があります。<span class="fixed">Maybe -&gt; Bool</span> という関数は存在し得ない（具体型でないので）が、<span class="fixed">Maybe a -&gt; Bool</span> は OK。これで <span class="fixed">Maybe something</span> 形式の型はすべて <span class="fixed">YesNo</span> に入りました。</p>
+<p>前に定義した二分探索木 <span class="fixed">Tree a</span>。空木は偽っぽく、非空は真っぽい：</p>
 <pre name="code" class="haskell:hs">instance YesNo (Tree a) where
     yesno EmptyTree = False
     yesno _ = True
 </pre>
-<p>Can a traffic light be a yes or no value? Sure. If it's red, you 
-stop. If it's green, you go. If it's yellow? Eh, I usually run the 
-yellows because I live for adrenaline.</p>
+<p>信号機は yes/no の値になれるか？　なれます。赤なら止まる、緑なら進む、黄色は？　まあ、私はアドレナリンのために走っちゃいます。</p>
 <pre name="code" class="haskell:hs">instance YesNo TrafficLight where
     yesno Red = False
     yesno _ = True
 </pre>
-<p>Cool, now that we have some instances, let's go play!</p>
+<p>クール、インスタンスができたので遊んでみましょう！</p>
 <pre name="code" class="haskell:hs">ghci&gt; yesno $ length []
 False
 ghci&gt; yesno "haha"
@@ -1122,13 +731,11 @@ True
 ghci&gt; :t yesno
 yesno :: (YesNo a) =&gt; a -&gt; Bool
 </pre>
-<p>Right, it works! Let's make a function that mimics the if statement, but it works with <span class="fixed">YesNo</span> values.</p>
+<p>動きます！　<span class="fixed">YesNo</span> 値で if 文を真似する関数を作ります。</p>
 <pre name="code" class="haskell:hs">yesnoIf :: (YesNo y) =&gt; y -&gt; a -&gt; a -&gt; a
 yesnoIf yesnoVal yesResult noResult = if yesno yesnoVal then yesResult else noResult
 </pre>
-<p>Pretty straightforward. It takes a yes-no-ish value and two things. 
-If the yes-no-ish value is more of a yes, it returns the first of the 
-two things, otherwise it returns the second of them.</p>
+<p>シンプル。yes/no っぽい値と2つの値を取り、yes っぽいなら最初の値、そうでなければ2 つ目を返す。</p>
 <pre name="code" class="haskell:hs">ghci&gt; yesnoIf [] "YEAH!" "NO!"
 "NO!"
 ghci&gt; yesnoIf [2,3,4] "YEAH!" "NO!"
@@ -1140,52 +747,35 @@ ghci&gt; yesnoIf (Just 500) "YEAH!" "NO!"
 ghci&gt; yesnoIf Nothing "YEAH!" "NO!"
 "NO!"
 </pre>
-<a name="the-functor-typeclass"></a><h2>The Functor typeclass</h2>
-<p>So far, we've encountered a lot of the typeclasses in the standard library. We've played with <span class="fixed">Ord</span>, which is for stuff that can be ordered. We've palled around with <span class="fixed">Eq</span>, which is for things that can be equated. We've seen <span class="fixed">Show</span>, which presents an interface for types whose values can be displayed as strings. Our good friend <span class="fixed">Read</span> is there whenever we need to convert a string to a value of some type. And now, we're going to take a look at the <span class="label class">Functor</span>
- typeclass, which is basically for things that can be mapped over. 
-You're probably thinking about lists now, since mapping over lists is 
-such a dominant idiom in Haskell. And you're right, the list type is 
-part of the <span class="fixed">Functor</span> typeclass.</p>
-<p>What better way to get to know the <span class="fixed">Functor</span> typeclass than to see how it's implemented? Let's take a peek.</p>
+<a name="the-functor-typeclass"></a><h2>Functor型クラス</h2>
+<p>これまで標準ライブラリの型クラスをたくさん見てきました。<span class="fixed">Ord</span>（順序）、<span class="fixed">Eq</span>（等価性）、<span class="fixed">Show</span>（文字列化）、<span class="fixed">Read</span>（文字列から値）。今度は <span class="label class">Functor</span> 型クラスを見ます。基本的に「map（写像）できるもの」のためのものです。リストを思い浮かべるかもしれませんね。実際、リストは <span class="fixed">Functor</span> 型クラスの一員です。</p>
+<p><span class="fixed">Functor</span> を理解する一番の方法は実装を見ること。覗いてみましょう。</p>
 <pre name="code" class="haskell:hs">class Functor f where
     fmap :: (a -&gt; b) -&gt; f a -&gt; f b
 </pre>
 
-<p>Alright. We see that it defines one function, <span class="fixed">fmap</span>, and doesn't provide any default implementation for it. The type of <span class="fixed">fmap</span>
- is interesting. In the definitions of typeclasses so far, the type 
-variable that played the role of the type in the typeclass was a 
-concrete type, like the <span class="fixed">a</span> in <span class="fixed">(==) :: (Eq a) =&gt; a -&gt; a -&gt; Bool</span>. But now, the <span class="fixed">f</span> is not a concrete type (a type that a value can hold, like <span class="fixed">Int</span>, <span class="fixed">Bool</span> or <span class="fixed">Maybe String</span>), but a type constructor that takes one type parameter. A quick refresher example: <span class="fixed">Maybe Int</span> is a concrete type, but <span class="fixed">Maybe</span> is a type constructor that takes one type as the parameter. Anyway, we see that <span class="fixed">fmap</span> takes a function from one type to another and a functor applied with one type and returns a functor applied with another type.</p>
-<p>If this sounds a bit confusing, don't worry. All will be revealed 
-soon when we check out a few examples. Hmm, this type declaration for <span class="fixed">fmap</span> reminds me of something. If you don't know what the type signature of <span class="fixed">map</span> is, it's: <span class="fixed">map :: (a -&gt; b) -&gt; [a] -&gt; [b]</span>.</p>
-<p>Ah, interesting! It takes a function from one type to another and a 
-list of one type and returns a list of another type. My friends, I think
- we have ourselves a functor! In fact, <span class="fixed">map</span> is just a <span class="fixed">fmap</span> that works only on lists. Here's how the list is an instance of the <span class="fixed">Functor</span> typeclass.</p>
+<p>OK。関数 <span class="fixed">fmap</span> を1つ定義し、デフォルト実装はなし。<span class="fixed">fmap</span> の型が興味深い。これまでの型クラス定義では、型変数は具体型を表していました（<span class="fixed">(==) :: (Eq a) =&gt; a -&gt; a -&gt; Bool</span> の <span class="fixed">a</span> など）。でも今、<span class="fixed">f</span> は具体型ではなく、型引数を1つ取る型コンストラクタです。クイック復習：<span class="fixed">Maybe Int</span> は具体型、<span class="fixed">Maybe</span> は型を引数に取る型コンストラクタ。<span class="fixed">fmap</span> は「ある型から別の型への関数」と「ある型を適用したファンクタ」を取って、「別の型を適用したファンクタ」を返す、という関数。</p>
+<p>混乱しても大丈夫、例を見ればすぐ分かります。<span class="fixed">fmap</span> の型宣言、何かを思い出させますね。<span class="fixed">map</span> の型シグネチャを知らないなら：<span class="fixed">map :: (a -&gt; b) -&gt; [a] -&gt; [b]</span>。</p>
+<p>あ、興味深い！　ある型から別の型への関数と、ある型のリストを取って別の型のリストを返す。これはファンクタですね！　実際 <span class="fixed">map</span> はリストにのみ動く <span class="fixed">fmap</span> です。リストを <span class="fixed">Functor</span> のインスタンスにする方法：</p>
 <pre name="code" class="haskell:hs">instance Functor [] where
     fmap = map
 </pre>
-<p>That's it! Notice how we didn't write <span class="fixed">instance Functor [a] where</span>, because from <span class="fixed">fmap :: (a -&gt; b) -&gt; f a -&gt; f b</span>, we see that the <span class="fixed">f</span> has to be a type constructor that takes one type. <span class="fixed">[a]</span> is already a concrete type (of a list with any type inside it), while <span class="fixed">[]</span> is a type constructor that takes one type and can produce types such as <span class="fixed">[Int]</span>, <span class="fixed">[String]</span> or even <span class="fixed">[[String]]</span>.</p>
-<p>Since for lists, <span class="fixed">fmap</span> is just <span class="fixed">map</span>, we get the same results when using them on lists.</p>
+<p>これだけ！　<span class="fixed">instance Functor [a] where</span> ではなく <span class="fixed">[]</span> と書いていることに注目。<span class="fixed">fmap :: (a -&gt; b) -&gt; f a -&gt; f b</span> から、<span class="fixed">f</span> は引数1つを取る型コンストラクタである必要があります。<span class="fixed">[a]</span> はもう具体型（中身が任意の型のリスト）ですが、<span class="fixed">[]</span> は型を1つ取って <span class="fixed">[Int]</span>、<span class="fixed">[String]</span>、<span class="fixed">[[String]]</span> などを生む型コンストラクタです。</p>
+<p>リストでは <span class="fixed">fmap</span> はただの <span class="fixed">map</span> なので結果は同じ：</p>
 <pre name="code" class="haskell:hs">map :: (a -&gt; b) -&gt; [a] -&gt; [b]
 ghci&gt; fmap (*2) [1..3]
 [2,4,6]
 ghci&gt; map (*2) [1..3]
 [2,4,6]
 </pre>
-<p>What happens when we <span class="fixed">map</span> or <span class="fixed">fmap</span> over an empty list? Well, of course, we get an empty list. It just turns an empty list of type <span class="fixed">[a]</span> into an empty list of type <span class="fixed">[b]</span>.</p>
-<p>Types that can act like a box can be functors. You can think of a 
-list as a box that has an infinite amount of little compartments and 
-they can all be empty, one can be full and the others empty or a number 
-of them can be full. So, what else has the properties of being like a 
-box? For one, the <span class="fixed">Maybe a</span> type. In a way, it's like a box that can either hold nothing, in which case it has the value of <span class="fixed">Nothing</span>, or it can hold one item, like <span class="fixed">"HAHA"</span>, in which case it has a value of <span class="fixed">Just "HAHA"</span>. Here's how <span class="fixed">Maybe</span> is a functor.</p>
+<p>空リストに <span class="fixed">map</span> や <span class="fixed">fmap</span> をすると、空リストが返ります。<span class="fixed">[a]</span> 型の空リストを <span class="fixed">[b]</span> 型の空リストに変えるだけ。</p>
+<p>箱のように振る舞う型はファンクタになれます。リストは無限のコンパートメントを持つ箱で、空のもあれば中身が入っているのもある、と考えられます。他に箱っぽい性質を持つものは？　<span class="fixed">Maybe a</span> 型。何も入っていないか（<span class="fixed">Nothing</span>）、1つだけ入っているか（<span class="fixed">Just "HAHA"</span>）。<span class="fixed">Maybe</span> がファンクタである方法：</p>
 <pre name="code" class="haskell:hs">instance Functor Maybe where
     fmap f (Just x) = Just (f x)
     fmap f Nothing = Nothing
 </pre>
-<p>Again, notice how we wrote <span class="fixed">instance Functor Maybe where</span> instead of <span class="fixed">instance Functor (Maybe m) where</span>, like we did when we were dealing with <span class="fixed">Maybe</span> and <span class="fixed">YesNo</span>. <span class="fixed">Functor</span> wants a type constructor that takes one type and not a concrete type. If you mentally replace the <span class="fixed">f</span>s with <span class="fixed">Maybe</span>s, <span class="fixed">fmap</span> acts like a <span class="fixed">(a -&gt; b) -&gt; Maybe a -&gt; Maybe b</span> for this particular type, which looks OK. But if you replace <span class="fixed">f</span> with <span class="fixed">(Maybe m)</span>, then it would seem to act like a <span class="fixed">(a -&gt; b) -&gt; Maybe m a -&gt; Maybe m b</span>, which doesn't make any damn sense because <span class="fixed">Maybe</span> takes just one type parameter.</p>
-<p>Anyway, the <span class="fixed">fmap</span> implementation is pretty simple. If it's an empty value of <span class="fixed">Nothing</span>, then just return a <span class="fixed">Nothing</span>.
- If we map over an empty box, we get an empty box. It makes sense. Just 
-like if we map over an empty list, we get back an empty list. If it's 
-not an empty value, but rather a single value packed up in a <span class="fixed">Just</span>, then we apply the function on the contents of the <span class="fixed">Just</span>.</p>
+<p>また、<span class="fixed">instance Functor (Maybe m) where</span> ではなく <span class="fixed">instance Functor Maybe where</span> と書いていることに注目。<span class="fixed">Functor</span> は具体型ではなく1引数を取る型コンストラクタを欲しています。<span class="fixed">f</span> を <span class="fixed">Maybe</span> に置き換えると、<span class="fixed">fmap</span> はこの型では <span class="fixed">(a -&gt; b) -&gt; Maybe a -&gt; Maybe b</span> のように振る舞い、OK そう。<span class="fixed">f</span> を <span class="fixed">(Maybe m)</span> に置き換えると、<span class="fixed">(a -&gt; b) -&gt; Maybe m a -&gt; Maybe m b</span> となって意味不明（<span class="fixed">Maybe</span> は型引数を1つしか取らない）。</p>
+<p>さて、<span class="fixed">fmap</span> 実装はシンプル。<span class="fixed">Nothing</span> なら <span class="fixed">Nothing</span> を返す。空の箱を map したら空の箱、と。空リストを map したら空リスト、と同じ。<span class="fixed">Just</span> に1つ詰められた値なら、関数を中身に適用。</p>
 <pre name="code" class="haskell:hs">ghci&gt; fmap (++ " HEY GUYS IM INSIDE THE JUST") (Just "Something serious.")
 Just "Something serious. HEY GUYS IM INSIDE THE JUST"
 ghci&gt; fmap (++ " HEY GUYS IM INSIDE THE JUST") Nothing
@@ -1195,12 +785,7 @@ Just 400
 ghci&gt; fmap (*2) Nothing
 Nothing
 </pre>
-<p>Another thing that can be mapped over and made an instance of <span class="fixed">Functor</span> is our <span class="fixed">Tree a</span> type. It can be thought of as a box in a way (holds several or no values) and the <span class="fixed">Tree</span> type constructor takes exactly one type parameter. If you look at <span class="fixed">fmap</span> as if it were a function made only for <span class="fixed">Tree</span>, its type signature would look like <span class="fixed">(a -&gt; b) -&gt; Tree a -&gt; Tree b</span>.
- We're going to use recursion on this one. Mapping over an empty tree 
-will produce an empty tree. Mapping over a non-empty tree will be a tree
- consisting of our function applied to the root value and its left and 
-right sub-trees will be the previous sub-trees, only our function will 
-be mapped over them.</p>
+<p>もう1つ map 可能で <span class="fixed">Functor</span> インスタンスにできるのが <span class="fixed">Tree a</span>。複数（または0）の値を入れる箱とも考えられ、<span class="fixed">Tree</span> 型コンストラクタは型引数をぴったり1つ取ります。<span class="fixed">fmap</span> が <span class="fixed">Tree</span> 専用なら、型シグネチャは <span class="fixed">(a -&gt; b) -&gt; Tree a -&gt; Tree b</span>。再帰を使います。空木の map は空木。非空木の map は、ルート値に関数を適用した木と、左右部分木それぞれに関数を map した木。</p>
 <pre name="code" class="haskell:hs">instance Functor Tree where
     fmap f EmptyTree = EmptyTree
     fmap f (Node x leftsub rightsub) = Node (f x) (fmap f leftsub) (fmap f rightsub)
@@ -1210,111 +795,63 @@ EmptyTree
 ghci&gt; fmap (*4) (foldr treeInsert EmptyTree [5,7,3,2,1,7])
 Node 28 (Node 4 EmptyTree (Node 8 EmptyTree (Node 12 EmptyTree (Node 20 EmptyTree EmptyTree)))) EmptyTree
 </pre>
-<p>Nice! Now how about <span class="fixed">Either a b</span>? Can this be made a functor? The <span class="fixed">Functor</span> typeclass wants a type constructor that takes only one type parameter but <span class="fixed">Either</span> takes two. Hmmm! I know, we'll partially apply <span class="fixed">Either</span> by feeding it only one parameter so that it has one free parameter. Here's how <span class="fixed">Either a</span> is a functor in the standard libraries:</p>
+<p>素敵！　では <span class="fixed">Either a b</span> はどうでしょう？　<span class="fixed">Functor</span> は引数1つの型コンストラクタが欲しいけど、<span class="fixed">Either</span> は2つ取る。うーむ！　よし、<span class="fixed">Either</span> を1つだけ与えて部分適用すれば、空き引数が1つになる。標準ライブラリでの <span class="fixed">Either a</span> がファンクタである方法：</p>
 <pre name="code" class="haskell:hs">instance Functor (Either a) where
     fmap f (Right x) = Right (f x)
     fmap f (Left x) = Left x
 </pre>
-<p>Well well, what did we do here? You can see how we made <span class="fixed">Either a</span> an instance instead of just <span class="fixed">Either</span>. That's because <span class="fixed">Either a</span> is a type constructor that takes one parameter, whereas <span class="fixed">Either</span> takes two. If <span class="fixed">fmap</span> was specifically for <span class="fixed">Either a</span>, the type signature would then be <span class="fixed">(b -&gt; c) -&gt; Either a b -&gt; Either a c</span> because that's the same as <span class="fixed">(b -&gt; c) -&gt; (Either a) b -&gt; (Either a) c</span>. In the implementation, we mapped in the case of a <span class="fixed">Right</span> value constructor, but we didn't in the case of a <span class="fixed">Left</span>. Why is that? Well, if we look back at how the <span class="fixed">Either a b</span> type is defined, it's kind of like:</p>
+<p>何をしたか。<span class="fixed">Either</span> ではなく <span class="fixed">Either a</span> をインスタンスにしました。<span class="fixed">Either a</span> が引数1つの型コンストラクタで、<span class="fixed">Either</span> は2つだから。<span class="fixed">fmap</span> が <span class="fixed">Either a</span> 専用なら型は <span class="fixed">(b -&gt; c) -&gt; Either a b -&gt; Either a c</span>（<span class="fixed">(b -&gt; c) -&gt; (Either a) b -&gt; (Either a) c</span> と同じ）。実装では <span class="fixed">Right</span> のときは map し、<span class="fixed">Left</span> はしません。なぜ？　<span class="fixed">Either a b</span> の定義を見れば：</p>
 <pre name="code" class="haskell:hs">data Either a b = Left a | Right b
 </pre>
-<p>Well, if we wanted to map one function over both of them, <span class="fixed">a</span> and <span class="fixed">b</span> would have to be the same type. I mean, if we tried to map a function that takes a string and returns a string and the <span class="fixed">b</span> was a string but the <span class="fixed">a</span> was a number, that wouldn't really work out. Also, from seeing what <span class="fixed">fmap</span>'s type would be if it operated only on <span class="fixed">Either</span>
- values, we see that the first parameter has to remain the same while 
-the second one can change and the first parameter is actualized by the <span class="fixed">Left</span> value constructor.</p>
-<p>This also goes nicely with our box analogy if we think of the <span class="fixed">Left</span> part as sort of an empty box with an error message written on the side telling us why it's empty.</p>
-<p>Maps from <span class="fixed">Data.Map</span> can also be made a functor because they hold values (or not!). In the case of <span class="fixed">Map k v</span>, <span class="fixed">fmap</span> will map a function <span class="fixed">v -&gt; v'</span> over a map of type <span class="fixed">Map k v</span> and return a map of type <span class="fixed">Map k v'</span>. </p><div class="hintbox">Note, the <span class="fixed">'</span>
- has no special meaning in types just like it doesn't have special 
-meaning when naming values. It's used to denote things that are similar,
- only slightly changed.</div>
-<p>Try figuring out how <span class="fixed">Map k</span> is made an instance of <span class="fixed">Functor</span> by yourself!</p>
-<p>With the <span class="fixed">Functor</span> typeclass, we've seen how
- typeclasses can represent pretty cool higher-order concepts. We've also
- had some more practice with partially applying types and making 
-instances. In one of the next chapters, we'll also take a look at some 
-laws that apply for functors.</p>
-<div class="hintbox"><em>Just one more thing!</em> Functors should obey 
-some laws so that they may have some properties that we can depend on 
-and not think about too much. If we use <span class="fixed">fmap (+1)</span> over the list <span class="fixed">[1,2,3,4]</span>, we expect the result to be <span class="fixed">[2,3,4,5]</span> and not its reverse, <span class="fixed">[5,4,3,2]</span>. If we use <span class="fixed">fmap (\a -&gt; a)</span>
- (the identity function, which just returns its parameter) over some 
-list, we expect to get back the same list as a result. For example, if 
-we gave the wrong functor instance to our <span class="fixed">Tree</span> type, using <span class="fixed">fmap</span>
- over a tree where the left sub-tree of a node only has elements that 
-are smaller than the node and the right sub-tree only has nodes that are
- larger than the node might produce a tree where that's not the case. 
-We'll go over the functor laws in more detail in one of the next 
-chapters.</div>
-<a name="kinds-and-some-type-foo"></a><h2>Kinds and some type-foo</h2>
+<p>両方を1つの関数で map するなら、<span class="fixed">a</span> と <span class="fixed">b</span> は同じ型である必要があります。文字列を取って文字列を返す関数を map し、<span class="fixed">b</span> が文字列で <span class="fixed">a</span> が数なら、うまくいきません。<span class="fixed">Either</span> の <span class="fixed">fmap</span> 型から見ても、最初のパラメータは変わらず、2 つ目が変わる必要があり、最初のパラメータは <span class="fixed">Left</span> 値コンストラクタで実体化されます。</p>
+<p>箱のアナロジーとも合います。<span class="fixed">Left</span> 部分は「中が空でエラーメッセージが書かれた箱」のようなもの。</p>
+<p><span class="fixed">Data.Map</span> のマップもファンクタになれます（値を保持する／しない）。<span class="fixed">Map k v</span> の場合、<span class="fixed">fmap</span> は関数 <span class="fixed">v -&gt; v'</span> を <span class="fixed">Map k v</span> に map して <span class="fixed">Map k v'</span> を返します。</p><div class="hintbox">注意、<span class="fixed">'</span> は値の名前と同じく、型でも特別な意味は持ちません。「似ているけど少し違うもの」を表すのに使われます。</div>
+<p><span class="fixed">Map k</span> がどう <span class="fixed">Functor</span> インスタンスになるか、自分で考えてみてください！</p>
+<p><span class="fixed">Functor</span> 型クラスで、型クラスがクールな高階概念を表現できることを見ました。型の部分適用やインスタンス作成にも慣れてきたはず。次の章でファンクタが従う法則も見ます。</p>
+<div class="hintbox"><em>もう1つ！</em>　ファンクタは法則に従うべきです。そうすれば私たちは性質に頼って深く考えずに済みます。<span class="fixed">[1,2,3,4]</span> に <span class="fixed">fmap (+1)</span> したら <span class="fixed">[2,3,4,5]</span> を期待します、<span class="fixed">[5,4,3,2]</span> ではなく。<span class="fixed">fmap (\a -&gt; a)</span>（恒等関数）をリストに使ったら、同じリストが返るはず。<span class="fixed">Tree</span> に間違ったファンクタインスタンスを与えると、左部分木がノードより小さく右がより大きいという性質を保たない木になるかもしれません。次章でファンクタ則を詳しく扱います。</div>
+<a name="kinds-and-some-type-foo"></a><h2>カインドと型の話</h2>
 
-<p>Type constructors take other types as parameters to eventually 
-produce concrete types. That kind of reminds me of functions, which take
- values as parameters to produce values. We've seen that type 
-constructors can be partially applied (<span class="fixed">Either String</span> is a type that takes one type and produces a concrete type, like <span class="fixed">Either String Int</span>),
- just like functions can. This is all very interesting indeed. In this 
-section, we'll take a look at formally defining how types are applied to
- type constructors, just like we took a look at formally defining how 
-values are applied to functions by using type declarations. <em>You don't really have to read this section to continue on your magical Haskell quest</em>
- and if you don't understand it, don't worry about it. However, getting 
-this will give you a very thorough understanding of the type system.</p>
-<p>So, values like <span class="fixed">3</span>, <span class="fixed">"YEAH"</span> or <span class="fixed">takeWhile</span>
- (functions are also values, because we can pass them around and such) 
-each have their own type. Types are little labels that values carry so 
-that we can reason about the values. But types have their own little 
-labels, called <em>kinds</em>. A kind is more or less the type of a type. This may sound a bit weird and confusing, but it's actually a really cool concept.</p>
-<p>What are kinds and what are they good for? Well, let's examine the kind of a type by using the <span class="fixed">:k</span> command in GHCI.</p>
+<p>型コンストラクタは型を引数に取って具体型を生みます。値を引数に取って値を生む関数とちょっと似ていますね。型コンストラクタが部分適用できることも見ました（<span class="fixed">Either String</span> は1つの型を取って <span class="fixed">Either String Int</span> のような具体型を生む型）。型がどう型コンストラクタに適用されるかを、関数の引数を型宣言で形式化したのと同じように、形式化してみます。<em>このセクションを読まなくても Haskell の旅は続けられます</em>し、分からなくても気にしなくて大丈夫。ですが、これが分かれば型システムを深く理解できます。</p>
+<p>値（<span class="fixed">3</span>、<span class="fixed">"YEAH"</span>、<span class="fixed">takeWhile</span> など。関数も値です）はそれぞれ型を持ちます。型は値に付けられたラベルのようなもの。でも型自身にもラベルがあり、それを <em>カインド (kind)</em> と呼びます。カインドは大まかに「型の型」。少し奇妙に聞こえますが、本当にクールな概念です。</p>
+<p>カインドって何でどう役立つか？　GHCi の <span class="fixed">:k</span> コマンドで型のカインドを調べてみましょう。</p>
 <pre name="code" class="haskell:hs">ghci&gt; :k Int
 Int :: *
 </pre>
-<p>A star? How quaint. What does that mean? A <span class="fixed">*</span>
- means that the type is a concrete type. A concrete type is a type that 
-doesn't take any type parameters and values can only have types that are
- concrete types. If I had to read <span class="fixed">*</span> out loud (I haven't had to do that so far), I'd say <i>star</i> or just <i>type</i>.</p>
-<p>Okay, now let's see what the kind of <span class="fixed">Maybe</span> is.</p>
+<p>星？　なに？　<span class="fixed">*</span> は具体型（型引数を取らない型、値が持てる型）の意味。声に出して読むなら「スター」または「タイプ」。</p>
+<p><span class="fixed">Maybe</span> のカインドは：</p>
 <pre name="code" class="haskell:hs">ghci&gt; :k Maybe
 Maybe :: * -&gt; *
 </pre>
-<p>The <span class="fixed">Maybe</span> type constructor takes one concrete type (like <span class="fixed">Int</span>) and then returns a concrete type like <span class="fixed">Maybe Int</span>. And that's what this kind tells us. Just like <span class="fixed">Int -&gt; Int</span> means that a function takes an <span class="fixed">Int</span> and returns an <span class="fixed">Int</span>, <span class="fixed">* -&gt; *</span> means that the type constructor takes one concrete type and returns a concrete type. Let's apply the type parameter to <span class="fixed">Maybe</span> and see what the kind of that type is.</p>
+<p><span class="fixed">Maybe</span> 型コンストラクタは具体型1つ（<span class="fixed">Int</span> など）を取り、具体型（<span class="fixed">Maybe Int</span>）を返す。<span class="fixed">Int -&gt; Int</span> が「Int を取って Int を返す関数」を意味するように、<span class="fixed">* -&gt; *</span> は「具体型を1つ取って具体型を返す型コンストラクタ」を意味します。<span class="fixed">Maybe</span> に型引数を適用すると：</p>
 <pre name="code" class="haskell:hs">ghci&gt; :k Maybe Int
 Maybe Int :: *
 </pre>
-<p>Just like I expected! We applied the type parameter to <span class="fixed">Maybe</span> and got back a concrete type (that's what <span class="fixed">* -&gt; *</span> means. A parallel (although not equivalent, types and kinds are two different things) to this is if we do <span class="fixed">:t isUpper</span> and <span class="fixed">:t isUpper 'A'</span>. <span class="fixed">isUpper</span> has a type of <span class="fixed">Char -&gt; Bool</span> and <span class="fixed">isUpper 'A'</span> has a type of <span class="fixed">Bool</span>, because its value is basically <span class="fixed">True</span>. Both those types, however, have a kind of <span class="fixed">*</span>.</p>
-<p>We used <span class="fixed">:k</span> on a type to get its kind, just like we can use <span class="fixed">:t</span>
- on a value to get its type. Like we said, types are the labels of 
-values and kinds are the labels of types and there are parallels between
- the two.</p>
-<p>Let's look at another kind.</p>
+<p>予想通り！　<span class="fixed">Maybe</span> に型引数を適用して具体型に。<span class="fixed">isUpper</span> が <span class="fixed">Char -&gt; Bool</span> 型で、<span class="fixed">isUpper 'A'</span> が <span class="fixed">Bool</span> 型（値は <span class="fixed">True</span>）で、両方ともカインドが <span class="fixed">*</span>、というのと並行（型とカインドは違うものですが）です。</p>
+<p>型のカインドは <span class="fixed">:k</span>、値の型は <span class="fixed">:t</span>。型は値のラベル、カインドは型のラベル、両者には並行関係があります。</p>
+<p>別のカインドを：</p>
 <pre name="code" class="haskell:hs">ghci&gt; :k Either
 Either :: * -&gt; * -&gt; *
 </pre>
-<p>Aha, this tells us that <span class="fixed">Either</span> takes two 
-concrete types as type parameters to produce a concrete type. It also 
-looks kind of like a type declaration of a function that takes two 
-values and returns something. Type constructors are curried (just like 
-functions), so we can partially apply them.</p>
+<p><span class="fixed">Either</span> は具体型2つを取って具体型を生む。2 引数の関数の型宣言にも見えます。型コンストラクタもカリー化されているので部分適用できます。</p>
 <pre name="code" class="haskell:hs">ghci&gt; :k Either String
 Either String :: * -&gt; *
 ghci&gt; :k Either String Int
 Either String Int :: *
 </pre>
-<p>When we wanted to make <span class="fixed">Either</span> a part of the <span class="fixed">Functor</span> typeclass, we had to partially apply it because <span class="fixed">Functor</span> wants types that take only one parameter while <span class="fixed">Either</span> takes two. In other words, <span class="fixed">Functor</span> wants types of kind <span class="fixed">* -&gt; *</span> and so we had to partially apply <span class="fixed">Either</span> to get a type of kind <span class="fixed">* -&gt; *</span> instead of its original kind <span class="fixed">* -&gt; * -&gt; *</span>. If we look at the definition of <span class="fixed">Functor</span> again</p>
-<pre name="code" class="haskell:hs">class Functor f where 
+<p><span class="fixed">Either</span> を <span class="fixed">Functor</span> に入れたいとき、部分適用が必要だったのは、<span class="fixed">Functor</span> が引数1つの型を欲しがり、<span class="fixed">Either</span> は2つ取るから。要するに <span class="fixed">Functor</span> はカインド <span class="fixed">* -&gt; *</span> の型を欲しがるので、<span class="fixed">Either</span> を部分適用してカインドを <span class="fixed">* -&gt; * -&gt; *</span> から <span class="fixed">* -&gt; *</span> に変えました。<span class="fixed">Functor</span> 定義をもう一度：</p>
+<pre name="code" class="haskell:hs">class Functor f where
     fmap :: (a -&gt; b) -&gt; f a -&gt; f b
 </pre>
-<p>we see that the <span class="fixed">f</span> type variable is used as
- a type that takes one concrete type to produce a concrete type. We know
- it has to produce a concrete type because it's used as the type of a 
-value in a function. And from that, we can deduce that types that want 
-to be friends with <span class="fixed">Functor</span> have to be of kind <span class="fixed">* -&gt; *</span>.</p>
-<p>Now, let's do some type-foo. Take a look at this typeclass that I'm just going to make up right now:</p>
+<p>型変数 <span class="fixed">f</span> は「具体型を1つ取って具体型を生む型」として使われています（関数の値の型として使われているので具体型を生む必要がある）。これから <span class="fixed">Functor</span> と仲良くしたい型はカインド <span class="fixed">* -&gt; *</span> である必要があると分かります。</p>
+<p>では型 foo を少し。次の型クラスを今でっち上げます：</p>
 <pre name="code" class="haskell:hs">class Tofu t where
     tofu :: j a -&gt; t a j
 </pre>
-<p>Man, that looks weird. How would we make a type that could be an 
-instance of that strange typeclass? Well, let's look at what its kind 
-would have to be. Because <span class="fixed">j a</span> is used as the type of a value that the <span class="fixed">tofu</span> function takes as its parameter, <span class="fixed">j a</span> has to have a kind of <span class="fixed">*</span>. We assume <span class="fixed">*</span> for <span class="fixed">a</span> and so we can infer that <span class="fixed">j</span> has to have a kind of <span class="fixed">* -&gt; *</span>. We see that <span class="fixed">t</span> has to produce a concrete value too and that it takes two types. And knowing that <span class="fixed">a</span> has a kind of <span class="fixed">*</span> and <span class="fixed">j</span> has a kind of <span class="fixed">* -&gt; *</span>, we infer that <span class="fixed">t</span> has to have a kind of <span class="fixed">* -&gt; (* -&gt; *) -&gt; *</span>. So it takes a concrete type (<span class="fixed">a</span>), a type constructor that takes one concrete type (<span class="fixed">j</span>) and produces a concrete type. Wow.</p>
-<p>OK, so let's make a type with a kind of <span class="fixed">* -&gt; (* -&gt; *) -&gt; *</span>. Here's one way of going about it.</p>
+<p>奇妙です。この型クラスのインスタンスになる型を作るには？　カインドを考えます。<span class="fixed">j a</span> が <span class="fixed">tofu</span> の引数の値の型として使われているので、<span class="fixed">j a</span> はカインド <span class="fixed">*</span>。<span class="fixed">a</span> も <span class="fixed">*</span> と仮定すると、<span class="fixed">j</span> は <span class="fixed">* -&gt; *</span>。<span class="fixed">t</span> も具体値を生み、2 つの型を取るので、<span class="fixed">a</span> が <span class="fixed">*</span> で <span class="fixed">j</span> が <span class="fixed">* -&gt; *</span> なら、<span class="fixed">t</span> は <span class="fixed">* -&gt; (* -&gt; *) -&gt; *</span>。具体型 <span class="fixed">a</span>、引数1つの型コンストラクタ <span class="fixed">j</span> を取って具体型を生む。</p>
+<p>カインド <span class="fixed">* -&gt; (* -&gt; *) -&gt; *</span> の型を作りましょう。</p>
 <pre name="code" class="haskell:hs">data Frank a b  = Frank {frankField :: b a} deriving (Show)
 </pre>
-<p>How do we know this type has a kind of <span class="fixed">* -&gt; (* -&gt; *) - &gt; *</span>? Well, fields in ADTs are made to hold values, so they must be of kind <span class="fixed">*</span>, obviously. We assume <span class="fixed">*</span> for <span class="fixed">a</span>, which means that <span class="fixed">b</span> takes one type parameter and so its kind is <span class="fixed">* -&gt; *</span>. Now we know the kinds of both <span class="fixed">a</span> and <span class="fixed">b</span> and because they're parameters for <span class="fixed">Frank</span>, we see that <span class="fixed">Frank</span> has a kind of <span class="fixed">* -&gt; (* -&gt; *) -&gt; *</span> The first <span class="fixed">*</span> represents <span class="fixed">a</span> and the <span class="fixed">(* -&gt; *)</span> represents <span class="fixed">b</span>. Let's make some <span class="fixed">Frank</span> values and check out their types.</p>
+<p>これがカインド <span class="fixed">* -&gt; (* -&gt; *) - &gt; *</span> なのはなぜ？　ADT のフィールドは値を持つので、明らかにカインド <span class="fixed">*</span>。<span class="fixed">a</span> を <span class="fixed">*</span> と仮定すると <span class="fixed">b</span> は型引数1つを取るので <span class="fixed">* -&gt; *</span>。だから <span class="fixed">Frank</span> はカインド <span class="fixed">* -&gt; (* -&gt; *) -&gt; *</span>。最初の <span class="fixed">*</span> が <span class="fixed">a</span>、<span class="fixed">(* -&gt; *)</span> が <span class="fixed">b</span>。<span class="fixed">Frank</span> 値を作って型を確認：</p>
 <pre name="code" class="haskell:hs">ghci&gt; :t Frank {frankField = Just "HAHA"}
 Frank {frankField = Just "HAHA"} :: Frank [Char] Maybe
 ghci&gt; :t Frank {frankField = Node 'a' EmptyTree EmptyTree}
@@ -1322,8 +859,8 @@ Frank {frankField = Node 'a' EmptyTree EmptyTree} :: Frank Char Tree
 ghci&gt; :t Frank {frankField = "YES"}
 Frank {frankField = "YES"} :: Frank Char []
 </pre>
-<p>Hmm. Because <span class="fixed">frankField</span> has a type of form <span class="fixed">a b</span>, its values must have types that are of a similar form as well. So they can be <span class="fixed">Just "HAHA"</span>, which has a type of <span class="fixed">Maybe [Char]</span> or it can have a value of <span class="fixed">['Y','E','S']</span>, which has a type of <span class="fixed">[Char]</span> (if we used our own list type for this, it would have a type of <span class="fixed">List Char</span>). And we see that the types of the <span class="fixed">Frank</span> values correspond with the kind for <span class="fixed">Frank</span>. <span class="fixed">[Char]</span> has a kind of <span class="fixed">*</span> and <span class="fixed">Maybe</span> has a kind of <span class="fixed">* -&gt; *</span>. Because in order to have a value, it has to be a concrete type and thus has to be fully applied, every value of <span class="fixed">Frank blah blaah</span> has a kind of <span class="fixed">*</span>.</p>
-<p>Making <span class="fixed">Frank</span> an instance of <span class="fixed">Tofu</span> is pretty simple. We see that <span class="fixed">tofu</span> takes a <span class="fixed">j a</span> (so an example type of that form would be <span class="fixed">Maybe Int</span>) and returns a <span class="fixed">t a j</span>. So if we replace <span class="fixed">Frank</span> with <span class="fixed">j</span>, the result type would be <span class="fixed">Frank Int Maybe</span>.</p>
+<p>うむ。<span class="fixed">frankField</span> は <span class="fixed">a b</span> 型なので、その値の型も同じ形である必要がある。<span class="fixed">Just "HAHA"</span> は <span class="fixed">Maybe [Char]</span>、<span class="fixed">['Y','E','S']</span> は <span class="fixed">[Char]</span> など。<span class="fixed">Frank</span> 値の型は <span class="fixed">Frank</span> のカインドに対応。値を持つには具体型である必要があるので、<span class="fixed">Frank blah blaah</span> はカインド <span class="fixed">*</span>。</p>
+<p><span class="fixed">Frank</span> を <span class="fixed">Tofu</span> インスタンスにするのは簡単。<span class="fixed">tofu</span> は <span class="fixed">j a</span>（例：<span class="fixed">Maybe Int</span>）を取って <span class="fixed">t a j</span> を返す。<span class="fixed">Frank</span> を <span class="fixed">j</span> に置き換えると結果型は <span class="fixed">Frank Int Maybe</span>。</p>
 <pre name="code" class="haskell:hs">instance Tofu Frank where
     tofu x = Frank x
 </pre>
@@ -1332,31 +869,19 @@ Frank {frankField = Just 'a'}
 ghci&gt; tofu ["HELLO"] :: Frank [Char] []
 Frank {frankField = ["HELLO"]}
 </pre>
-<p>Not very useful, but we did flex our type muscles. Let's do some more type-foo. We have this data type:</p>
+<p>あまり実用的ではありませんが、型筋肉を伸ばしました。もう少し型 foo を。次のデータ型：</p>
 <pre name="code" class="haskell:hs">data Barry t k p = Barry { yabba :: p, dabba :: t k }
 </pre>
-<p>And now we want to make it an instance of <span class="fixed">Functor</span>. <span class="fixed">Functor</span> wants types of kind <span class="fixed">* -&gt; *</span> but <span class="fixed">Barry</span> doesn't look like it has that kind. What is the kind of <span class="fixed">Barry</span>? Well, we see it takes three type parameters, so it's going to be <span class="fixed">something -&gt; something -&gt; something -&gt; *</span>. It's safe to say that <span class="fixed">p</span> is a concrete type and thus has a kind of <span class="fixed">*</span>. For <span class="fixed">k</span>, we assume <span class="fixed">*</span> and so by extension, <span class="fixed">t</span> has a kind of <span class="fixed">* -&gt; *</span>. Now let's just replace those kinds with the <i>somethings</i> that we used as placeholders and we see it has a kind of <span class="fixed">(* -&gt; *) -&gt; * -&gt; * -&gt; *</span>. Let's check that with GHCI.</p>
+<p>これを <span class="fixed">Functor</span> のインスタンスにしたい。<span class="fixed">Functor</span> はカインド <span class="fixed">* -&gt; *</span> の型を欲しがりますが、<span class="fixed">Barry</span> はそうじゃなさそう。カインドは？　3 つの型引数を取るので <span class="fixed">何か -&gt; 何か -&gt; 何か -&gt; *</span>。<span class="fixed">p</span> は具体型（カインド <span class="fixed">*</span>）と置く。<span class="fixed">k</span> も <span class="fixed">*</span> と仮定すると <span class="fixed">t</span> は <span class="fixed">* -&gt; *</span>。これらを「何か」に当てはめると、カインド <span class="fixed">(* -&gt; *) -&gt; * -&gt; * -&gt; *</span>。GHCi で確認：</p>
 <pre name="code" class="haskell:hs">ghci&gt; :k Barry
 Barry :: (* -&gt; *) -&gt; * -&gt; * -&gt; *
 </pre>
-<p>Ah, we were right. How satisfying. Now, to make this type a part of <span class="fixed">Functor</span> we have to partially apply the first two type parameters so that we're left with <span class="fixed">* -&gt; *</span>. That means that the start of the instance declaration will be: <span class="fixed">instance Functor (Barry a b) where</span>. If we look at <span class="fixed">fmap</span> as if it was made specifically for <span class="fixed">Barry</span>, it would have a type of <span class="fixed">fmap :: (a -&gt; b) -&gt; Barry c d a -&gt; Barry c d b</span>, because we just replace the <span class="fixed">Functor</span>'s <span class="fixed">f</span> with <span class="fixed">Barry c d</span>. The third type parameter from <span class="fixed">Barry</span> will have to change and we see that it's conviniently in its own field.</p>
+<p>正解！　<span class="fixed">Functor</span> に入れるには最初の2つの型引数を部分適用して <span class="fixed">* -&gt; *</span> にする必要があります。インスタンス宣言の冒頭は <span class="fixed">instance Functor (Barry a b) where</span>。<span class="fixed">fmap</span> が <span class="fixed">Barry</span> 専用なら型は <span class="fixed">fmap :: (a -&gt; b) -&gt; Barry c d a -&gt; Barry c d b</span>。<span class="fixed">Functor</span> の <span class="fixed">f</span> を <span class="fixed">Barry c d</span> に置き換えただけ。<span class="fixed">Barry</span> の3つ目の型引数が変わる必要があり、ちょうどそれは独自のフィールドになっています。</p>
 <pre name="code" class="haskell:hs">instance Functor (Barry a b) where
     fmap f (Barry {yabba = x, dabba = y}) = Barry {yabba = f x, dabba = y}
 </pre>
-<p>There we go! We just mapped the <span class="fixed">f</span> over the first field.</p>
-<p>In this section, we took a good look at how type parameters work and 
-kind of formalized them with kinds, just like we formalized function 
-parameters with type declarations. We saw that there are interesting 
-parallels between functions and type constructors. They are, however, 
-two completely different things. When working on real Haskell, you 
-usually won't have to mess with kinds and do kind inference by hand like
- we did now. Usually, you just have to partially apply your own type to <span class="fixed">* -&gt; *</span> or <span class="fixed">*</span>
- when making it an instance of one of the standard typeclasses, but it's
- good to know how and why that actually works. It's also interesting to 
-see that types have little types of their own. Again, you don't really 
-have to understand everything we did here to read on, but if you 
-understand how kinds work, chances are that you have a very solid grasp 
-of Haskell's type system.</p>
+<p>はい！　<span class="fixed">f</span> を最初のフィールドに map しただけ。</p>
+<p>このセクションでは、型引数の動きとカインドによる形式化を見ました。関数引数を型宣言で形式化するのと並行関係。関数と型コンストラクタの並行関係も見ました。両者は別物ですが面白い類似があります。実際の Haskell ではカインド推論を手でやることはあまりないでしょう。普通は、自前の型を <span class="fixed">* -&gt; *</span> や <span class="fixed">*</span> に部分適用して標準型クラスのインスタンスにするだけ。でも仕組みを知っておくと良いです。型に小さな型があるって面白いですよね。</p>
 
 </body>
 </html>

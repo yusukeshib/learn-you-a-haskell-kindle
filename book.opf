@@ -2,8 +2,8 @@
 
 <package xmlns="http://www.idpf.org/2007/opf" version="2.0">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-    <dc:title>Learn You a Haskell for Great Good!</dc:title>
-    <dc:language>en-us</dc:language>
+    <dc:title>すごいHaskellたのしく学ぼう！</dc:title>
+    <dc:language>ja</dc:language>
     <dc:creator>Miran Lipovača</dc:creator>
     <meta name="cover" content="cover"/>
   </metadata>
@@ -69,7 +69,7 @@
   </spine>
 
   <guide>
-    <reference type="toc" title="Table of Contents" href="pages/toc.html"></reference>
-    <reference type="text" title="Introduction" href="pages/introduction.html"></reference>
+    <reference type="toc" title="目次" href="pages/toc.html"></reference>
+    <reference type="text" title="はじめに" href="pages/introduction.html"></reference>
   </guide>
 </package>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">
 
-<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en-US">
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="ja">
   <head>
     <meta name="dtb:uid" content="BookId"/>
     <meta name="dtb:depth" content="2"/>
@@ -9,111 +9,111 @@
     <meta name="dtb:maxPageNumber" content="0"/>
   </head>
 
-  <docTitle><text>Learn You a Haskell for Great Good!</text></docTitle>
+  <docTitle><text>すごいHaskellたのしく学ぼう！</text></docTitle>
   <docAuthor><text>Miran Lipovača</text></docAuthor>
 
   <navMap>
     <navPoint class="toc" id="toc">
       <navLabel>
-        <text>Table of Contents</text>
+        <text>目次</text>
       </navLabel>
       <content src="pages/toc.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="introduction">
       <navLabel>
-        <text>Introduction</text>
+        <text>はじめに</text>
       </navLabel>
       <content src="pages/introduction.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="starting-out">
       <navLabel>
-        <text>Starting Out</text>
+        <text>はじめの一歩</text>
       </navLabel>
       <content src="pages/starting-out.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="types-and-typeclasses">
       <navLabel>
-        <text>Type and Typeclasses</text>
+        <text>型と型クラス</text>
       </navLabel>
       <content src="pages/types-and-typeclasses.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="syntax-in-functions">
       <navLabel>
-        <text>Syntax in Functions</text>
+        <text>関数の構文</text>
       </navLabel>
       <content src="pages/syntax-in-functions.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="recursion">
       <navLabel>
-        <text>Recursion</text>
+        <text>再帰</text>
       </navLabel>
       <content src="pages/recursion.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="higher-order-functions">
       <navLabel>
-        <text>Higher Order Functions</text>
+        <text>高階関数</text>
       </navLabel>
       <content src="pages/higher-order-functions.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="modules">
       <navLabel>
-        <text>Modules</text>
+        <text>モジュール</text>
       </navLabel>
       <content src="pages/modules.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="making-our-own-types-and-typeclasses">
       <navLabel>
-        <text>Making Our Own Types and Typeclasses</text>
+        <text>独自の型と型クラスを作る</text>
       </navLabel>
       <content src="pages/making-our-own-types-and-typeclasses.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="input-and-output">
       <navLabel>
-        <text>Input and Output</text>
+        <text>入出力</text>
       </navLabel>
       <content src="pages/input-and-output.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="functionally-solving-problems">
       <navLabel>
-        <text>Functionally Solving Problems</text>
+        <text>関数型プログラミングで問題を解く</text>
       </navLabel>
       <content src="pages/functionally-solving-problems.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="functors-applicative-functors-and-monoids">
       <navLabel>
-        <text>Functors Applicative Functors and Monoids</text>
+        <text>ファンクタ、アプリカティブファンクタ、モノイド</text>
       </navLabel>
       <content src="pages/functors-applicative-functors-and-monoids.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="a-fistful-of-monads">
       <navLabel>
-        <text>A Fistful of Monads</text>
+        <text>モナドひとつかみ</text>
       </navLabel>
       <content src="pages/a-fistful-of-monads.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="for-a-few-monads-more">
       <navLabel>
-        <text>For a Few Monads More</text>
+        <text>もう少しだけモナド</text>
       </navLabel>
       <content src="pages/for-a-few-monads-more.html"/>
     </navPoint>
 
     <navPoint class="chapter" id="zippers">
       <navLabel>
-        <text>Zippers</text>
+        <text>Zipper</text>
       </navLabel>
       <content src="pages/zippers.html"/>
     </navPoint>

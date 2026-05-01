@@ -1,31 +1,37 @@
-Learn You a Haskell for Great Good! on Kindle
-=============================================
-These are the sources that I used to generate [Miran Lipovača's book][1] in the
-Kindle-supported .mobi format.
+すごいHaskellたのしく学ぼう！ (Kindle 用日本語版)
+==================================================
 
+[Miran Lipovača の "Learn You a Haskell for Great Good!"][1] を Kindle 向けに日本語化した版です。
+原著の Kindle 用ソース（[igstan/learn-you-a-haskell-kindle][orig]）を fork し、本文を全章日本語化しました。
 
-Download Generated MOBI
------------------------
-[learn-you-a-haskell.mobi](https://github.com/RadoBuransky/learn-you-a-haskell-kindle/releases/download/v1.0.0/learn-you-a-haskell.mobi)
+EPUB をビルドする
+-----------------
+リポジトリには `book.opf` / `toc.ncx` / `pages/` / `css/` / `images/` が揃っているので、
+zip にまとめるだけで EPUB ができます：
 
+```sh
+./build-epub.sh
+# → learn-you-a-haskell-ja.epub
+```
 
-How to Generate the Book
-------------------------
-1. Download [KindleGen][2]
-2. Run:
+生成された `.epub` は最近の Kindle なら Send to Kindle で直接送れますし、
+calibre / Kindle Previewer で `.mobi` / `.azw3` への変換もできます。
 
-   `$ kindlegen -verbose -o learn-you-a-haskell.mobi book.opf`
+オリジナル英語版から MOBI を生成する手順
+----------------------------------------
+1. [KindleGen][2] をダウンロード
+2. 実行: `kindlegen -verbose -o learn-you-a-haskell.mobi book.opf`
+3. 生成された mobi を Kindle 端末または [Kindle Previewer][2] でテスト
 
-3. Load learn-you-a-haskell.mobi on your Kindle device or test it in the [Kindle
-Previewer tool][2].
+オリジナル
+----------
+- 原著: [Learn You a Haskell for Great Good!][1] (Miran Lipovača)
+- Kindle ソース: [igstan/learn-you-a-haskell-kindle][orig]
 
-
-Screenshots
------------
-![Table of Contents](https://github.com/igstan/learn-you-a-haskell-kindle/raw/master/screenshot-01.gif)
-![Sample section start](https://github.com/igstan/learn-you-a-haskell-kindle/raw/master/screenshot-02.gif)
-![Sample code snippet](https://github.com/igstan/learn-you-a-haskell-kindle/raw/master/screenshot-03.gif)
-
+ライセンス
+----------
+原著と同じく Creative Commons 表示-非営利-継承 3.0 非移植ライセンスで公開されています。
 
 [1]: http://learnyouahaskell.com/
 [2]: https://www.amazon.com/gp/feature.html?tag=mr060-20&docId=1000765211
+[orig]: https://github.com/igstan/learn-you-a-haskell-kindle

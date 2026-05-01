@@ -45,6 +45,6 @@ calibre / Kindle Previewer で `.mobi` / `.azw3` への変換もできます。
 原著と同じく Creative Commons 表示-非営利-継承 3.0 非移植ライセンス
 （[CC BY-NC-SA 3.0](https://creativecommons.org/licenses/by-nc-sa/3.0/)）の下で公開されています。
 
-[1]: http://learnyouahaskell.com/
+[1]: https://learnyouahaskell.github.io/
 [2]: https://www.amazon.com/gp/feature.html?tag=mr060-20&docId=1000765211
 [orig]: https://github.com/igstan/learn-you-a-haskell-kindle

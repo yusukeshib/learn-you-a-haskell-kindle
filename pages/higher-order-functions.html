@@ -3,46 +3,28 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Learn You a Haskell for Great Good!</title>
+<title>すごいHaskellたのしく学ぼう！</title>
 <link rel="stylesheet" href="../css/main.css" type="text/css" charset="utf-8">
 <body>
 
-<h1>Higher order functions</h1>
+<h1>高階関数</h1>
 
-<p>Haskell functions can take functions as parameters and return 
-functions as return values. A function that does either of those is 
-called a higher order function. Higher order functions aren't just a 
-part of the Haskell experience, they pretty much are the Haskell 
-experience. It turns out that if you want to define computations by 
-defining what stuff <i>is</i> instead of defining steps that change some
- state and maybe looping them, higher order functions are indispensable.
- They're a really powerful way of solving problems and thinking about 
-programs.</p>
-<a name="curried-functions"></a><h2>Curried functions</h2>
-<p>Every function in Haskell officially only takes one parameter. So how
- is it possible that we defined and used several functions that take 
-more than one parameter so far? Well, it's a clever trick! All the 
-functions that accepted <i>several parameters</i> so far have been <em>curried functions</em>. What does that mean? You'll understand it best on an example. Let's take our good friend, the <span class="fixed">max</span> function. It looks like it takes two parameters and returns the one that's bigger. Doing <span class="fixed">max 4 5</span> first creates a function that takes a parameter and returns either <span class="fixed">4</span> or that parameter, depending on which is bigger. Then, <span class="fixed">5</span>
- is applied to that function and that function produces our desired 
-result. That sounds like a mouthful but it's actually a really cool 
-concept. The following two calls are equivalent:</p>
+<p>Haskell の関数は、関数を引数として取ったり、関数を戻り値として返したりできます。そういうことをする関数のことを「高階関数」と呼びます。高階関数は単に Haskell 体験の一部というだけでなく、ほとんど Haskell 体験そのものです。状態を変更するステップを並べてループで回すのではなく、ものごとが <i>何で</i> あるかを定義することで計算を表現したいなら、高階関数は不可欠です。問題を解いたりプログラムを考えたりする本当に強力な手段なのです。</p>
+<a name="curried-functions"></a><h2>カリー化された関数</h2>
+<p>Haskell のすべての関数は、公式には引数を1つしか取りません。それなら、これまで複数の引数を取る関数をいくつも定義して使ってきたのはどういうことでしょう？　これは賢いトリックです！　ここまでで <i>複数の引数</i> を受け付けてきた関数は、すべて <em>カリー化された関数</em> でした。どういう意味でしょう？　例で考えるのが一番です。お馴染みの <span class="fixed">max</span> 関数を取り上げましょう。引数を2つ取って大きいほうを返すように見えますね。<span class="fixed">max 4 5</span> を実行すると、まず「引数を1つ取って、その引数と <span class="fixed">4</span> のうち大きいほうを返す関数」が作られます。次にその関数に <span class="fixed">5</span> が適用されて、ほしい結果が出ます。早口言葉のようですが、本当に素敵な概念です。次の2つの呼び出しは等価です：</p>
 <pre name="code" class="haskell:ghci">ghci&gt; max 4 5
 5
 ghci&gt; (max 4) 5
 5
 </pre>
 
-<p>Putting a space between two things is simply <b>function application</b>. The space is sort of like an operator and it has the highest precedence. Let's examine the type of <span class="fixed">max</span>. It's <span class="fixed">max :: (Ord a) =&gt; a -&gt; a -&gt; a</span>. That can also be written as <span class="fixed">max :: (Ord a) =&gt; a -&gt; (a -&gt; a)</span>. That could be read as: <span class="fixed">max</span> takes an <span class="fixed">a</span> and returns (that's the <span class="fixed">-&gt;</span>) a function that takes an <span class="fixed">a</span> and returns an <span class="fixed">a</span>. That's why the return type and the parameters of functions are all simply separated with arrows.</p>
-<p>So how is that beneficial to us? Simply speaking, if we call a function with too few parameters, we get back a <em>partially applied</em>
- function, meaning a function that takes as many parameters as we left 
-out. Using partial application (calling functions with too few 
-parameters, if you will) is a neat way to create functions on the fly so
- we can pass them to another function or to seed them with some data.</p>
-<p>Take a look at this offensively simple function:</p>
+<p>2つのものの間にスペースを置くのは <b>関数適用</b> です。スペースは演算子のようなもので、優先順位は最も高いです。<span class="fixed">max</span> の型を見てみましょう。<span class="fixed">max :: (Ord a) =&gt; a -&gt; a -&gt; a</span> です。これは <span class="fixed">max :: (Ord a) =&gt; a -&gt; (a -&gt; a)</span> とも書けます。「<span class="fixed">max</span> は <span class="fixed">a</span> を取り、（その <span class="fixed">-&gt;</span> です）<span class="fixed">a</span> を取って <span class="fixed">a</span> を返す関数を返す」と読めます。だから関数の戻り値の型と引数の型はすべて単にアロー（<span class="fixed">-&gt;</span>）で区切られているのです。</p>
+<p>これが何の役に立つのでしょう？　簡単に言えば、関数を引数の数より少なく呼び出すと、<em>部分適用された</em> 関数、つまり「省略した分の引数を取る関数」が返ってきます。部分適用（引数を少なく呼び出すこと）は、別の関数に渡すための関数を即興で作ったり、何かのデータを「あらかじめ仕込んだ」関数を作ったりする洒落た方法です。</p>
+<p>このバカシンプルな関数を見てください：</p>
 <pre name="code" class="haskell:ghci">multThree :: (Num a) =&gt; a -&gt; a -&gt; a -&gt; a
 multThree x y z = x * y * z
 </pre>
-<p>What really happens when we do <span class="fixed">multThree 3 5 9</span> or <span class="fixed">((multThree 3) 5) 9</span>? First, <span class="fixed">3</span> is applied to <span class="fixed">multThree</span>, because they're separated by a space. That creates a function that takes one parameter and returns a function. So then <span class="fixed">5</span> is applied to that, which creates a function that will take a parameter and multiply it by 15. <span class="fixed">9</span> is applied to that function and the result is 135 or something. Remember that this function's type could also be written as <span class="fixed">multThree :: (Num a) =&gt; a -&gt; (a -&gt; (a -&gt; a))</span>. The thing before the <span class="fixed">-&gt;</span> is the parameter that a function takes and the thing after it is what it returns. So our function takes an <span class="fixed">a</span> and returns a function of type <span class="fixed">(Num a) =&gt; a -&gt; (a -&gt; a)</span>. Similarly, this function takes an <span class="fixed">a</span> and returns a function of type <span class="fixed">(Num a) =&gt; a -&gt; a</span>. And this function, finally, just takes an <span class="fixed">a</span> and returns an <span class="fixed">a</span>. Take a look at this:</p>
+<p><span class="fixed">multThree 3 5 9</span> や <span class="fixed">((multThree 3) 5) 9</span> を呼ぶと、何が起きているのでしょう？　まず <span class="fixed">3</span> がスペースを挟んで <span class="fixed">multThree</span> に適用されます。これにより、引数を1つ取って関数を返す関数ができます。そこに <span class="fixed">5</span> が適用され、引数を取って 15 倍する関数ができます。最後に <span class="fixed">9</span> がその関数に適用されて 135 が得られます。この関数の型は <span class="fixed">multThree :: (Num a) =&gt; a -&gt; (a -&gt; (a -&gt; a))</span> とも書けます。<span class="fixed">-&gt;</span> の前にあるのが関数の取る引数で、後ろにあるのが返す値です。なのでこの関数は <span class="fixed">a</span> を取って <span class="fixed">(Num a) =&gt; a -&gt; (a -&gt; a)</span> 型の関数を返します。同様に、その関数も <span class="fixed">a</span> を取って <span class="fixed">(Num a) =&gt; a -&gt; a</span> 型の関数を返し、最後の関数は <span class="fixed">a</span> を取って <span class="fixed">a</span> を返すだけです。これを見てください：</p>
 <pre name="code" class="haskell:ghci">ghci&gt; let multTwoWithNine = multThree 9
 ghci&gt; multTwoWithNine 2 3
 54
@@ -50,34 +32,25 @@ ghci&gt; let multWithEighteen = multTwoWithNine 2
 ghci&gt; multWithEighteen 10
 180
 </pre>
-<p>By calling functions with too few parameters, so to speak, we're 
-creating new functions on the fly. What if we wanted to create a 
-function that takes a number and compares it to <span class="fixed">100</span>? We could do something like this:</p>
+<p>関数を必要な引数より少なく呼び出すことで、新しい関数をその場で作っているわけです。数を取って <span class="fixed">100</span> と比較する関数を作りたければ、こう書けます：</p>
 <pre name="code" class="haskell:hs">compareWithHundred :: (Num a, Ord a) =&gt; a -&gt; Ordering
 compareWithHundred x = compare 100 x
 </pre>
-<p>If we call it with <span class="fixed">99</span>, it returns a <span class="fixed">GT</span>. Simple stuff. Notice that the <span class="fixed">x</span> is on the right hand side on both sides of the equation. Now let's think about what <span class="fixed">compare 100</span> returns. It returns a function that takes a number and compares it with <span class="fixed">100</span>. Wow! Isn't that the function we wanted? We can rewrite this as:</p>
+<p><span class="fixed">99</span> で呼べば <span class="fixed">GT</span> が返ります。シンプルですね。両辺の右側に同じ <span class="fixed">x</span> があることに注目。<span class="fixed">compare 100</span> が何を返すか考えてみましょう。「数を取って <span class="fixed">100</span> と比較する関数」を返します。あれ？　欲しかった関数そのものでは？　書き換えられます：</p>
 <pre name="code" class="haskell:hs">compareWithHundred :: (Num a, Ord a) =&gt; a -&gt; Ordering
 compareWithHundred = compare 100
 </pre>
-<p>The type declaration stays the same, because <span class="fixed">compare 100</span> returns a function. Compare has a type of <span class="fixed">(Ord a) =&gt; a -&gt; (a -&gt; Ordering)</span> and calling it with <span class="fixed">100</span> returns a <span class="fixed">(Num a, Ord a) =&gt; a -&gt; Ordering</span>. The additional class constraint sneaks up there because <span class="fixed">100</span> is also part of the <span class="fixed">Num</span> typeclass.</p>
-<div class="hintbox"><em>Yo!</em> Make sure you really understand how curried functions and partial application work because they're really important!</div> <p>Infix
- functions can also be partially applied by using sections. To section 
-an infix function, simply surround it with parentheses and only supply a
- parameter on one side. That creates a function that takes one parameter
- and then applies it to the side that's missing an operand. An 
-insultingly trivial function:</p>
+<p>型宣言は変わりません。<span class="fixed">compare 100</span> が関数を返すからです。compare の型は <span class="fixed">(Ord a) =&gt; a -&gt; (a -&gt; Ordering)</span> で、<span class="fixed">100</span> を渡して呼ぶと <span class="fixed">(Num a, Ord a) =&gt; a -&gt; Ordering</span> が返ります。<span class="fixed">100</span> が <span class="fixed">Num</span> 型クラスにも属しているため、追加のクラス制約が紛れ込んでいます。</p>
+<div class="hintbox"><em>よっ！</em>　カリー化と部分適用がどう動くか、ちゃんと理解しておいてくださいね。本当に大事ですから！</div> <p>中置関数も「セクション」を使えば部分適用できます。中置関数をセクションにするには、括弧で囲んで片側だけに引数を書きます。すると「もう片側のオペランドが欠けている関数」が作れます。バカみたいに自明な関数：</p>
 <pre name="code" class="haskell:hs">divideByTen :: (Floating a) =&gt; a -&gt; a
 divideByTen = (/10)
 </pre>
-<p>Calling, say, <span class="fixed">divideByTen 200</span> is equivalent to doing <span class="fixed">200 / 10</span>, as is doing <span class="fixed">(/10) 200</span>. A function that checks if a character supplied to it is an uppercase letter:</p>
+<p><span class="fixed">divideByTen 200</span> は <span class="fixed">200 / 10</span> や <span class="fixed">(/10) 200</span> と等価です。文字が大文字かを調べる関数も作れます：</p>
 <pre name="code" class="haskell:hs">isUpperAlphanum :: Char -&gt; Bool
 isUpperAlphanum = (`elem` ['A'..'Z'])
 </pre>
-<p>The only special thing about sections is using <span class="fixed">-</span>. From the definition of sections, <span class="fixed">(-4)</span> would result in a function that takes a number and subtracts 4 from it. However, for convenience, <span class="fixed">(-4)</span>
- means minus four. So if you want to make a function that subtracts 4 
-from the number it gets as a parameter, partially apply the <span class="fixed">subtract</span> function like so: <span class="fixed">(subtract 4)</span>.</p>
-<p>What happens if we try to just do <span class="fixed">multThree 3 4</span> in GHCI instead of binding it to a name with a <i>let</i> or passing it to another function?</p>
+<p>セクションで唯一気をつけるのは <span class="fixed">-</span> です。セクションの定義からすると <span class="fixed">(-4)</span> は「数を取って 4 を引く関数」になりそうですが、便宜上 <span class="fixed">(-4)</span> はマイナス4を意味します。引数から 4 を引く関数を作りたければ、<span class="fixed">subtract</span> 関数を部分適用して <span class="fixed">(subtract 4)</span> と書きます。</p>
+<p>GHCi で <i>let</i> で名前に束縛したり別の関数に渡したりせず、ただ <span class="fixed">multThree 3 4</span> と打つとどうなるでしょう？</p>
 <pre name="code" class="haskell:hs">ghci&gt; multThree 3 4
 &lt;interactive&gt;:1:0:
     No instance for (Show (t -&gt; t))
@@ -86,29 +59,16 @@ from the number it gets as a parameter, partially apply the <span class="fixed">
     In the expression: print it
     In a 'do' expression: print it
 </pre>
-<p>GHCI is telling us that the expression produced a function of type <span class="fixed">a -&gt; a</span> but it doesn't know how to print it to the screen. Functions aren't instances of the <span class="fixed">Show</span> typeclass, so we can't get a neat string representation of a function. When we do, say, <span class="fixed">1 + 1</span> at the GHCI prompt, it first calculates that to <span class="fixed">2</span> and then calls <span class="fixed">show</span> on <span class="fixed">2</span> to get a textual representation of that number. And the textual representation of <span class="fixed">2</span> is just the string <span class="fixed">"2"</span>, which then gets printed to our screen.</p>
-<a name="higher-orderism"></a><h2>Some higher-orderism is in order</h2>
-<p>Functions can take functions as parameters and also return functions.
- To illustrate this, we're going to make a function that takes a 
-function and then applies it twice to something!</p>
+<p>GHCi は「式は <span class="fixed">a -&gt; a</span> 型の関数を返したけれど、それを画面に表示する方法を知らない」と言っています。関数は <span class="fixed">Show</span> 型クラスのインスタンスではないので、関数の文字列表現は得られません。GHCi のプロンプトで <span class="fixed">1 + 1</span> と入力すると、まず <span class="fixed">2</span> に評価され、次に <span class="fixed">2</span> に <span class="fixed">show</span> が呼ばれて文字列表現を得ます。<span class="fixed">2</span> の文字列表現はただの文字列 <span class="fixed">"2"</span> で、それが画面に出力されます。</p>
+<a name="higher-orderism"></a><h2>いざ高階関数主義へ</h2>
+<p>関数は引数として関数を取れますし、戻り値として関数を返すこともできます。これを示すために、関数を取って何かに2回適用する関数を作ります！</p>
 <pre name="code" class="haskell:hs">applyTwice :: (a -&gt; a) -&gt; a -&gt; a
 applyTwice f x = f (f x)
 </pre>
 
-<p>First of all, notice the type declaration. Before, we didn't need parentheses because <span class="fixed">-&gt;</span>
- is naturally right-associative. However, here, they're mandatory. They 
-indicate that the first parameter is a function that takes something and
- returns that same thing. The second parameter is something of that type
- also and the return value is also of the same type. We could read this 
-type declaration in the curried way, but to save ourselves a headache, 
-we'll just say that this function takes two parameters and returns one 
-thing. The first parameter is a function (of type <span class="fixed">a -&gt; a</span>) and the second is that same <span class="fixed">a</span>. The function can also be <span class="fixed">Int -&gt; Int</span> or <span class="fixed">String -&gt; String</span> or whatever. But then, the second parameter to also has to be of that type. </p>
-<div class="hintbox"><em>Note:</em> From now on, we'll say that 
-functions take several parameters despite each function actually taking 
-only one parameter and returning partially applied functions until we 
-reach a function that returns a solid value. So for simplicity's sake, 
-we'll say that <span class="fixed">a -&gt; a -&gt; a</span> takes two parameters, even though we know what's really going on under the hood.</div>
-<p>The body of the function is pretty simple. We just use the parameter <span class="fixed">f</span> as a function, applying <span class="fixed">x</span> to it by separating them with a space and then applying the result to <span class="fixed">f</span> again. Anyway, playing around with the function:</p>
+<p>まず型宣言に注目。これまで括弧は不要でした。<span class="fixed">-&gt;</span> は自然に右結合だからです。でもここでは括弧が必須です。最初の引数が「何かを取って同じ型の何かを返す関数」であることを示しているのです。2 つ目の引数も同じ型で、戻り値も同じ型です。この型宣言をカリー化された形で読むこともできますが、頭が痛くなるので「2つの引数を取って1つの値を返す関数」と読むことにします。最初の引数が関数（<span class="fixed">a -&gt; a</span> 型）、2つ目が同じ <span class="fixed">a</span>。関数の型は <span class="fixed">Int -&gt; Int</span> や <span class="fixed">String -&gt; String</span> でも構いません。ただし2つ目の引数もそれに合わせる必要があります。</p>
+<div class="hintbox"><em>Note:</em> ここからは、各関数が実際には引数を1つしか取らず、固体の値を返す関数に至るまで部分適用された関数を返す、という事実を承知の上で、「複数の引数を取る関数」と呼ぶことにします。話を簡単にするため、<span class="fixed">a -&gt; a -&gt; a</span> は「2つの引数を取る」と言います。中で何が起きているかは分かっていますからね。</div>
+<p>関数本体はとてもシンプル。引数 <span class="fixed">f</span> を関数として使い、<span class="fixed">x</span> をスペース区切りで適用し、その結果に再び <span class="fixed">f</span> を適用します。とりあえず動かしてみましょう：</p>
 <pre name="code" class="haskell:hs">ghci&gt; applyTwice (+3) 10
 16
 ghci&gt; applyTwice (++ " HAHA") "HEY"
@@ -120,35 +80,15 @@ ghci&gt; applyTwice (multThree 2 2) 9
 ghci&gt; applyTwice (3:) [1]
 [3,3,1]
 </pre>
-<p>The awesomeness and usefulness of partial application is evident. If 
-our function requires us to pass it a function that takes only one 
-parameter, we can just partially apply a function to the point where it 
-takes only one parameter and then pass it.</p>
-<p>Now we're going to use higher order programming to implement a really
- useful function that's in the standard library. It's called <span class="fixed">zipWith</span>.
- It takes a function and two lists as parameters and then joins the two 
-lists by applying the function between corresponding elements. Here's 
-how we'll implement it:</p>
+<p>部分適用の素晴らしさと有用性が見て取れます。引数を1つしか取らない関数を渡す必要があるとき、関数を部分適用して引数を1つだけ取る関数にしてから渡せます。</p>
+<p>では高階プログラミングを使って、標準ライブラリにある便利な関数 <span class="fixed">zipWith</span> を実装してみましょう。これは関数と2つのリストを引数に取り、対応する要素にその関数を適用して2つのリストを結合します。実装はこんな感じ：</p>
 <pre name="code" class="haskell:hs">zipWith' :: (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]
 zipWith' _ [] _ = []
 zipWith' _ _ [] = []
 zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
 </pre>
-<p>Look at the type declaration. The first parameter is a function that 
-takes two things and produces a third thing. They don't have to be of 
-the same type, but they can. The second and third parameter are lists. 
-The result is also a list. The first has to be a list of <span class="fixed">a</span>'s, because the joining function takes <span class="fixed">a</span>'s as its first argument. The second has to be a list of <span class="fixed">b</span>'s, because the second parameter of the joining function is of type <span class="fixed">b</span>. The result is a list of <span class="fixed">c</span>'s. If the type declaration of a function says it accepts an <span class="fixed">a -&gt; b -&gt; c</span> function as a parameter, it will also accept an <span class="fixed">a -&gt; a -&gt; a</span>
- function, but not the other way around! Remember that when you're 
-making functions, especially higher order ones, and you're unsure of the
- type, you can just try omitting the type declaration and then checking 
-what Haskell infers it to be by using <span class="fixed">:t</span>.</p>
-<p>The action in the function is pretty similar to the normal <span class="fixed">zip</span>.
- The edge conditions are the same, only there's an extra argument, the 
-joining function, but that argument doesn't matter in the edge 
-conditions, so we just use a <span class="fixed">_</span> for it. And function body at the last pattern is also similar to <span class="fixed">zip</span>, only it doesn't do <span class="fixed">(x,y)</span>, but <span class="fixed">f x y</span>.
- A single higher order function can be used for a multitude of different
- tasks if it's general enough. Here's a little demonstration of all the 
-different things our <span class="fixed">zipWith'</span> function can do:</p>
+<p>型宣言を見てみましょう。最初の引数は2つの値を取って3つ目の値を返す関数。型は同じである必要はありませんが、同じでも構いません。2つ目と3つ目はリスト。結果もリストです。最初は <span class="fixed">a</span> のリスト（結合関数の最初の引数が <span class="fixed">a</span> なので）、2つ目は <span class="fixed">b</span> のリスト（結合関数の2つ目の引数が <span class="fixed">b</span> なので）、結果は <span class="fixed">c</span> のリスト。型宣言が <span class="fixed">a -&gt; b -&gt; c</span> 型の関数を引数に取ると言っていれば、<span class="fixed">a -&gt; a -&gt; a</span> 型の関数も渡せます。逆は無理ですが！　関数を作っていて型に自信がないときは（特に高階関数の場合）、型宣言を省略して <span class="fixed">:t</span> で Haskell の推論を確認するのが手です。</p>
+<p>関数の中身は普通の <span class="fixed">zip</span> によく似ています。エッジ条件も同じで、ただ結合関数という追加の引数があるだけです。エッジ条件ではその引数は関係ないので <span class="fixed">_</span> を使います。最後のパターンの本体も <span class="fixed">zip</span> と似ていて、<span class="fixed">(x,y)</span> ではなく <span class="fixed">f x y</span> をするだけ。汎用的なら、1つの高階関数で大量のタスクをこなせます。<span class="fixed">zipWith'</span> でできることをいくつか見てみましょう：</p>
 <pre name="code" class="haskell:ghci">ghci&gt; zipWith' (+) [4,2,5,6] [2,6,2,3]
 [6,8,7,9]
 ghci&gt; zipWith' max [6,3,2,1] [7,3,1,5]
@@ -161,47 +101,30 @@ ghci&gt; zipWith' (zipWith' (*)) [[1,2,3],[3,5,6],[2,3,4]] [[3,2,2],[3,4,5],[5,4
 [[3,4,6],[9,20,30],[10,12,12]]
 </pre>
 <p>
-As you can see, a single higher order function can be used in very 
-versatile ways. Imperative programming usually uses stuff like for 
-loops, while loops, setting something to a variable, checking its state,
- etc. to achieve some behavior and then wrap it around an interface, 
-like a function. Functional programming uses higher order functions to 
-abstract away common patterns, like examining two lists in pairs and 
-doing something with those pairs or getting a set of solutions and 
-eliminating the ones you don't need.
+このように、1 つの高階関数を本当に多彩に使えます。命令型プログラミングは、何らかの動作を実現するために for ループや while ループ、変数への代入、状態のチェックなどを使い、それを関数のようなインターフェースで包みます。関数型プログラミングは、共通のパターン（2 つのリストをペアで調べてペアごとに何かする、解の集合から不要なものを取り除く、など）を高階関数で抽象化します。
 </p>
-<p>We'll implement another function that's already in the standard library, called <span class="fixed">flip</span>.
- Flip simply takes a function and returns a function that is like our 
-original function, only the first two arguments are flipped. We can 
-implement it like so:</p>
+<p>標準ライブラリにある別の関数 <span class="fixed">flip</span> も実装してみましょう。flip は関数を取って、最初の2つの引数の順序を入れ替えただけの関数を返します。こう実装できます：</p>
 <pre name="code" class="haskell:hs">flip' :: (a -&gt; b -&gt; c) -&gt; (b -&gt; a -&gt; c)
 flip' f = g
     where g x y = f y x
 </pre>
-<p>Reading the type declaration, we say that it takes a function that takes an <span class="fixed">a</span> and a <span class="fixed">b</span> and returns a function that takes a <span class="fixed">b</span> and an <span class="fixed">a</span>. But because functions are curried by default, the second pair of parentheses is really unnecessary, because <span class="fixed">-&gt;</span> is right associative by default. <span class="fixed">(a -&gt; b -&gt; c) -&gt; (b -&gt; a -&gt; c)</span> is the same as <span class="fixed">(a -&gt; b -&gt; c) -&gt; (b -&gt; (a -&gt; c))</span>, which is the same as <span class="fixed">(a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c</span>. We wrote that <span class="fixed">g x y = f y x</span>. If that's true, then <span class="fixed">f y x = g x y</span> must also hold, right? Keeping that in mind, we can define this function in an even simpler manner.</p>
+<p>型宣言を読み解くと「<span class="fixed">a</span> と <span class="fixed">b</span> を取る関数を取り、<span class="fixed">b</span> と <span class="fixed">a</span> を取る関数を返す」となります。ただし関数はデフォルトでカリー化されるので、2 つ目の括弧は実は不要です（<span class="fixed">-&gt;</span> はデフォルトで右結合）。<span class="fixed">(a -&gt; b -&gt; c) -&gt; (b -&gt; a -&gt; c)</span> は <span class="fixed">(a -&gt; b -&gt; c) -&gt; (b -&gt; (a -&gt; c))</span> と同じで、それは <span class="fixed">(a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c</span> と同じです。<span class="fixed">g x y = f y x</span> と書きました。それが正しいなら、<span class="fixed">f y x = g x y</span> も成り立つはず。これを念頭に、もっとシンプルに定義できます。</p>
 <pre name="code" class="haskell:hs">flip' :: (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 flip' f y x = f x y
 </pre>
-<p>Here, we take advantage of the fact that functions are curried. When we call <span class="fixed">flip' f</span> without the parameters <span class="fixed">y</span> and <span class="fixed">x</span>, it will return an <span class="fixed">f</span>
- that takes those two parameters but calls them flipped. Even though 
-flipped functions are usually passed to other functions, we can take 
-advantage of currying when making higher-order functions by thinking 
-ahead and writing what their end result would be if they were called 
-fully applied.</p>
+<p>ここでは関数がカリー化される性質を活用しています。<span class="fixed">flip' f</span> を <span class="fixed">y</span> と <span class="fixed">x</span> なしで呼ぶと、その2つを入れ替えて呼ぶ <span class="fixed">f</span> を返します。flip された関数は通常別の関数に渡されますが、高階関数を作るときに「最終的な呼び出し結果」を先取りして書くことで、カリー化を活用できます。</p>
 <pre name="code" class="haskell:ghci">ghci&gt; flip' zip [1,2,3,4,5] "hello"
 [('h',1),('e',2),('l',3),('l',4),('o',5)]
 ghci&gt; zipWith (flip' div) [2,2..] [10,8,6,4,2]
 [5,4,3,2,1]
 </pre>
-<a name="maps-and-filters"></a><h2>Maps and filters</h2>
-<p><span class="function label">map</span> takes a function and a list 
-and applies that function to every element in the list, producing a new 
-list. Let's see what its type signature is and how it's defined.</p>
+<a name="maps-and-filters"></a><h2>mapとfilter</h2>
+<p><span class="function label">map</span> は関数とリストを取り、リストの各要素に関数を適用して新しいリストを作ります。型シグネチャと定義を見てみましょう。</p>
 <pre name="code" class="haskell:hs">map :: (a -&gt; b) -&gt; [a] -&gt; [b]
 map _ [] = []
 map f (x:xs) = f x : map f xs
 </pre>
-<p>The type signature says that it takes a function that takes an <span class="fixed">a</span> and returns a <span class="fixed">b</span>, a list of <span class="fixed">a</span>'s and returns a list of <span class="fixed">b</span>'s. It's interesting that just by looking at a function's type signature, you can sometimes tell what it does. <span class="fixed">map</span> is one of those really versatile higher-order functions that can be used in millions of different ways. Here it is in action:</p>
+<p>型シグネチャから「<span class="fixed">a</span> を取って <span class="fixed">b</span> を返す関数、<span class="fixed">a</span> のリストを取り、<span class="fixed">b</span> のリストを返す」と分かります。型シグネチャを見るだけで、その関数が何をするか分かることもあるのは面白いですね。<span class="fixed">map</span> は何百万通りもの使い方ができる、本当に汎用的な高階関数の1つです。動かしてみましょう：</p>
 <pre name="code" class="haskell:ghci">ghci&gt; map (+3) [1,5,3,1,6]
 [4,8,6,4,9]
 ghci&gt; map (++ "!") ["BIFF", "BANG", "POW"]
@@ -213,22 +136,15 @@ ghci&gt; map (map (^2)) [[1,2],[3,4,5,6],[7,8]]
 ghci&gt; map fst [(1,2),(3,5),(6,3),(2,6),(2,5)]
 [1,3,6,2,2]
 </pre>
-<p>You've probably noticed that each of these could be achieved with a list comprehension. <span class="fixed">map (+3) [1,5,3,1,6]</span> is the same as writing <span class="fixed">[x+3 | x &lt;- [1,5,3,1,6]]</span>. However, using <span class="fixed">map</span>
- is much more readable for cases where you only apply some function to 
-the elements of a list, especially once you're dealing with maps of maps
- and then the whole thing with a lot of brackets can get a bit messy.</p>
-<p><span class="label function">filter</span> is a function that takes a
- predicate (a predicate is a function that tells whether something is 
-true or not, so in our case, a function that returns a boolean value) 
-and a list and then returns the list of elements that satisfy the 
-predicate. The type signature and implementation go like this:</p> 
+<p>これらはすべてリスト内包表記でも実現できることに気づいたでしょう。<span class="fixed">map (+3) [1,5,3,1,6]</span> は <span class="fixed">[x+3 | x &lt;- [1,5,3,1,6]]</span> と同じです。とはいえ、リスト要素にただ関数を適用するだけなら <span class="fixed">map</span> のほうがずっと読みやすいです。特に map の中で map を扱うようになると、括弧だらけで散らかってきます。</p>
+<p><span class="label function">filter</span> は述語（何かが真かどうか教えてくれる関数、つまり真偽値を返す関数）とリストを取り、述語を満たす要素だけからなるリストを返します。型シグネチャと実装：</p>
 <pre name="code" class="haskell:hs">filter :: (a -&gt; Bool) -&gt; [a] -&gt; [a]
 filter _ [] = []
-filter p (x:xs) 
+filter p (x:xs)
     | p x       = x : filter p xs
     | otherwise = filter p xs
 </pre>
-<p>Pretty simple stuff. If <span class="fixed">p x</span> evaluates to <span class="fixed">True</span>, the element gets included in the new list. If it doesn't, it stays out. Some usage examples:</p>
+<p>シンプル。<span class="fixed">p x</span> が <span class="fixed">True</span> なら新しいリストに含め、そうでなければ含めません。使用例：</p>
 <pre name="code" class="haskell:hs">ghci&gt; filter (&gt;3) [1,5,3,2,1,6,4,3,2,1]
 [5,6,4]
 ghci&gt; filter (==3) [1,2,3,4,5]
@@ -242,88 +158,41 @@ ghci&gt; filter (`elem` ['a'..'z']) "u LaUgH aT mE BeCaUsE I aM diFfeRent"
 ghci&gt; filter (`elem` ['A'..'Z']) "i lauGh At You BecAuse u r aLL the Same"
 "GAYBALLS"
 </pre>
-<p>All of this could also be achived with list comprehensions by the use of predicates. There's no set rule for when to use <span class="fixed">map</span> and <span class="fixed">filter</span> versus using list comprehension, you just have to decide what's more readable depending on the code and the context. The <span class="fixed">filter</span>
- equivalent of applying several predicates in a list comprehension is 
-either filtering something several times or joining the predicates with 
-the logical <span class="fixed">&amp;&amp;</span> function. </p>
-<p>Remember our quicksort function from the <a href="recursion.html">previous chapter</a>?
- We used list comprehensions to filter out the list elements that are 
-smaller than (or equal to) and larger than the pivot. We can achieve the
- same functionality in a more readable way by using <span class="fixed">filter</span>:</p>
-<pre name="code" class="haskell:ghci">quicksort :: (Ord a) =&gt; [a] -&gt; [a]  
-quicksort [] = []  
-quicksort (x:xs) =   
+<p>これらもリスト内包表記の述語で同じことができます。<span class="fixed">map</span>・<span class="fixed">filter</span> とリスト内包表記、どちらを使うべきかに決まりはなく、コードと文脈に応じて読みやすい方を選びます。リスト内包表記で複数の述語を適用する <span class="fixed">filter</span> 版は、「何回もフィルタする」か「述語を論理 <span class="fixed">&amp;&amp;</span> 関数で結合する」かのどちらかです。</p>
+<p><a href="recursion.html">前章</a> のクイックソートを覚えていますか？　ピボット以下の要素とピボットより大きい要素を分けるのにリスト内包表記を使いました。<span class="fixed">filter</span> を使えば同じことをもっと読みやすく書けます：</p>
+<pre name="code" class="haskell:ghci">quicksort :: (Ord a) =&gt; [a] -&gt; [a]
+quicksort [] = []
+quicksort (x:xs) =
     let smallerSorted = quicksort (filter (&lt;=x) xs)
-        biggerSorted = quicksort (filter (&gt;x) xs) 
+        biggerSorted = quicksort (filter (&gt;x) xs)
     in  smallerSorted ++ [x] ++ biggerSorted
 </pre>
 
-<p>Mapping and filtering is the bread and butter of every functional 
-programmer's toolbox. Uh. It doesn't matter if you do it with the <span class="fixed">map</span> and <span class="fixed">filter</span>
- functions or list comprehensions. Recall how we solved the problem of 
-finding right triangles with a certain circumference. With imperative 
-programming, we would have solved it by nesting three loops and then 
-testing if the current combination satisfies a right triangle and if it 
-has the right perimeter. If that's the case, we would have printed it 
-out to the screen or something. In functional programming, that pattern 
-is achieved with mapping and filtering. You make a function that takes a
- value and produces some result. We map that function over a list of 
-values and then we filter the resulting list out for the results that 
-satisfy our search. Thanks to Haskell's laziness, even if you map 
-something over a list several times and filter it several times, it will
- only pass over the list once.</p>
-<p>Let's <em>find the largest number under 100,000 that's divisible by 3829</em>. To do that, we'll just filter a set of possibilities in which we know the solution lies. </p>
+<p>map と filter は関数型プログラマにとっての主食です。うむ。<span class="fixed">map</span> と <span class="fixed">filter</span> 関数を使おうとリスト内包表記を使おうと違いはありません。前章で「特定の周長の直角三角形を見つける」問題を解いたのを思い出してください。命令型プログラミングなら 3 重ループで解いて、現在の組み合わせが直角三角形か、周長が正しいかをチェックして、合致したら出力していたでしょう。関数型プログラミングではそのパターンを map と filter で実現します。値を取って結果を返す関数を作り、その関数を値のリストに map し、結果を絞り込む述語で filter する。Haskell の遅延評価のおかげで、リストに map や filter を何回適用しても、リストを走査するのは1回だけです。</p>
+<p>では <em>10 万未満で 3829 で割り切れる最大の数を見つけよう</em>。解の存在範囲が分かっている可能性の集合を filter するだけです。</p>
 <pre name="code" class="haskell:hs">largestDivisible :: (Integral a) =&gt; a
 largestDivisible = head (filter p [100000,99999..])
     where p x = x `mod` 3829 == 0
 </pre>
-<p>We first make a list of all numbers lower than 100,000, descending. 
-Then we filter it by our predicate and because the numbers are sorted in
- a descending manner, the largest number that satisfies our predicate is
- the first element of the filtered list. We didn't even need to use a 
-finite list for our starting set. That's laziness in action again. 
-Because we only end up using the head of the filtered list, it doesn't 
-matter if the filtered list is finite or infinite. The evaluation stops 
-when the first adequate solution is found.</p>
-<p>Next up, we're going to <em>find the sum of all odd squares that are smaller than 10,000</em>. But first, because we'll be using it in our solution, we're going to introduce the <span class="label function">takeWhile</span>
- function. It takes a predicate and a list and then goes from the 
-beginning of the list and returns its elements while the predicate holds
- true. Once an element is found for which the predicate doesn't hold, it
- stops. If we wanted to get the first word of the string <span class="fixed">"elephants know how to party"</span>, we could do <span class="fixed">takeWhile (/=' ') "elephants know how to party"</span> and it would return <span class="fixed">"elephants"</span>. Okay. The sum of all odd squares that are smaller than 10,000. First, we'll begin by mapping the <span class="fixed">(^2)</span> function to the infinite list <span class="fixed">[1..]</span>.
- Then we filter them so we only get the odd ones. And then, we'll take 
-elements from that list while they are smaller than 10,000. Finally, 
-we'll get the sum of that list. We don't even have to define a function 
-for that, we can do it in one line in GHCI:</p>
+<p>まず 10 万未満のすべての数を降順で並べたリストを作ります。それを述語で filter します。降順なので、述語を満たす最大の数はフィルタ後リストの先頭要素になります。最初のリストは有限である必要すらありませんでした。これが遅延評価の威力です。フィルタ後リストの先頭しか使わないので、フィルタ後のリストが有限か無限かは関係ないのです。最初の適切な解が見つかった時点で評価が止まります。</p>
+<p>次に <em>1 万未満の奇数の平方の総和を求めよう</em>。解には <span class="label function">takeWhile</span> 関数を使うので、先に紹介します。これは述語とリストを取り、リストの先頭から述語が真である間だけ要素を返します。述語が偽になる要素が見つかったら止まります。<span class="fixed">"elephants know how to party"</span> の最初の単語を取りたければ <span class="fixed">takeWhile (/=' ') "elephants know how to party"</span> で <span class="fixed">"elephants"</span> が得られます。OK。1 万未満の奇数の平方の総和。まず無限リスト <span class="fixed">[1..]</span> に <span class="fixed">(^2)</span> を map します。次に奇数だけ filter します。そして 10000 未満のものだけ takeWhile で取り、最後に sum で総和を取ります。関数を定義する必要すらなく、GHCi で1行で書けます：</p>
 <pre name="code" class="haskell:ghci">ghci&gt; sum (takeWhile (&lt;10000) (filter odd (map (^2) [1..])))
 166650
 </pre>
-<p>Awesome! We start with some initial data (the infinite list of all 
-natural numbers) and then we map over it, filter it and cut it until it 
-suits our needs and then we just sum it up. We could have also written 
-this using list comprehensions:</p>
+<p>すごい！　初期データ（自然数の無限リスト）から始め、map と filter と切り取りを使って必要な形に整え、最後に sum で合計する。リスト内包表記でも書けます：</p>
 <pre name="code" class="haskell:ghci">ghci&gt; sum (takeWhile (&lt;10000) [n^2 | n &lt;- [1..], odd (n^2)])
 166650
 </pre>
-<p>It's a matter of taste as to which one you find prettier. Again, 
-Haskell's property of laziness is what makes this possible. We can map 
-over and filter an infinite list, because it won't actually map and 
-filter it right away, it'll delay those actions. Only when we force 
-Haskell to show us the sum does the <span class="fixed">sum</span> function say to the <span class="fixed">takeWhile</span> that it needs those numbers. <span class="fixed">takeWhile</span> forces the filtering and mapping to occur, but only until a number greater than or equal to 10,000 is encountered. </p>
-<p>For our next problem, we'll be dealing with Collatz sequences. We 
-take a natural number. If that number is even, we divide it by two. If 
-it's odd, we multiply it by 3 and then add 1 to that. We take the 
-resulting number and apply the same thing to it, which produces a new 
-number and so on. In essence, we get a chain of numbers. It is thought 
-that for all starting numbers, the chains finish at the number 1. So if 
-we take the starting number 13, we get this sequence: <i>13, 40, 20, 10, 5, 16, 8, 4, 2, 1</i>. 13*3 + 1 equals 40. 40 divided by 2 is 20, etc. We see that the chain has 10 terms.</p>
-<p>Now what we want to know is this: <em>for all starting numbers between 1 and 100, how many chains have a length greater than 15?</em> First off, we'll write a function that produces a chain:</p>
+<p>どちらが綺麗かは好みの問題です。これも Haskell の遅延評価の性質があってこそ。無限リストに map や filter ができるのは、すぐに map や filter をするのではなく、その動作を遅らせるからです。Haskell に総和を見せろと強制してはじめて、<span class="fixed">sum</span> 関数が <span class="fixed">takeWhile</span> に「数が必要だ」と要求します。<span class="fixed">takeWhile</span> はフィルタリングと map を強制しますが、10000 以上の数に出会うまでだけです。</p>
+<p>次は Collatz 数列の問題です。自然数を取ります。偶数なら 2 で割ります。奇数なら 3 倍して 1 を足します。得られた数に同じ操作を繰り返し、新しい数を生成し続ける。要するに数の連鎖が得られます。すべての開始数について、連鎖は最終的に 1 で終わると考えられています。たとえば 13 から始めると <i>13, 40, 20, 10, 5, 16, 8, 4, 2, 1</i> という数列が得られます。13×3 + 1 は 40。40 ÷ 2 は 20。連鎖の長さは 10 ですね。</p>
+<p>知りたいのはこれです：<em>1 から 100 までの開始数のうち、長さが 15 を超える連鎖はいくつあるか？</em>　まず、連鎖を生成する関数を書きます：</p>
 <pre name="code" class="haskell:hs">chain :: (Integral a) =&gt; a -&gt; [a]
 chain 1 = [1]
 chain n
     | even n =  n:chain (n `div` 2)
     | odd n  =  n:chain (n*3 + 1)
 </pre>
-<p>Because the chains end at 1, that's the edge case. This is a pretty standard recursive function.</p>
+<p>連鎖は 1 で終わるので、それがエッジケース。標準的な再帰関数です。</p>
 <pre name="code" class="haskell:ghci">ghci&gt; chain 10
 [10,5,16,8,4,2,1]
 ghci&gt; chain 1
@@ -331,181 +200,87 @@ ghci&gt; chain 1
 ghci&gt; chain 30
 [30,15,46,23,70,35,106,53,160,80,40,20,10,5,16,8,4,2,1]
 </pre>
-<p>Yay! It seems to be working correctly. And now, the function that tells us the answer to our question:</p>
+<p>うまく動いてそう！　では問題に答える関数：</p>
 <pre name="code" class="haskell:hs">numLongChains :: Int
 numLongChains = length (filter isLong (map chain [1..100]))
     where isLong xs = length xs &gt; 15
 </pre>
-<p>We map the <span class="fixed">chain</span> function to <span class="fixed">[1..100]</span>
- to get a list of chains, which are themselves represented as lists. 
-Then, we filter them by a predicate that just checks whether a list's 
-length is longer than 15. Once we've done the filtering, we see how many
- chains are left in the resulting list.</p>
-<div class="hintbox"><em>Note:</em> This function has a type of <span class="fixed">numLongChains :: Int</span> because <span class="fixed">length</span> returns an <span class="fixed">Int</span> instead of a <span class="fixed">Num a</span> for historical reasons. If we wanted to return a more general <span class="fixed">Num a</span>, we could have used <span class="fixed">fromIntegral</span> on the resulting length.</div>
-<p>Using <span class="fixed">map</span>, we can also do stuff like <span class="fixed">map (*) [0..]</span>,
- if not for any other reason than to illustrate how currying works and 
-how (partially applied) functions are real values that you can pass 
-around to other functions or put into lists (you just can't turn them to
- strings). So far, we've only mapped functions that take one parameter 
-over lists, like <span class="fixed">map (*2) [0..]</span> to get a list of type <span class="fixed">(Num a) =&gt; [a]</span>, but we can also do <span class="fixed">map (*) [0..]</span> without a problem. What happens here is that the number in the list is applied to the function <span class="fixed">*</span>, which has a type of <span class="fixed">(Num a) =&gt; a -&gt; a -&gt; a</span>. Applying only one parameter to a function that takes two parameters returns a function that takes one parameter. If we map <span class="fixed">*</span> over the list <span class="fixed">[0..]</span>, we get back a list of functions that only take one parameter, so <span class="fixed">(Num a) =&gt; [a -&gt; a]</span>. <span class="fixed">map (*) [0..]</span> produces a list like the one we'd get by writing <span class="fixed">[(0*),(1*),(2*),(3*),(4*),(5*)..</span>.</p>
+<p><span class="fixed">[1..100]</span> に <span class="fixed">chain</span> 関数を map して連鎖のリスト（連鎖もリスト）を得ます。それを「リストの長さが 15 を超えるか」の述語で filter し、残った連鎖の数を数えます。</p>
+<div class="hintbox"><em>Note:</em> この関数の型は <span class="fixed">numLongChains :: Int</span> です。<span class="fixed">length</span> が歴史的事情から <span class="fixed">Num a</span> ではなく <span class="fixed">Int</span> を返すからです。より一般的な <span class="fixed">Num a</span> を返したければ、結果の長さに <span class="fixed">fromIntegral</span> を使えます。</div>
+<p><span class="fixed">map</span> を使うと <span class="fixed">map (*) [0..]</span> のようなこともできます。これはカリー化の仕組みと、（部分適用された）関数も他の関数に渡せたりリストに入れたりできる本物の値だ（文字列に変換だけはできませんが）と示すための例です。これまで <span class="fixed">map (*2) [0..]</span> のように、引数を1つ取る関数だけをリストに map してきました。これは <span class="fixed">(Num a) =&gt; [a]</span> 型のリストを生みます。<span class="fixed">map (*) [0..]</span> も問題なく書けます。リストの数が <span class="fixed">*</span> 関数（型は <span class="fixed">(Num a) =&gt; a -&gt; a -&gt; a</span>）に適用されているのです。2 引数を取る関数に1つだけ適用すれば、引数を1つ取る関数が返ります。<span class="fixed">*</span> をリスト <span class="fixed">[0..]</span> に map すると、引数を1つ取る関数のリスト、すなわち <span class="fixed">(Num a) =&gt; [a -&gt; a]</span> が得られます。<span class="fixed">map (*) [0..]</span> は <span class="fixed">[(0*),(1*),(2*),(3*),(4*),(5*)..</span> と書いたものに相当するリストを生成します。</p>
 <pre name="code" class="haskell:hs">ghci&gt; let listOfFuns = map (*) [0..]
 ghci&gt; (listOfFuns !! 4) 5
 20
 </pre>
-<p>Getting the element with the index <span class="fixed">4</span> from our list returns a function that's equivalent to <span class="fixed">(4*)</span>. And then, we just apply <span class="fixed">5</span> to that function. So that's like writing <span class="fixed">(4*) 5</span> or just <span class="fixed">4 * 5</span>.</p>
-<a name="lambdas"></a><h2>Lambdas</h2>
+<p>リストの添字 <span class="fixed">4</span> の要素を取ると <span class="fixed">(4*)</span> に相当する関数が返ります。それに <span class="fixed">5</span> を適用するので、結果は <span class="fixed">(4*) 5</span> あるいは <span class="fixed">4 * 5</span> と同じです。</p>
+<a name="lambdas"></a><h2>ラムダ</h2>
 
-<p>Lambdas are basically anonymous functions that are used because we 
-need some functions only once. Normally, we make a lambda with the sole 
-purpose of passing it to a higher-order function. To make a lambda, we 
-write a <span class="fixed">\</span> (because it kind of looks like the 
-greek letter lambda if you squint hard enough) and then we write the 
-parameters, separated by spaces. After that comes a <span class="fixed">-&gt;</span> and then the function body. We usually surround them by parentheses, because otherwise they extend all the way to the right.</p>
-<p>If you look about 5 inches up, you'll see that we used a <i>where</i> binding in our <span class="fixed">numLongChains</span> function to make the <span class="fixed">isLong</span> function for the sole purpose of passing it to <span class="fixed">filter</span>. Well, instead of doing that, we can use a lambda:</p>
+<p>ラムダは要するに無名関数で、関数を一度しか使わないときに使います。普通は高階関数に渡すためだけにラムダを作ります。ラムダを書くには、まず <span class="fixed">\</span> を書き（ギリシャ文字のラムダにちょっとだけ似ているので、ぐっと目を細めれば見えてきます）、次に引数をスペース区切りで書き、続けて <span class="fixed">-&gt;</span>、最後に関数本体を書きます。括弧で囲むのが普通です。そうしないとラムダが式の右端まで延びてしまうからです。</p>
+<p>5 インチほど上にスクロールすれば、<span class="fixed">numLongChains</span> 関数で <i>where</i> 束縛を使い、<span class="fixed">isLong</span> 関数を作って <span class="fixed">filter</span> に渡しているのが見えます。代わりにラムダを使ってみましょう：</p>
 <pre name="code" class="haskell:hs">numLongChains :: Int
 numLongChains = length (filter (\xs -&gt; length xs &gt; 15) (map chain [1..100]))
 </pre>
-<p>Lambdas are expressions, that's why we can just pass them like that. The expression <span class="fixed">(\xs -&gt; length xs &gt; 15)</span> returns a function that tells us whether the length of the list passed to it is greater than 15.</p>
+<p>ラムダも式なので、こうしてそのまま渡せます。<span class="fixed">(\xs -&gt; length xs &gt; 15)</span> は「渡されたリストの長さが 15 を超えるかを返す関数」です。</p>
 
-<p>People who are not well acquainted with how currying and partial 
-application works often use lambdas where they don't need to. For 
-instance, the expressions <span class="fixed">map (+3) [1,6,3,2]</span> and <span class="fixed">map (\x -&gt; x + 3) [1,6,3,2]</span> are equivalent since both <span class="fixed">(+3)</span> and <span class="fixed">(\x -&gt; x + 3)</span>
- are functions that take a number and add 3 to it. Needless to say, 
-making a lambda in this case is stupid since using partial application 
-is much more readable.</p>
-<p>Like normal functions, lambdas can take any number of parameters:</p>
+<p>カリー化と部分適用に慣れていない人は、必要のないところでもラムダを使いがちです。たとえば <span class="fixed">map (+3) [1,6,3,2]</span> と <span class="fixed">map (\x -&gt; x + 3) [1,6,3,2]</span> は等価です。<span class="fixed">(+3)</span> も <span class="fixed">(\x -&gt; x + 3)</span> も「数を取って 3 を足す関数」だからです。この場面でラムダを書くのは間が抜けています。部分適用のほうがずっと読みやすい。</p>
+<p>普通の関数と同じく、ラムダも何個でも引数を取れます：</p>
 <pre name="code" class="haskell:ghci">ghci&gt; zipWith (\a b -&gt; (a * 30 + 3) / b) [5,4,3,2,1] [1,2,3,4,5]
 [153.0,61.5,31.0,15.75,6.6]
 </pre>
-<p>And like normal functions, you can pattern match in lambdas. The only
- difference is that you can't define several patterns for one parameter,
- like making a <span class="fixed">[]</span> and a <span class="fixed">(x:xs)</span>
- pattern for the same parameter and then having values fall through. If a
- pattern matching fails in a lambda, a runtime error occurs, so be 
-careful when pattern matching in lambdas!</p>
+<p>普通の関数と同じく、ラムダでもパターンマッチが使えます。違うのは、1つの引数に対して複数のパターンを定義してフォールスルーさせる、という使い方ができないこと（<span class="fixed">[]</span> と <span class="fixed">(x:xs)</span> を同じ引数に書く、みたいなのは無理）。ラムダでパターンマッチが失敗すると実行時エラーになるので、ラムダでパターンマッチするときは注意してください！</p>
 <pre name="code" class="haskell:ghci">ghci&gt; map (\(a,b) -&gt; a + b) [(1,2),(3,5),(6,3),(2,6),(2,5)]
 [3,8,9,8,7]
 </pre>
-<p>Lambdas are normally surrounded by parentheses unless we mean for 
-them to extend all the way to the right. Here's something interesting: 
-due to the way functions are curried by default, these two are 
-equivalent:</p>
+<p>ラムダは右端まで延ばすつもりでない限り、普通は括弧で囲みます。面白いことに、関数がデフォルトでカリー化される性質ゆえ、次の2つは等価です：</p>
 <pre name="code" class="haskell:ghci">addThree :: (Num a) =&gt; a -&gt; a -&gt; a -&gt; a
 addThree x y z = x + y + z
 </pre>
 <pre name="code" class="haskell:ghci">addThree :: (Num a) =&gt; a -&gt; a -&gt; a -&gt; a
 addThree = \x -&gt; \y -&gt; \z -&gt; x + y + z
 </pre>
-<p>If we define a function like this, it's obvious why the type declaration is what it is. There are three <span class="fixed">-&gt;</span>'s
- in both the type declaration and the equation. But of course, the first
- way to write functions is far more readable, the second one is pretty 
-much a gimmick to illustrate currying.</p>
-<p>However, there are times when using this notation is cool. I think that the <span class="fixed">flip</span> function is the most readable when defined like so:</p>
+<p>こう定義すれば、なぜ型宣言がそうなるのかは明らかです。型宣言にも等式にも <span class="fixed">-&gt;</span> が3つあります。とはいえ、当然ながら最初の書き方のほうがずっと読みやすく、2つ目はカリー化を示すための小ネタにすぎません。</p>
+<p>とはいえ、この記法がイケる場面もあります。<span class="fixed">flip</span> 関数はこう書くのが一番読みやすいと思います：</p>
 <pre name="code" class="haskell:ghci">flip' :: (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 flip' f = \x y -&gt; f y x
 </pre>
-<p>Even though that's the same as writing <span class="fixed">flip' f x y = f y x</span>, we make it obvious that this will be used for producing a new function most of the time. The most common use case with <span class="fixed">flip</span>
- is calling it with just the function parameter and then passing the 
-resulting function on to a map or a filter. So use lambdas in this way 
-when you want to make it explicit that your function is mainly meant to 
-be partially applied and passed on to a function as a parameter.</p>
-<a name="folds"></a><h2>Only folds and horses</h2>
+<p><span class="fixed">flip' f x y = f x y</span> と同じですが、こう書くと「この関数はたいてい新しい関数を生むために使う」と明確になります。<span class="fixed">flip</span> の最も多い使い方は、関数引数だけ与えて呼び、できた関数を map や filter に渡すこと。だから「主に部分適用して関数の引数として渡す」と明示したいときはラムダ表記が便利です。</p>
+<a name="folds"></a><h2>foldと馬とロバ</h2>
 
-<p>Back when we were dealing with recursion, we noticed a theme 
-throughout many of the recursive functions that operated on lists. 
-Usually, we'd have an edge case for the empty list. We'd introduce the <span class="fixed">x:xs</span>
- pattern and then we'd do some action that involves a single element and
- the rest of the list. It turns out this is a very common pattern, so a 
-couple of very useful functions were introduced to encapsulate it. These
- functions are called folds. They're sort of like the <span class="fixed">map</span> function, only they reduce the list to some single value. </p>
-<p>A fold takes a binary function, a starting value (I like to call it 
-the accumulator) and a list to fold up. The binary function itself takes
- two parameters. The binary function is called with the accumulator and 
-the first (or last) element and produces a new accumulator. Then, the 
-binary function is called again with the new accumulator and the now new
- first (or last) element, and so on. Once we've walked over the whole 
-list, only the accumulator remains, which is what we've reduced the list
- to.</p>
-<p>First let's take a look at the <span class="label function">foldl</span>
- function, also called the left fold. It folds the list up from the left
- side. The binary function is applied between the starting value and the
- head of the list. That produces a new accumulator value and the binary 
-function is called with that value and the next element, etc.</p>
-<p>Let's implement <span class="fixed">sum</span> again, only this time, we'll use a fold instead of explicit recursion.</p>
+<p>再帰を扱っていたとき、リストを操作する多くの再帰関数に共通するテーマに気づいたと思います。普通、空リスト用のエッジケースを用意し、<span class="fixed">x:xs</span> パターンを導入し、ある要素と残りのリストに関する処理を行います。これは非常によくあるパターンなので、それをカプセル化する超便利な関数がいくつか導入されました。それが fold です。<span class="fixed">map</span> 関数のようなものですが、リストを単一の値に縮約します。</p>
+<p>fold は、二項関数、初期値（私はアキュムレータと呼びたい）、畳み込みたいリストを取ります。二項関数自身は2つの引数を取ります。二項関数はアキュムレータと最初（または最後）の要素に対して呼ばれ、新しいアキュムレータを生みます。次に、新しいアキュムレータと次の最初（または最後）の要素に対して再び二項関数が呼ばれ、と繰り返されます。リスト全体を歩き終えると、アキュムレータだけが残り、それがリストを縮約した結果です。</p>
+<p>まず <span class="label function">foldl</span>（左 fold とも呼ばれる）を見てみましょう。リストを左側から畳み込みます。二項関数は初期値とリストの先頭の間で適用され、新しいアキュムレータ値を生み、次に二項関数がその値と次の要素に対して呼ばれ、と続きます。</p>
+<p>もう一度 <span class="fixed">sum</span> を、今度は明示的な再帰ではなく fold で実装してみます。</p>
 <pre name="code" class="haskell:hs">sum' :: (Num a) =&gt; [a] -&gt; a
 sum' xs = foldl (\acc x -&gt; acc + x) 0 xs
 </pre>
-<p>Testing, one two three:</p>
+<p>テスト、いち、にい、さん：</p>
 <pre name="code" class="haskell:ghci">ghci&gt; sum' [3,5,2,1]
 11
 </pre>
 <img src="../images/foldl.png" alt="foldl" class="left" width="172" height="348"/>
-<p>Let's take an in-depth look into how this fold happens. <span class="fixed">\acc x -&gt; acc + x</span> is the binary function. <span class="fixed">0</span> is the starting value and <span class="fixed">xs</span> is the list to be folded up. Now first, <span class="fixed">0</span> is used as the <span class="fixed">acc</span> parameter to the binary function and <span class="fixed">3</span> is used as the <span class="fixed">x</span> (or the current element) parameter. <span class="fixed">0 + 3</span> produces a <span class="fixed">3</span> and it becomes the new accumulator value, so to speak. Next up, <span class="fixed">3</span> is used as the accumulator value and <span class="fixed">5</span> as the current element and <span class="fixed">8</span> becomes the new accumulator value. Moving forward, <span class="fixed">8</span> is the accumulator value, <span class="fixed">2</span> is the current element, the new accumulator value is <span class="fixed">10</span>. Finally, that <span class="fixed">10</span> is used as the accumulator value and <span class="fixed">1</span> as the current element, producing an <span class="fixed">11</span>. Congratulations, you've done a fold! </p>
-<p>This professional diagram on the left illustrates how a fold happens,
- step by step (day by day!). The greenish brown number is the 
-accumulator value. You can see how the list is sort of consumed up from 
-the left side by the accumulator. Om nom nom nom! If we take into 
-account that functions are curried, we can write this implementation 
-ever more succinctly, like so:</p> 
+<p>fold がどう起こるかを詳しく見てみましょう。<span class="fixed">\acc x -&gt; acc + x</span> が二項関数。<span class="fixed">0</span> が初期値、<span class="fixed">xs</span> が畳み込み対象のリスト。まず <span class="fixed">0</span> が二項関数の <span class="fixed">acc</span> 引数として、<span class="fixed">3</span> が <span class="fixed">x</span>（現在の要素）として使われます。<span class="fixed">0 + 3</span> で <span class="fixed">3</span> が生まれ、それが新しいアキュムレータになります。次に <span class="fixed">3</span> がアキュムレータ、<span class="fixed">5</span> が現在の要素として使われ、<span class="fixed">8</span> が新しいアキュムレータに。さらに <span class="fixed">8</span> と <span class="fixed">2</span> で新しいアキュムレータは <span class="fixed">10</span>。最後に <span class="fixed">10</span> と <span class="fixed">1</span> で <span class="fixed">11</span>。おめでとう、fold できました！</p>
+<p>左にあるプロフェッショナルな図は、fold が一段ずつ進む様子を示しています（一日一日！）。緑がかった茶色の数字がアキュムレータ値です。リストが左側からアキュムレータに食べられていくのが見えるでしょう。むしゃむしゃ！　関数のカリー化を踏まえれば、もっと簡潔に書けます：</p>
 <pre name="code" class="haskell:hs">sum' :: (Num a) =&gt; [a] -&gt; a
 sum' = foldl (+) 0
 </pre>
-<p>The lambda function <span class="fixed">(\acc x -&gt; acc + x)</span> is the same as <span class="fixed">(+)</span>. We can omit the <span class="fixed">xs</span> as the parameter because calling <span class="fixed">foldl (+) 0</span> will return a function that takes a list. Generally, if you have a function like <span class="fixed">foo a = bar b a</span>, you can rewrite it as <span class="fixed">foo = bar b</span>, because of currying.</p>
-<p>Anyhoo, let's implement another function with a left fold before moving on to right folds. I'm sure you all know that <span class="fixed">elem</span>
- checks whether a value is part of a list so I won't go into that again 
-(whoops, just did!). Let's implement it with a left fold. </p>
+<p>ラムダ <span class="fixed">(\acc x -&gt; acc + x)</span> は <span class="fixed">(+)</span> と同じです。<span class="fixed">xs</span> は省けます。<span class="fixed">foldl (+) 0</span> はリストを取る関数を返すからです。一般に <span class="fixed">foo a = bar b a</span> のような関数は、カリー化のおかげで <span class="fixed">foo = bar b</span> と書き換えられます。</p>
+<p>右 fold に進む前に、もうひとつ左 fold で関数を実装してみます。<span class="fixed">elem</span> は値がリストの中にあるかをチェックする関数ですね（おっと、説明してしまいました）。左 fold で実装します。</p>
 <pre name="code" class="haskell:hs">elem' :: (Eq a) =&gt; a -&gt; [a] -&gt; Bool
 elem' y ys = foldl (\acc x -&gt; if x == y then True else acc) False ys
 </pre>
-<p>Well, well, well, what do we have here? The starting value and 
-accumulator here is a boolean value. The type of the accumulator value 
-and the end result is always the same when dealing with folds. Remember 
-that if you ever don't know what to use as a starting value, it'll give 
-you some idea. We start off with <span class="fixed">False</span>. It makes sense to use <span class="fixed">False</span>
- as a starting value. We assume it isn't there. Also, if we call a fold 
-on an empty list, the result will just be the starting value. Then we 
-check the current element is the element we're looking for. If it is, we
- set the accumulator to <span class="fixed">True</span>. If it's not, we just leave the accumulator unchanged. If it was <span class="fixed">False</span> before, it stays that way because this current element is not it. If it was <span class="fixed">True</span>, we leave it at that.</p>
-<p>The right fold, <span class="function label">foldr</span> works in a 
-similar way to the left fold, only the accumulator eats up the values 
-from the right. Also, the left fold's binary function has the 
-accumulator as the first parameter and the current value as the second 
-one (so <span class="fixed">\acc x -&gt; ...</span>), the right fold's binary function has the current value as the first parameter and the accumulator as the second one (so <span class="fixed">\x acc -&gt; ...</span>). It kind of makes sense that the right fold has the accumulator on the right, because it folds from the right side.</p>
-<p>The accumulator value (and hence, the result) of a fold can be of any
- type. It can be a number, a boolean or even a new list. We'll be 
-implementing the map function with a right fold. The accumulator will be
- a list, we'll be accumulating the mapped list element by element. From 
-that, it's obvious that the starting element will be an empty list.</p>
+<p>さてさて、何でしょう。ここでの初期値とアキュムレータは真偽値です。fold ではアキュムレータの型と最終結果の型は常に同じです。初期値に何を使えばよいか分からないなら、これがヒントになります。<span class="fixed">False</span> から始めるのは理にかなっています。「目的の値はまだ無い」と仮定するからです。空リストに fold を呼ぶと結果は単に初期値になりますし。次に、現在の要素が探している要素かをチェックします。一致したらアキュムレータを <span class="fixed">True</span> に。違ったらアキュムレータをそのままに。前が <span class="fixed">False</span> だったらこの要素は違うのでそのまま <span class="fixed">False</span>、<span class="fixed">True</span> ならそのまま <span class="fixed">True</span>。</p>
+<p>右 fold（<span class="function label">foldr</span>）も似たように動きますが、アキュムレータが値を右から食べていきます。また、左 fold の二項関数はアキュムレータが第1引数で現在の値が第2引数（<span class="fixed">\acc x -&gt; ...</span>）ですが、右 fold の二項関数は現在の値が第1引数でアキュムレータが第2引数（<span class="fixed">\x acc -&gt; ...</span>）です。右 fold ではアキュムレータが右にあるのは、右から畳み込むからだと考えれば納得です。</p>
+<p>fold のアキュムレータ値（つまり結果）は任意の型でかまいません。数値、真偽値、新しいリストでもOK。右 fold で map 関数を実装してみます。アキュムレータはリスト、map 結果のリストを要素ごとに積み上げていきます。明らかに初期値は空リストです。</p>
 <pre name="code" class="haskell:hs">map' :: (a -&gt; b) -&gt; [a] -&gt; [b]
 map' f xs = foldr (\x acc -&gt; f x : acc) [] xs
 </pre>
-<p>If we're mapping <span class="fixed">(+3)</span> to <span class="fixed">[1,2,3]</span>, we approach the list from the right side. We take the last element, which is <span class="fixed">3</span> and apply the function to it, which ends up being <span class="fixed">6</span>. Then, we prepend it to the accumulator, which is was <span class="fixed">[]</span>. <span class="fixed">6:[]</span> is <span class="fixed">[6]</span> and that's now the accumulator. We apply <span class="fixed">(+3)</span> to <span class="fixed">2</span>, that's <span class="fixed">5</span> and we prepend (<span class="fixed">:</span>) it to the accumulator, so the accumulator is now <span class="fixed">[5,6]</span>. We apply <span class="fixed">(+3)</span> to <span class="fixed">1</span> and prepend that to the accumulator and so the end value is <span class="fixed">[4,5,6]</span>.</p>
-<p>Of course, we could have implemented this function with a left fold too. It would be <span class="fixed">map' f xs = foldl (\acc x -&gt; acc ++ [f x]) [] xs</span>, but the thing is that the <span class="fixed">++</span> function is much more expensive than <span class="fixed">:</span>, so we usually use right folds when we're building up new lists from a list.</p>
+<p><span class="fixed">(+3)</span> を <span class="fixed">[1,2,3]</span> に map するとき、リストに右側から取り組みます。最後の要素 <span class="fixed">3</span> を取り、関数を適用して <span class="fixed">6</span>。アキュムレータ <span class="fixed">[]</span> に前置すると <span class="fixed">6:[]</span> つまり <span class="fixed">[6]</span>。これが新しいアキュムレータ。次に <span class="fixed">2</span> に <span class="fixed">(+3)</span> を適用して <span class="fixed">5</span>、これをアキュムレータに前置（<span class="fixed">:</span>）して <span class="fixed">[5,6]</span>。次に <span class="fixed">1</span> に <span class="fixed">(+3)</span> を適用して前置して、最終結果は <span class="fixed">[4,5,6]</span>。</p>
+<p>もちろん左 fold でも実装できます：<span class="fixed">map' f xs = foldl (\acc x -&gt; acc ++ [f x]) [] xs</span>。ただし <span class="fixed">++</span> は <span class="fixed">:</span> よりずっとコストが高いので、リストから新しいリストを作るときは普通右 fold を使います。</p>
 
-<p>If you reverse a list, you can do a right fold on it just like you 
-would have done a left fold and vice versa. Sometimes you don't even 
-have to do that. The <span class="fixed">sum</span> function can be 
-implemented pretty much the same with a left and right fold. One big 
-difference is that right folds work on infinite lists, whereas left ones
- don't! To put it plainly, if you take an infinite list at some point 
-and you fold it up from the right, you'll eventually reach the beginning
- of the list. However, if you take an infinite list at a point and you 
-try to fold it up from the left, you'll never reach an end! </p>
-<p><em>Folds can be used to implement any function where you traverse a 
-list once, element by element, and then return something based on that. 
-Whenever you want to traverse a list to return something, chances are 
-you want a fold.</em> That's why folds are, along with maps and filters, one of the most useful types of functions in functional programming.</p> 
-<p>The <span class="label function">foldl1</span> and <span class="label function">foldr1</span> functions work much like <span class="fixed">foldl</span> and <span class="fixed">foldr</span>,
- only you don't need to provide them with an explicit starting value. 
-They assume the first (or last) element of the list to be the starting 
-value and then start the fold with the element next to it. With that in 
-mind, the <span class="fixed">sum</span> function can be implemented like so: <span class="fixed">sum = foldl1 (+)</span>.
- Because they depend on the lists they fold up having at least one 
-element, they cause runtime errors if called with empty lists. <span class="fixed">foldl</span> and <span class="fixed">foldr</span>,
- on the other hand, work fine with empty lists. When making a fold, 
-think about how it acts on an empty list. If the function doesn't make 
-sense when given an empty list, you can probably use a <span class="fixed">foldl1</span> or <span class="fixed">foldr1</span> to implement it.</p>
-<p>Just to show you how powerful folds are, we're going to implement a bunch of standard library functions by using folds:</p>
+<p>リストを反転すれば、左 fold するつもりだったところに右 fold を使えますし、その逆もできます。そもそも反転すら不要なときもあります。<span class="fixed">sum</span> 関数は左 fold でも右 fold でもほぼ同じように実装できます。大きな違いは、右 fold は無限リストでも動くけれど左 fold は動かない、という点です。直感的に言えば、無限リストのある時点を取って右から畳めば、いつかリストの「先頭」に到達できます。一方、無限リストを左から畳もうとしたら、終わりにたどり着けないのです！</p>
+<p><em>fold は、リストを一度走査して要素ごとに何かを取り出し、最終的に何かを返す関数すべての実装に使えます。リストを走査して何かを返したいときは、たぶん fold を使いたいときです。</em>　だから fold は、map と filter と並んで、関数型プログラミングで最も役立つタイプの関数のひとつなのです。</p>
+<p><span class="label function">foldl1</span> と <span class="label function">foldr1</span> は <span class="fixed">foldl</span>・<span class="fixed">foldr</span> と似ていますが、明示的な初期値を渡す必要がありません。リストの最初（または最後）の要素を初期値として使い、その隣の要素から fold を始めます。たとえば <span class="fixed">sum</span> は <span class="fixed">sum = foldl1 (+)</span> と書けます。畳み込むリストに少なくとも1要素あることが前提なので、空リストで呼ぶと実行時エラーになります。<span class="fixed">foldl</span>・<span class="fixed">foldr</span> は空リストでも動きます。fold を作るときは、空リストでどう振る舞うか考えましょう。空リストで意味をなさない関数なら、<span class="fixed">foldl1</span>・<span class="fixed">foldr1</span> で実装できる可能性が高いです。</p>
+<p>fold のパワーを示すために、標準ライブラリの関数をいろいろ fold で実装してみましょう：</p>
 <pre name="code" class="haskell:hs">maximum' :: (Ord a) =&gt; [a] -&gt; a
 maximum' = foldr1 (\x acc -&gt; if x &gt; acc then x else acc)
 
@@ -524,15 +299,9 @@ head' = foldr1 (\x _ -&gt; x)
 last' :: [a] -&gt; a
 last' = foldl1 (\_ x -&gt; x)
 </pre>
-<p><span class="fixed">head</span> is better implemented by pattern matching, but this just goes to show, you can still achieve it by using folds. Our <span class="fixed">reverse'</span>
- definition is pretty clever, I think. We take a starting value of an 
-empty list and then approach our list from the left and just prepend to 
-our accumulator. In the end, we build up a reversed list. <span class="fixed">\acc x -&gt; x : acc</span> kind of looks like the <span class="fixed">:</span> function, only the parameters are flipped. That's why we could have also written our reverse as <span class="fixed">foldl (flip (:)) []</span>. </p>
-<p>Another way to picture right and left folds is like this: say we have a right fold and the binary function is <span class="fixed">f</span> and the starting value is <span class="fixed">z</span>. If we're right folding over the list <span class="fixed">[3,4,5,6]</span>, we're essentially doing this: <span class="fixed">f 3 (f 4 (f 5 (f 6 z)))</span>. <span class="fixed">f</span>
- is called with the last element in the list and the accumulator, that 
-value is given as the accumulator to the next to last value and so on. 
-If we take <span class="fixed">f</span> to be <span class="fixed">+</span> and the starting accumulator value to be <span class="fixed">0</span>, that's <span class="fixed">3 + (4 + (5 + (6 + 0)))</span>. Or if we write <span class="fixed">+</span> as a prefix function, that's <span class="fixed">(+) 3 ((+) 4 ((+) 5 ((+) 6 0)))</span>. Similarly, doing a left fold over that list with <span class="fixed">g</span> as the binary function and <span class="fixed">z</span> as the accumulator is the equivalent of <span class="fixed">g (g (g (g z 3) 4) 5) 6</span>. If we use <span class="fixed">flip (:)</span> as the binary function and <span class="fixed">[]</span> as the accumulator (so we're reversing the list), then that's the equivalent of <span class="fixed">flip (:) (flip (:) (flip (:) (flip (:) [] 3) 4) 5) 6</span>. And sure enough, if you evaluate that expression, you get <span class="fixed">[6,5,4,3]</span>.</p>
-<p><span class="function label">scanl</span> and <span class="function label">scanr</span> are like <span class="fixed">foldl</span> and <span class="fixed">foldr</span>, only they report all the intermediate accumulator states in the form of a list. There are also <span class="fixed">scanl1</span> and <span class="fixed">scanr1</span>, which are analogous to <span class="fixed">foldl1</span> and <span class="fixed">foldr1</span>.</p>
+<p><span class="fixed">head</span> はパターンマッチで実装するほうが良いですが、fold でも書けると示すためです。<span class="fixed">reverse'</span> の定義はけっこう賢いと思います。空リストを初期値として、左からリストにアプローチし、ただアキュムレータに前置していくだけ。最終的に反転リストが組み上がります。<span class="fixed">\acc x -&gt; x : acc</span> は <span class="fixed">:</span> 関数の引数を入れ替えたものに見えます。だから reverse は <span class="fixed">foldl (flip (:)) []</span> とも書けます。</p>
+<p>右 fold と左 fold の別の見方として：右 fold で二項関数を <span class="fixed">f</span>、初期値を <span class="fixed">z</span> とし、<span class="fixed">[3,4,5,6]</span> を右畳み込みするなら、要するに <span class="fixed">f 3 (f 4 (f 5 (f 6 z)))</span> をしています。<span class="fixed">f</span> はリストの最後の要素とアキュムレータで呼ばれ、その値が次の要素のアキュムレータになり、と続きます。<span class="fixed">f</span> を <span class="fixed">+</span>、初期値を <span class="fixed">0</span> にすると <span class="fixed">3 + (4 + (5 + (6 + 0)))</span>。<span class="fixed">+</span> を前置関数で書けば <span class="fixed">(+) 3 ((+) 4 ((+) 5 ((+) 6 0)))</span>。同じく、二項関数 <span class="fixed">g</span>、アキュムレータ <span class="fixed">z</span> での左 fold は <span class="fixed">g (g (g (g z 3) 4) 5) 6</span> と等価です。<span class="fixed">flip (:)</span> をニ項関数、空リスト <span class="fixed">[]</span> をアキュムレータにすると（リスト反転）、<span class="fixed">flip (:) (flip (:) (flip (:) (flip (:) [] 3) 4) 5) 6</span> です。これを評価すると確かに <span class="fixed">[6,5,4,3]</span> になります。</p>
+<p><span class="function label">scanl</span>・<span class="function label">scanr</span> は <span class="fixed">foldl</span>・<span class="fixed">foldr</span> に似ていますが、途中のアキュムレータの状態をリストとして報告してくれます。<span class="fixed">scanl1</span>・<span class="fixed">scanr1</span> もあり、<span class="fixed">foldl1</span>・<span class="fixed">foldr1</span> に対応します。</p>
 <pre name="code" class="haskell:ghci">ghci&gt; scanl (+) 0 [3,5,2,1]
 [0,3,8,10,11]
 ghci&gt; scanr (+) 0 [3,5,2,1]
@@ -542,14 +311,8 @@ ghci&gt; scanl1 (\acc x -&gt; if x &gt; acc then x else acc) [3,4,5,3,7,9,2,1]
 ghci&gt; scanl (flip (:)) [] [3,2,1]
 [[],[3],[2,3],[1,2,3]]
 </pre>
-<p>When using a <span class="fixed">scanl</span>, the final result will be in the last element of the resulting list while a <span class="fixed">scanr</span> will place the result in the head.</p>
-<p>Scans are used to monitor the progression of a function that can be implemented as a fold. Let's answer us this question: <em>How many elements does it take for the sum of the roots of all natural numbers to exceed 1000?</em> To get the squares of all natural numbers, we just do <span class="fixed">map sqrt [1..]</span>.
- Now, to get the sum, we could do a fold, but because we're interested 
-in how the sum progresses, we're going to do a scan. Once we've done the
- scan, we just see how many sums are under 1000. The first sum in the 
-scanlist will be 1, normally. The second will be 1 plus the square root 
-of 2. The third will be that plus the square root of 3. If there are X 
-sums under 1000, then it takes X+1 elements for the sum to exceed 1000.</p>
+<p><span class="fixed">scanl</span> では最終結果は結果リストの末尾に、<span class="fixed">scanr</span> では結果リストの先頭に置かれます。</p>
+<p>scan は、fold として実装できる関数の進捗を追うのに使います。こんな質問に答えてみましょう：<em>すべての自然数の平方根の和が 1000 を超えるには、何個の要素が必要か？</em>　すべての自然数の平方根を得るには <span class="fixed">map sqrt [1..]</span>。和を求めるなら fold ですが、和の進捗が知りたいので scan を使います。scan のあと、1000 未満の和がいくつあるか数えるだけ。scan リストの最初の和は 1。2 つ目は 1 + √2、3 つ目はそれ + √3、と続きます。1000 未満の和が X 個あれば、和が 1000 を超えるには X+1 個の要素が必要です。</p>
 <pre name="code" class="haskell:hs">sqrtSums :: Int
 sqrtSums = length (takeWhile (&lt;1000) (scanl1 (+) (map sqrt [1..]))) + 1
 </pre>
@@ -560,113 +323,73 @@ ghci&gt; sum (map sqrt [1..131])
 ghci&gt; sum (map sqrt [1..130])
 993.6486803921487
 </pre>
-<p>We use <span class="fixed">takeWhile</span> here instead of <span class="fixed">filter</span> because <span class="fixed">filter</span> doesn't work on infinite lists. Even though we know the list is ascending, <span class="fixed">filter</span> doesn't, so we use <span class="fixed">takeWhile</span> to cut the scanlist off at the first occurence of a sum greater than 1000.</p>
-<a name="function-application"></a><h2>Function application with $</h2>
-<p>Alright, next up, we'll take a look at the <span class="fixed">$</span> function, also called <i>function application</i>. First of all, let's check out how it's defined:</p>
+<p>ここでは <span class="fixed">filter</span> ではなく <span class="fixed">takeWhile</span> を使っています。<span class="fixed">filter</span> は無限リストでは動かないからです。リストが昇順だと我々は知っていても <span class="fixed">filter</span> は知らないので、<span class="fixed">takeWhile</span> で和が 1000 を超えた最初の地点で scan リストを切り取ります。</p>
+<a name="function-application"></a><h2>$による関数適用</h2>
+<p>次に、<span class="fixed">$</span> 関数（<i>関数適用</i> とも呼ばれる）を見てみましょう。まず定義をチェック：</p>
 <pre name="code" class="haskell:hs">($) :: (a -&gt; b) -&gt; a -&gt; b
 f $ x = f x
 </pre>
 
-<p>What the heck? What is this useless operator? It's just function 
-application! Well, almost, but not quite! Whereas normal function 
-application (putting a space between two things) has a really high 
-precedence, the <span class="fixed">$</span> function has the lowest precedence. Function application with a space is left-associative (so <span class="fixed">f a b c</span> is the same as <span class="fixed">((f a) b) c)</span>), function application with <span class="fixed">$</span> is right-associative.</p>
-<p>That's all very well, but how does this help us? Most of the time, 
-it's a convenience function so that we don't have to write so many 
-parentheses. Consider the expression <span class="fixed">sum (map sqrt [1..130])</span>. Because <span class="fixed">$</span> has such a low precedence, we can rewrite that expression as <span class="fixed">sum $ map sqrt [1..130]</span>, saving ourselves precious keystrokes! When a <span class="fixed">$</span> is encountered, the expression on its right is applied as the parameter to the function on its left. How about <span class="fixed">sqrt 3 + 4 + 9</span>? This adds together 9, 4 and the square root of 3. If we want get the square root of <i>3 + 4 + 9</i>, we'd have to write <span class="fixed">sqrt (3 + 4 + 9)</span> or if we use <span class="fixed">$</span> we can write it as <span class="fixed">sqrt $ 3 + 4 + 9</span> because <span class="fixed">$</span> has the lowest precedence of any operator. That's why you can imagine a <span class="fixed">$</span>
- being sort of the equivalent of writing an opening parentheses and then
- writing a closing one on the far right side of the expression.</p>
-<p>How about <span class="fixed">sum (filter (&gt; 10) (map (*2) [2..10]))</span>? Well, because <span class="fixed">$</span> is right-associative, <span class="fixed">f (g (z x))</span> is equal to <span class="fixed">f $ g $ z x</span>. And so, we can rewrite <span class="fixed">sum (filter (&gt; 10) (map (*2) [2..10]))</span> as <span class="fixed">sum $ filter (&gt; 10) $ map (*2) [2..10]</span>. </p>
-<p>But apart from getting rid of parentheses, <span class="fixed">$</span>
- means that function application can be treated just like another 
-function. That way, we can, for instance, map function application over a
- list of functions.</p>
+<p>えっ？　この役立たずの演算子は何？　ただの関数適用じゃん！　まあほぼそう、でも完全に同じではありません！　通常の関数適用（2 つのものの間にスペース）は優先順位が非常に高いのに対し、<span class="fixed">$</span> 関数は最低の優先順位を持ちます。スペースによる関数適用は左結合（<span class="fixed">f a b c</span> は <span class="fixed">((f a) b) c</span>）ですが、<span class="fixed">$</span> による関数適用は右結合です。</p>
+<p>それで何の役に？　多くの場合、これは便利関数で、括弧をたくさん書かなくて済むようにしてくれます。<span class="fixed">sum (map sqrt [1..130])</span> という式を考えましょう。<span class="fixed">$</span> は優先順位が低いので、<span class="fixed">sum $ map sqrt [1..130]</span> と書き換えられます。貴重なキー入力が節約できる！　<span class="fixed">$</span> に出会うと、その右側の式が左側の関数の引数として適用されます。<span class="fixed">sqrt 3 + 4 + 9</span> はどうでしょう？　これは 9, 4, √3 を足します。<i>3 + 4 + 9</i> の平方根を取りたければ <span class="fixed">sqrt (3 + 4 + 9)</span> と書くか、<span class="fixed">$</span> を使って <span class="fixed">sqrt $ 3 + 4 + 9</span> と書けます（<span class="fixed">$</span> はあらゆる演算子の中で最低の優先順位）。<span class="fixed">$</span> はちょうど「開き括弧を書いて、式の右端まで延ばして閉じ括弧を書いた」のと同じ役割だと考えられます。</p>
+<p><span class="fixed">sum (filter (&gt; 10) (map (*2) [2..10]))</span> はどうでしょう？　<span class="fixed">$</span> は右結合なので、<span class="fixed">f (g (z x))</span> は <span class="fixed">f $ g $ z x</span> と等価です。<span class="fixed">sum (filter (&gt; 10) (map (*2) [2..10]))</span> は <span class="fixed">sum $ filter (&gt; 10) $ map (*2) [2..10]</span> と書き換えられます。</p>
+<p>括弧を消す以外にも、<span class="fixed">$</span> によって関数適用を別の関数のように扱えるようになります。たとえば関数のリストに対して関数適用を map できます。</p>
 <pre name="code" class="haskell:ghci">ghci&gt; map ($ 3) [(4+), (10*), (^2), sqrt]
 [7.0,30.0,9.0,1.7320508075688772]
 </pre>
-<a name="composition"></a><h2>Function composition</h2>
-<p>In mathematics, function composition is defined like this: <img src="../images/composition.png" alt="(f . g)(x) = f(g(x))" width="169" height="20">, meaning that composing two functions produces a new function that, when called with a parameter, say, <i>x</i> is the equivalent of calling <i>g</i> with the parameter <i>x</i> and then calling the <i>f</i> with that result.</p>
-<p>In Haskell, function composition is pretty much the same thing. We do function composition with the <span class="fixed">.</span> function, which is defined like so:</p>
+<a name="composition"></a><h2>関数合成</h2>
+<p>数学で関数合成は次のように定義されます：<img src="../images/composition.png" alt="(f . g)(x) = f(g(x))" width="169" height="20">。2 つの関数を合成すると新しい関数ができ、その関数は引数 <i>x</i> で呼ばれると、まず <i>g</i> を <i>x</i> で呼び、その結果に <i>f</i> を適用したのと同じ結果を返します。</p>
+<p>Haskell でも関数合成はほぼ同じです。関数合成は <span class="fixed">.</span> 関数で行います。定義は次の通り：</p>
 <pre name="code" class="haskell:hs">(.) :: (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 f . g = \x -&gt; f (g x)
 </pre>
 
-<p>Mind the type declaration. <span class="fixed">f</span> must take as its parameter a value that has the same type as <span class="fixed">g</span>'s return value. So the resulting function takes a parameter of the same type that <span class="fixed">g</span> takes and returns a value of the same type that <span class="fixed">f</span> returns. The expression <span class="fixed">negate . (* 3)</span> returns a function that takes a number, multiplies it by 3 and then negates it.</p>
-<p>One of the uses for function composition is making functions on the 
-fly to pass to other functions. Sure, can use lambdas for that, but many
- times, function composition is clearer and more concise. Say we have a 
-list of numbers and we want to turn them all into negative numbers. One 
-way to do that would be to get each number's absolute value and then 
-negate it, like so:</p>
+<p>型宣言に注目。<span class="fixed">f</span> は <span class="fixed">g</span> の戻り値と同じ型の値を引数に取らなければなりません。結果の関数は <span class="fixed">g</span> が取るのと同じ型の引数を取り、<span class="fixed">f</span> が返すのと同じ型の値を返します。<span class="fixed">negate . (* 3)</span> は「数を取って 3 倍してから符号を反転する関数」を返します。</p>
+<p>関数合成の用途のひとつは、別の関数に渡すための関数をその場で作ることです。ラムダでもできますが、関数合成のほうが明快で簡潔なことが多いです。たとえば数のリストをすべて負の数に変換したいなら、各数の絶対値を取ってから符号を反転すればよいです：</p>
 <pre name="code" class="haskell:hs">ghci&gt; map (\x -&gt; negate (abs x)) [5,-3,-6,7,-3,2,-19,24]
 [-5,-3,-6,-7,-3,-2,-19,-24]
 </pre>
-<p>Notice the lambda and how it looks like the result function composition. Using function composition, we can rewrite that as:</p>
+<p>ラムダの形が関数合成の結果に似ていることに注目。関数合成を使うとこう書き換えられます：</p>
 <pre name="code" class="haskell:hs">ghci&gt; map (negate . abs) [5,-3,-6,7,-3,2,-19,24]
 [-5,-3,-6,-7,-3,-2,-19,-24]
 </pre>
-<p>Fabulous! Function composition is right-associative, so we can compose many functions at a time. The expression <span class="fixed">f (g (z x))</span> is equivalent to <span class="fixed">(f . g . z) x</span>. With that in mind, we can turn</p>
+<p>素晴らしい！　関数合成は右結合なので、複数の関数を一度に合成できます。<span class="fixed">f (g (z x))</span> は <span class="fixed">(f . g . z) x</span> と同じです。これを踏まえて、</p>
 <pre name="code" class="haskell:ghci">ghci&gt; map (\xs -&gt; negate (sum (tail xs))) [[1..5],[3..6],[1..7]]
 [-14,-15,-27]
 </pre>
-<p>into</p>
+<p>を</p>
 <pre name="code" class="haskell:ghci">ghci&gt; map (negate . sum . tail) [[1..5],[3..6],[1..7]]
 [-14,-15,-27]
 </pre>
-<p>But what about functions that take several parameters? Well, if we 
-want to use them in function composition, we usually have to partially 
-apply them just so much that each function takes just one parameter. <span class="fixed"> sum (replicate 5 (max 6.7 8.9))</span> can be rewritten as <span class="fixed">(sum . replicate 5 . max 6.7) 8.9</span> or as <span class="fixed">sum . replicate 5 . max 6.7 $ 8.9</span>. What goes on in here is this: a function that takes what <span class="fixed">max 6.7</span> takes and applies <span class="fixed">replicate 5</span>
- to it is created. Then, a function that takes the result of that and 
-does a sum of it is created. Finally, that function is called with <span class="fixed">8.9</span>. But normally, you just read that as: apply <span class="fixed">8.9</span> to <span class="fixed">max 6.7</span>, then apply <span class="fixed">replicate 5</span> to that and then apply <span class="fixed">sum</span>
- to that. If you want to rewrite an expression with a lot of parentheses
- by using function composition, you can start by putting the last 
-parameter of the innermost function after a <span class="fixed">$</span>
- and then just composing all the other function calls, writing them 
-without their last parameter and putting dots between them. If you have <span class="fixed">replicate 100 (product (map (*3) (zipWith max [1,2,3,4,5] [4,5,6,7,8])))</span>, you can write it as <span class="fixed">replicate 100 . product . map (*3) . zipWith max [1,2,3,4,5] $ [4,5,6,7,8]</span>.
- If the expression ends with three parentheses, chances are that if you 
-translate it into function composition, it'll have three composition 
-operators.</p>
-<p>Another common use of function composition is defining functions in the so-called point free style (also called the point<i>less</i> style). Take for example this function that we wrote earlier:</p>
-<pre name="code" class="haskell:hs">sum' :: (Num a) =&gt; [a] -&gt; a   
-sum' xs = foldl (+) 0 xs   
+<p>と書き換えられます。</p>
+<p>でも、複数の引数を取る関数はどうでしょう？　関数合成で使いたいなら、各関数が引数を1つだけ取るところまで部分適用するのが普通です。<span class="fixed">sum (replicate 5 (max 6.7 8.9))</span> は <span class="fixed">(sum . replicate 5 . max 6.7) 8.9</span> や <span class="fixed">sum . replicate 5 . max 6.7 $ 8.9</span> と書き換えられます。何が起きているかというと：「<span class="fixed">max 6.7</span> が取るものを取って <span class="fixed">replicate 5</span> を適用する関数」が作られ、次に「その結果を取って sum する関数」が作られ、最後にその関数が <span class="fixed">8.9</span> で呼ばれる、という流れ。普通は「<span class="fixed">8.9</span> を <span class="fixed">max 6.7</span> に適用し、その結果に <span class="fixed">replicate 5</span> を適用し、さらに <span class="fixed">sum</span> を適用する」と読みます。括弧だらけの式を関数合成で書き直したいなら、まず一番内側の関数の最後の引数を <span class="fixed">$</span> の後ろに置き、他の関数呼び出しを最後の引数を取り除きつつドットでつなげます。<span class="fixed">replicate 100 (product (map (*3) (zipWith max [1,2,3,4,5] [4,5,6,7,8])))</span> なら <span class="fixed">replicate 100 . product . map (*3) . zipWith max [1,2,3,4,5] $ [4,5,6,7,8]</span> と書けます。式が3つの閉じ括弧で終わるなら、関数合成にすると合成演算子も3つになる可能性が高いです。</p>
+<p>関数合成のもう1つの一般的な使い方は、いわゆるポイントフリースタイル（ポイント<i>レス</i>スタイルとも呼ばれる）で関数を定義することです。先ほど書いたこの関数を例に：</p>
+<pre name="code" class="haskell:hs">sum' :: (Num a) =&gt; [a] -&gt; a
+sum' xs = foldl (+) 0 xs
 </pre>
-<p>The <span class="fixed">xs</span> is exposed on both right sides. Because of currying, we can omit the <span class="fixed">xs</span> on both sides, because calling <span class="fixed">foldl (+) 0</span> creates a function that takes a list. Writing the function as <span class="fixed">sum' = foldl (+) 0</span> is called writing it in point free style. How would we write this in point free style?</p>
+<p>右辺の両側に <span class="fixed">xs</span> が出ています。カリー化のおかげで両側の <span class="fixed">xs</span> を省けます。<span class="fixed">foldl (+) 0</span> はリストを取る関数を返すからです。<span class="fixed">sum' = foldl (+) 0</span> と書くのがポイントフリースタイル。次の関数をポイントフリーで書けるでしょうか？</p>
 <pre name="code" class="haskell:hs">fn x = ceiling (negate (tan (cos (max 50 x))))
 </pre>
-<p>We can't just get rid of the <span class="fixed">x</span> on both right right sides. The <span class="fixed">x</span> in the function body has parentheses after it. <span class="fixed">cos (max 50)</span> wouldn't make sense. You can't get the cosine of a function. What we can do is express <span class="fixed">fn</span> as a composition of functions.</p>
+<p>右辺両側の <span class="fixed">x</span> を消すわけにはいきません。本体の <span class="fixed">x</span> の後ろに括弧があります。<span class="fixed">cos (max 50)</span> は意味をなしません。関数の cos なんて取れない。代わりにできるのは、<span class="fixed">fn</span> を関数合成で表現することです。</p>
 <pre name="code" class="haskell:hs">fn = ceiling . negate . tan . cos . max 50
 </pre>
-<p>Excellent! Many times, a point free style is more readable and 
-concise, because it makes you think about functions and what kind of 
-functions composing them results in instead of thinking about data and 
-how it's shuffled around. You can take simple functions and use 
-composition as glue to form more complex functions. However, many times,
- writing a function in point free style can be less readable if a 
-function is too complex. That's why making long chains of function 
-composition is discouraged, although I plead guilty of sometimes being 
-too composition-happy. The prefered style is to use <i>let</i> bindings 
-to give labels to intermediary results or split the problem into 
-sub-problems and then put it together so that the function makes sense 
-to someone reading it instead of just making a huge composition chain.</p>
-<p>In the section about maps and filters, we solved a problem of finding
- the sum of all odd squares that are smaller than 10,000. Here's what 
-the solution looks like when put into a function.</p>
+<p>素晴らしい！　ポイントフリースタイルは、データがどう動き回るかではなく、関数とそれを合成して何ができるかを考えさせるので、より読みやすく簡潔なことが多いです。シンプルな関数を糊（合成）でつなげて複雑な関数を作れます。ただし、関数が複雑すぎるとポイントフリーは読みにくくなることもあるので、長い合成チェーンは推奨されません。私自身もときどき合成しすぎてしまうので人のことは言えませんが。好ましいのは、<i>let</i> 束縛で中間結果にラベルを付けたり、問題をサブ問題に分けて組み合わせることで、巨大な合成チェーンではなく読み手にとって意味の通る関数にすることです。</p>
+<p>map と filter のセクションで、1 万未満の奇数の平方の総和を求めました。それを関数として書くとこうなります。</p>
 <pre name="code" class="haskell:hs">oddSquareSum :: Integer
-oddSquareSum = sum (takeWhile (&lt;10000) (filter odd (map (^2) [1..])))   
+oddSquareSum = sum (takeWhile (&lt;10000) (filter odd (map (^2) [1..])))
 </pre>
-<p>Being such a fan of function composition, I would have probably written that like this:</p>
+<p>関数合成大好き人間としては、私ならこう書くでしょう：</p>
 <pre name="code" class="haskell:hs">oddSquareSum :: Integer
 oddSquareSum = sum . takeWhile (&lt;10000) . filter odd . map (^2) $ [1..]
 </pre>
-<p>However, if there was a chance of someone else reading that code, I would have written it like this:</p>
+<p>でも他の人が読む可能性があるなら、こう書きます：</p>
 <pre name="code" class="haskell:hs">oddSquareSum :: Integer
-oddSquareSum = 
+oddSquareSum =
     let oddSquares = filter odd $ map (^2) [1..]
         belowLimit = takeWhile (&lt;10000) oddSquares
     in  sum belowLimit
 </pre>
-<p>It wouldn't win any code golf competition, but someone reading the 
-function will probably find it easier to read than a composition chain.</p>
+<p>コードゴルフでは勝てませんが、合成チェーンより読みやすいと感じる人が多いはずです。</p>
 
 </body>
 </html>
